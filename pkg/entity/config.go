@@ -1,6 +1,6 @@
 package entity
 
-type ExchangeConfig struct {
+type RangeConfig struct {
 	Id int64 `gorm:"type:bigserial;primaryKey;autoIncrement"`
 
 	Typo string `gorm:"size:32"`

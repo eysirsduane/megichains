@@ -7,6 +7,7 @@ import (
 	"megichains/apps/job/manager"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
+	"megichains/pkg/service"
 	"os"
 	"os/signal"
 	"syscall"
@@ -31,7 +32,8 @@ func main() {
 		panic(err)
 	}
 
-	bsc := keeps.NewBSCMonitor(db)
+	bscservice := service.NewBscService(db)
+	bsc := keeps.NewBSCMonitor(&cfg, bscservice)
 	mgr := manager.NewKeepManager([]func(){bsc.Monitor})
 	mgr.Start()
 

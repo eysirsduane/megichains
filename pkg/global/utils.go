@@ -6,16 +6,23 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func Amount(sun int64) (amount float64) {
+type AmountTypo int64
+
+const (
+	AmountTypoBsc AmountTypo = 1_000_000_000_000_000_000
+	AmountTypoSun AmountTypo = 1_000_000
+)
+
+func Amount(sun int64, typo AmountTypo) (amount float64) {
 	a := decimal.NewFromInt(sun)
-	b := decimal.NewFromFloat(1_000_000)
+	b := decimal.NewFromFloat(float64(typo))
 
 	return a.Div(b).InexactFloat64()
 }
 
-func Sun(amount float64) (sun int64) {
+func Sun(amount float64, typo AmountTypo) (sun int64) {
 	a := decimal.NewFromFloat(amount)
-	b := decimal.NewFromFloat(1_000_000)
+	b := decimal.NewFromFloat(float64(typo))
 	return a.Mul(b).IntPart()
 }
 

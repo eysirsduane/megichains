@@ -10,6 +10,7 @@ type Config struct {
 	Auth Auth
 	DB   DB
 	Tron Tron
+	Bsc  Bsc
 	Bot  Bot
 }
 
@@ -29,6 +30,14 @@ type DB struct {
 	Port     int16
 	Charset  string
 	Timezone string
+}
+
+type Bsc struct {
+	ChainId     uint16
+	GrpcNetwork string
+	ApiKey      string
+	USDTAddress string
+	USDCAddress string
 }
 
 type Tron struct {

@@ -40,7 +40,7 @@ func main() {
 	server := rest.MustNewServer(cfg.RestConf)
 	defer server.Stop()
 
-	excfgservice := service.NewExchangeConfigService(db)
+	excfgservice := service.NewRangeConfigService(db)
 	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
 	userservice := service.NewUserService(db)
 	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice)

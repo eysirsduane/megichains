@@ -10,12 +10,12 @@ import (
 
 type ServiceContext struct {
 	Config       global.Config
-	ExcfgService *service.ExchangeConfigService
+	ExcfgService *service.RangeConfigService
 	AuthService  *service.AuthService
 	UserService  *service.UserService
 }
 
-func NewServiceContext(c global.Config, excfg *service.ExchangeConfigService, auth *service.AuthService, user *service.UserService) *ServiceContext {
+func NewServiceContext(c global.Config, excfg *service.RangeConfigService, auth *service.AuthService, user *service.UserService) *ServiceContext {
 	return &ServiceContext{
 		Config:       c,
 		ExcfgService: excfg,

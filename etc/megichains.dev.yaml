@@ -7,7 +7,7 @@ Log:
   ServiceName: "megichains_service"
   Mode: console
   Path: "./logs"
-  KeepDays: 60
+  KeepDays: 30
   Stat: false
   TimeFormat: "2006-01-02 15:04:05"
 
@@ -26,6 +26,13 @@ DB:
   Name: megichains
   Charset: utf8mb4
   Timezone: UTC
+
+BSC:
+  ChainId: 56
+  GrpcNetwork: wss://bnb-testnet.g.alchemy.com/v2/
+  ApiKey: e9NHfWClRByVJCAgbZsq7   
+  USDTAddress: "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"
+  USDCAddress: "0x64544969ed7ebf5f083679233325356ebe738930"
 
 Tron:
   # Network: https://api.trongrid.io

@@ -1,0 +1,39 @@
+Name: megichains-prod
+Host: 0.0.0.0
+Port: 6666
+
+Log:
+  ServiceName: "megichains_service"
+  Mode: file
+  Path: "./logs"
+  KeepDays: 30
+  Stat: false
+  TimeFormat: "2006-01-02 15:04:05"
+
+Auth:
+  AccessSecret: "d:Dcjm39vmdf9JF)(#MCV;ldj39(VJM#:V939fkLVJK%&*)_3o03ke0dflmff9(FJDF:LKM#9f(FJ3:FP(DF*()))*jf))"
+  AccessExpire: 3600  
+  RefreshSecret: "vmdf9JF)(#MCV;ldj:Dcjm39vmdf9JF)(#MCV39(VJM#:V93VJK%&*)_3o03ke0dflmff9M#9f(FJ3:FP(fkLdk3&*k3!"
+  RefreshExpire: 604800
+  Issuer: www.baidu.com
+
+DB:
+  User: postgres
+  Password: "123456"
+  Host: db
+  Port: 5432
+  Name: megichains
+  Charset: utf8mb4
+  Timezone: UTC
+
+Tron:
+  GrpcNetwork: grpc://grpc.nile.trongrid.io:50051
+  HttpNetwork: https://nile.trongrid.io
+  Trx2UsdtRateApi: https://api.htx.com/market/detail?symbol=trxusdt
+  OwnerPrivateKey: ab09942dcabd1e1a6ced3e7002dcadcd244104dffa8884eb67cde035659ccf86
+  MonitorAddress: TD9ryFrcJd74nd24P7ToHjqjSfcaHqk92G
+  TRC20USDTAddress: TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf
+
+Bot:
+  Token: "8365546663:AAHzYZpB0KvwSguCNzLLYsR9DbtvMjrJSEg"
+  Service: "@eysirs2233"

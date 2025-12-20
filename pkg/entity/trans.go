@@ -1,8 +1,8 @@
 package entity
 
-type BscTransaction struct {
+type BscLog struct {
 	Id      int64  `gorm:"primaryKey;autoIncrement"`
-	ChainId uint16 `gorm:""`
+	ChainId uint64 `gorm:""`
 	TxHash  string `gorm:"size:255;uniqueIndex:idx_trans_index"`
 	Index   uint   `gorm:"uniqueIndex:idx_trans_index"`
 	TxIndex uint   `gorm:""`
@@ -17,7 +17,7 @@ type BscTransaction struct {
 	FromHex string `gorm:"size:255"`
 	ToHex   string `gorm:"size:255"`
 
-	Address        string `gorm:"size:255"`
+	Contract       string `gorm:"size:255"`
 	BlockHash      string `gorm:"size:255"`
 	BlockNumber    uint64 `gorm:""`
 	BlockTimestamp uint64 `gorm:""`

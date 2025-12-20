@@ -1,6 +1,6 @@
 package entity
 
-type DelegateOrder struct {
+type Order struct {
 	Id            int64  `gorm:"type:BIGSERIAL;primaryKey;autoIncrement"`
 	UserId        int64  `gorm:""`
 	TransactionId string `gorm:"size:255;uniqueIndex"`

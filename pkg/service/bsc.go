@@ -16,12 +16,20 @@ func NewBscService(db *gorm.DB) *BscService {
 	return &BscService{db: db}
 }
 
-func (s *BscService) SaveTransaction(trans *entity.BscTransaction) (err error) {
-	err = s.db.Create(trans).Error
+func (s *BscService) SaveLog(blog *entity.BscLog) (err error) {
+	err = s.db.Create(blog).Error
 	if err != nil {
 		logx.Errorf("db bsc service save transaction failed, err:%v", err)
 		err = biz.CodeParamsEmpty
 	}
 
+	return
+}
+func (s *BscService) CreateAddresses(addrs []*entity.Address) (err error) {
+	err = s.db.Create(addrs).Error
+	if err != nil {
+		logx.Errorf("db bsc service create address failed, err:%v", err)
+		err = biz.CodeParamsEmpty
+	}
 	return
 }

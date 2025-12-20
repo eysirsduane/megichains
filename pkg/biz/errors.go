@@ -40,4 +40,5 @@ var (
 	BscTransactionUpdateFailed    = NewSpecificError(4003, "BSC交易更新失败")
 	BscTransactionFindFailed      = NewSpecificError(4004, "BSC交易查询失败")
 	BscTransactionContractInvalid = NewSpecificError(4005, "BSC交易合约地址无效")
+	BscTransactionStatusInvalid   = NewSpecificError(4006, "BSC交易状态无效")
 )

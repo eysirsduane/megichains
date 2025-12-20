@@ -30,14 +30,14 @@ DB:
 BSC:
   ChainId: 56
   GrpcNetwork: wss://bnb-testnet.g.alchemy.com/v2/
-  ApiKey: e9NHfWClRByVJCAgbZsq7   
-  USDTAddress: "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"
-  USDCAddress: "0x64544969ed7ebf5f083679233325356ebe738930"
+  ApiKey: e9NHfWClRByVJCAgbZsq7 
+  ContractAddresses: 
+    - Address: "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"
+      Currency: "USDT"
+    - Address: "0x64544969ed7EBf5f083679233325356EbE738930"
+      Currency: "USDC"
 
 Tron:
-  # Network: https://api.trongrid.io
-  # GrpcNetwork: grpc://grpc.shasta.trongrid.io:50051
-  # HttpNetwork: https://api.shasta.trongrid.io
   GrpcNetwork: grpc://grpc.nile.trongrid.io:50051
   HttpNetwork: https://nile.trongrid.io
   Trx2UsdtRateApi: https://api.htx.com/market/detail?symbol=trxusdt

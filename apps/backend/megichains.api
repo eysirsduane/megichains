@@ -77,15 +77,15 @@ type UserInfoGetResp {
 	Username string `json:"username"`
 }
 
-type BscTransactionListReq {}
+type BscLogListReq {}
 
-type BscTransactionListResp {
-	Records []*BscTransactionItem
+type BscLogListResp {
+	Records []*BscLogItem
 	Total   int64
 	PagesBody
 }
 
-type BscTransactionItem {}
+type BscLogItem {}
 
 @server (
 	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
@@ -159,7 +159,7 @@ service megichains {
 	prefix: /v1
 )
 service megichains {
-	@handler BscTransactionListHandler
-	get /bsc/transaction/list (BscTransactionListReq) returns (BscTransactionListResp)
+	@handler BscLogListHandler
+	get /bsc/log/list (BscLogListReq) returns (BscLogListResp)
 }
 

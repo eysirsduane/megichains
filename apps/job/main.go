@@ -1,13 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"megichains/apps/job/keeps"
-	"megichains/apps/job/manager"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
 	"megichains/pkg/service"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -17,6 +19,7 @@ import (
 )
 
 var configFile = flag.String("f", "../../etc/megichains.dev.yaml", "the config file")
+var bsc *keeps.BSCMonitor
 
 func main() {
 	flag.Parse()
@@ -33,16 +36,102 @@ func main() {
 	}
 
 	bscservice := service.NewBscService(db)
-	bsc := keeps.NewBSCMonitor(&cfg, bscservice)
-	mgr := manager.NewKeepManager([]func(){bsc.Monitor})
-	mgr.Start()
+	addrservice := service.NewAddressService(db)
+	bsc = keeps.NewBSCMonitor(&cfg, bscservice, addrservice)
+	// mgr := manager.NewKeepManager([]func(){bsc.Monitor})
+	// mgr.Start()
+	// bsc.GenerateBSCAddress()
 
 	starting := "Starting job..."
 	fmt.Println(starting)
 	logx.Info(starting)
 
+	http.HandleFunc("/listen", listen)
+	http.HandleFunc("/listens", listens)
+	fmt.Println("HTTP 服务启动 7002...")
+	err = http.ListenAndServe(":7002", nil)
+	if err != nil {
+		fmt.Println("Error starting http server:", err)
+		panic(err)
+	}
+
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 	sig := <-sigchan
 	logx.Infof("收到信号:%s, 准备退出...", sig)
+}
+func listens(w http.ResponseWriter, r *http.Request) {
+	bsc.RangeListen()
+
+	fmt.Fprintf(w, "已启动批量监听")
+}
+
+func listen(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	bytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "读取请求体失败", http.StatusInternalServerError)
+		return
+	}
+	logx.Infof("收到 listen 请求, body:%s", string(bytes))
+
+	var req ListenRequest
+	err = json.Unmarshal(bytes, &req)
+	if err != nil {
+		http.Error(w, "解析请求体失败", http.StatusBadRequest)
+		return
+	}
+	if req.Chain == "" {
+		http.Error(w, "链不能为空", http.StatusBadRequest)
+		return
+	}
+	if req.Seconds > 3600 || req.Seconds <= 0 {
+		http.Error(w, "监听时间不合法", http.StatusBadRequest)
+		return
+	}
+	if req.Receiver == "" {
+		http.Error(w, "接收地址不能为空", http.StatusBadRequest)
+		return
+	}
+
+	switch req.Chain {
+	case "BSC":
+		exist := startBSCMonitor(&req)
+		if exist {
+			logx.Errorf("监听地址已存在, receiver:%s", req.Receiver)
+			fmt.Fprintf(w, "已存在监听地址, receiver:%s", req.Receiver)
+			return
+		}
+
+		fmt.Fprintf(w, "已启动监听, chain:%v, receiver:%s, seconds:%d", req.Chain, req.Receiver, req.Seconds)
+	default:
+		http.Error(w, "不支持的链类型", http.StatusBadRequest)
+		return
+	}
+}
+
+func startBSCMonitor(req *ListenRequest) (exist bool) {
+	bsc.Receivers.Range(func(key, val any) bool {
+		if key.(string) == req.Receiver {
+			logx.Infof("BSC 已存在监听地址, to:%v", req.Receiver)
+			exist = true
+			return false
+		}
+		return true
+	})
+
+	if exist {
+		return
+	}
+
+	go bsc.Listen(req.Receiver, req.Seconds)
+
+	return
+}
+
+type ListenRequest struct {
+	Chain    string `json:"chain"`
+	Receiver string `json:"receiver"`
+	Seconds  int64  `json:"seconds"`
 }

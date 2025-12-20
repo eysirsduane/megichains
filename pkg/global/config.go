@@ -7,10 +7,10 @@ import "github.com/zeromicro/go-zero/rest"
 
 type Config struct {
 	rest.RestConf
-	Auth Auth
-	DB   DB
-	Tron Tron
-	Bsc  Bsc
+	Auth *Auth
+	DB   *DB
+	Tron *Tron
+	Bsc  *Bsc
 	Bot  Bot
 }
 
@@ -33,11 +33,10 @@ type DB struct {
 }
 
 type Bsc struct {
-	ChainId     uint16
-	GrpcNetwork string
-	ApiKey      string
-	USDTAddress string
-	USDCAddress string
+	ChainId           uint16
+	GrpcNetwork       string
+	ApiKey            string
+	ContractAddresses []*ContractAddress
 }
 
 type Tron struct {
@@ -54,4 +53,9 @@ type Tron struct {
 type Bot struct {
 	Token   string
 	Service string
+}
+
+type ContractAddress struct {
+	Address  string
+	Currency string
 }

@@ -1,0 +1,119 @@
+# yaml 配置实例
+services:
+  # frontadmin:
+  #   # image: eysirsduane/megitron-frontadmin:latest
+  #   image: eysirsduane/megitron-frontadmin:mac
+  #   restart: always
+  #   environment:
+  #     DB_HOST: db
+  #     DB_PORT: 5432
+  #     DB_USER: postgres
+  #     DB_PASSWORD: 123456
+  #     DB_NAME: megitron
+  #     DB_CHARSET: utf8mb4
+  #     DB_TIMEZONE: UTC
+  #   ports:
+  #     - 8888
+  #   depends_on:
+  #     backend:
+  #       condition: service_healthy
+  #   volumes:
+  #     - /Users/eysirs/logs:/app/logs
+  #     - /Users/eysirs/workspace/megitron/etc:/app/etc
+  
+  # telegram:
+  #   image: eysirsduane/megitron-telegram:mac
+  #   restart: always
+  #   environment:
+  #     DB_HOST: db
+  #     DB_PORT: 5432
+  #     DB_USER: postgres
+  #     DB_PASSWORD: 123456
+  #     DB_NAME: megitron
+  #     DB_CHARSET: utf8mb4
+  #     DB_TIMEZONE: UTC
+  #   ports:
+  #     - 7777
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   volumes:
+  #     - /Users/eysirs/logs:/app/logs
+  #     - /Users/eysirs/workspace/megitron/etc:/app/etc
+
+  # backend:
+  #   # image: eysirsduane/megitron-web:latest
+  #   image: eysirsduane/megitron-backend:mac
+  #   restart: always
+  #   environment:
+  #     DB_HOST: db
+  #     DB_PORT: 5432
+  #     DB_USER: postgres
+  #     DB_PASSWORD: 123456
+  #     DB_NAME: megitron
+  #     DB_CHARSET: utf8mb4
+  #     DB_TIMEZONE: UTC
+  #   ports:
+  #     - 6666
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   volumes:
+  #     - /Users/eysirs/logs:/app/logs
+  #     - /Users/eysirs/workspace/megitron/etc:/app/etc
+  #     # - /home/test/logs:/app/logs
+
+  job:
+    # image: eysirsduane/megitron-web:latest
+    image: eysirsduane/megitron-job:mac
+    restart: always
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: 123456
+      DB_NAME: megitron
+      DB_CHARSET: utf8mb4
+      DB_TIMEZONE: UTC
+    ports:
+      - 5555
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - /Users/eysirs/logs:/app/logs
+      - /Users/eysirs/workspace/megitron/etc:/app/etc
+
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80" #
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro 
+      - ./html:/usr/share/nginx/html:ro 
+    depends_on:
+      - job
+
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: megitron
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d megitron']
+      interval: 3s
+      retries: 5
+      start_period: 20s
+    volumes:
+      - type: bind
+        # source: /home/test/database/postgresql
+        source: /Users/eysirs/database/postgresql
+        target: /var/lib/postgresql
+
+volumes:
+  volume-postgresql:

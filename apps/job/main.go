@@ -69,29 +69,38 @@ func listens(w http.ResponseWriter, r *http.Request) {
 func listen(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
+	resp := &ResponseMessage{
+		Code:    500,
+		Message: "",
+	}
+
 	bytes, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "读取请求体失败", http.StatusInternalServerError)
+		resp.Message = "读取请求体失败"
+		returnError(w, resp)
 		return
 	}
-	logx.Infof("收到 listen 请求, body:%s", string(bytes))
 
 	var req ListenRequest
 	err = json.Unmarshal(bytes, &req)
 	if err != nil {
-		http.Error(w, "解析请求体失败", http.StatusBadRequest)
+		resp.Message = "解析请求体失败"
+		returnError(w, resp)
 		return
 	}
 	if req.Chain == "" {
-		http.Error(w, "链不能为空", http.StatusBadRequest)
+		resp.Message = "链不能为空"
+		returnError(w, resp)
 		return
 	}
 	if req.Seconds > 3600 || req.Seconds <= 0 {
-		http.Error(w, "监听时间不合法", http.StatusBadRequest)
+		resp.Message = "监听时间不合法"
+		returnError(w, resp)
 		return
 	}
 	if req.Receiver == "" {
-		http.Error(w, "接收地址不能为空", http.StatusBadRequest)
+		resp.Message = "接收地址不能为空"
+		returnError(w, resp)
 		return
 	}
 
@@ -100,15 +109,30 @@ func listen(w http.ResponseWriter, r *http.Request) {
 		exist := startBSCMonitor(&req)
 		if exist {
 			logx.Errorf("监听地址已存在, receiver:%s", req.Receiver)
-			fmt.Fprintf(w, "已存在监听地址, receiver:%s", req.Receiver)
+			resp.Message = "监听地址已存在"
+			returnError(w, resp)
 			return
 		}
-
-		fmt.Fprintf(w, "已启动监听, chain:%v, receiver:%s, seconds:%d", req.Chain, req.Receiver, req.Seconds)
 	default:
-		http.Error(w, "不支持的链类型", http.StatusBadRequest)
+		resp.Message = "不支持的链类型"
+		returnError(w, resp)
 		return
 	}
+
+	resp.Code = 0
+	resp.Message = fmt.Sprintf("监听启动成功, chain:%v, receiver:%s", req.Chain, req.Receiver)
+
+	byts, _ := json.Marshal(resp)
+	fmt.Fprint(w, string(byts))
+}
+
+func returnError(w http.ResponseWriter, resp *ResponseMessage) {
+	byts, err := json.Marshal(resp)
+	if err != nil {
+		return
+	}
+
+	http.Error(w, string(byts), http.StatusInternalServerError)
 }
 
 func startBSCMonitor(req *ListenRequest) (exist bool) {
@@ -128,6 +152,11 @@ func startBSCMonitor(req *ListenRequest) (exist bool) {
 	go bsc.Listen(req.Receiver, req.Seconds)
 
 	return
+}
+
+type ResponseMessage struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 type ListenRequest struct {

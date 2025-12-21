@@ -19,7 +19,7 @@ import (
 )
 
 var configFile = flag.String("f", "../../etc/megichains.dev.yaml", "the config file")
-var bsc *keeps.BSCMonitor
+var eth *keeps.ETHMonitor
 
 func main() {
 	flag.Parse()
@@ -35,12 +35,9 @@ func main() {
 		panic(err)
 	}
 
-	bscservice := service.NewBscService(db)
+	ethservice := service.NewEthService(db)
 	addrservice := service.NewAddressService(db)
-	bsc = keeps.NewBSCMonitor(&cfg, bscservice, addrservice)
-	// mgr := manager.NewKeepManager([]func(){bsc.Monitor})
-	// mgr.Start()
-	// bsc.GenerateBSCAddress()
+	eth = keeps.NewETHMonitor(&cfg, ethservice, addrservice)
 
 	starting := "Starting job..."
 	fmt.Println(starting)
@@ -61,7 +58,7 @@ func main() {
 	logx.Infof("收到信号:%s, 准备退出...", sig)
 }
 func listens(w http.ResponseWriter, r *http.Request) {
-	bsc.RangeListen()
+	eth.RangeListen()
 
 	fmt.Fprintf(w, "已启动批量监听")
 }
@@ -104,17 +101,10 @@ func listen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	switch req.Chain {
-	case "BSC":
-		exist := startBSCMonitor(&req)
-		if exist {
-			logx.Errorf("监听地址已存在, receiver:%s", req.Receiver)
-			resp.Message = "监听地址已存在"
-			returnError(w, resp)
-			return
-		}
-	default:
-		resp.Message = "不支持的链类型"
+	exist := startETHMonitor(global.ChainName(req.Chain), &req)
+	if exist {
+		logx.Errorf("监听地址已存在, receiver:%s", req.Receiver)
+		resp.Message = "监听地址已存在"
 		returnError(w, resp)
 		return
 	}
@@ -135,10 +125,10 @@ func returnError(w http.ResponseWriter, resp *ResponseMessage) {
 	http.Error(w, string(byts), http.StatusInternalServerError)
 }
 
-func startBSCMonitor(req *ListenRequest) (exist bool) {
-	bsc.Receivers.Range(func(key, val any) bool {
+func startETHMonitor(chain global.ChainName, req *ListenRequest) (exist bool) {
+	eth.Receivers.Range(func(key, val any) bool {
 		if key.(string) == req.Receiver {
-			logx.Infof("BSC 已存在监听地址, to:%v", req.Receiver)
+			logx.Infof("ETH 已存在监听地址, to:%v", req.Receiver)
 			exist = true
 			return false
 		}
@@ -149,7 +139,7 @@ func startBSCMonitor(req *ListenRequest) (exist bool) {
 		return
 	}
 
-	go bsc.Listen(req.Receiver, req.Seconds)
+	go eth.Listen(chain, req.MerchId, req.Receiver, req.Seconds-3)
 
 	return
 }
@@ -160,6 +150,7 @@ type ResponseMessage struct {
 }
 
 type ListenRequest struct {
+	MerchId  string `json:"merch_id"`
 	Chain    string `json:"chain"`
 	Receiver string `json:"receiver"`
 	Seconds  int64  `json:"seconds"`

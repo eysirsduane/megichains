@@ -41,4 +41,16 @@ var (
 	BscTransactionFindFailed      = NewSpecificError(4004, "BSC交易查询失败")
 	BscTransactionContractInvalid = NewSpecificError(4005, "BSC交易合约地址无效")
 	BscTransactionStatusInvalid   = NewSpecificError(4006, "BSC交易状态无效")
+	BscOrderSaveFailed            = NewSpecificError(4007, "BSC订单保存失败")
+)
+
+var (
+	//Exchange Bill
+	EthTransactionSaveFailed      = NewSpecificError(4001, "ETH交易失败")
+	EthTransactionDeleteFailed    = NewSpecificError(4002, "ETH交易删除失败")
+	EthTransactionUpdateFailed    = NewSpecificError(4003, "ETH交易更新失败")
+	EthTransactionFindFailed      = NewSpecificError(4004, "ETH交易查询失败")
+	EthTransactionContractInvalid = NewSpecificError(4005, "ETH交易合约地址无效")
+	EthTransactionStatusInvalid   = NewSpecificError(4006, "ETH交易状态无效")
+	EthOrderSaveFailed            = NewSpecificError(4007, "ETH订单保存失败")
 )

@@ -17,6 +17,14 @@ const (
 	TronTransactionTypoDelegateResourceContract string = "DelegateResourceContract"
 )
 
+type ChainName string
+
+const (
+	ChainNameTron ChainName = "TRON"
+	ChainNameEth  ChainName = "ETH"
+	ChainNameBsc  ChainName = "BSC"
+)
+
 type CurrenyTypo string
 
 const (

@@ -4,7 +4,7 @@ Port: 6666
 
 Log:
   ServiceName: "megichains_service"
-  Mode: file
+  Mode: console
   Path: "./logs"
   KeepDays: 30
   Stat: false
@@ -20,11 +20,21 @@ Auth:
 DB:
   User: postgres
   Password: "123456"
-  Host: db
+  Host: 127.0.0.1
   Port: 5432
   Name: megichains
   Charset: utf8mb4
   Timezone: UTC
+
+BSC:
+  ChainId: 56
+  GrpcNetwork: wss://bnb-testnet.g.alchemy.com/v2/
+  ApiKey: e9NHfWClRByVJCAgbZsq7 
+  ContractAddresses: 
+    - Address: "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"
+      Currency: "USDT"
+    - Address: "0x64544969ed7EBf5f083679233325356EbE738930"
+      Currency: "USDC"
 
 Tron:
   GrpcNetwork: grpc://grpc.nile.trongrid.io:50051

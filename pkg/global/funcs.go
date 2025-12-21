@@ -1,7 +1,9 @@
 package global
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"math"
 	"megichains/pkg/biz"
@@ -87,7 +89,7 @@ func GenerateToken(uid int64, username string, secret string, expire int64, issu
 
 func GenerateRefreshToken(uid int64, username string, secret string, expire int64, issuer string) (token string, err error) {
 	claims := Claims{
-		UserID: uid,
+		UserID:   uid,
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(expire))),
@@ -123,4 +125,31 @@ func HashPassword(pwd string) (hash string, err error) {
 func CheckPassword(hash, pwd string) (ok bool) {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(pwd))
 	return err == nil
+}
+
+func NotifyEPay(url, merchOrderId, fromHex, toHex, currency string, receivedAmount float64) (err error) {
+	req := EPayRequest{
+		MerchOrderId: merchOrderId,
+		FromHex:      fromHex,
+		ToHex:        toHex,
+		Amount:       receivedAmount,
+		Currency:     currency,
+	}
+
+	byts, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	resp, err := http.Post(url, "application/json", bytes.NewReader(byts))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("notify epay service failed, status code:%v", resp.StatusCode)
+	}
+
+	return
 }

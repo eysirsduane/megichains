@@ -7,11 +7,14 @@ import "github.com/zeromicro/go-zero/rest"
 
 type Config struct {
 	rest.RestConf
-	Auth *Auth
-	DB   *DB
-	Tron *Tron
-	Bsc  *Bsc
-	Bot  Bot
+	Auth            *Auth
+	DB              *DB
+	EPay            *EPay
+	Tron            *Tron
+	Eth             *Eth
+	Bsc             *Bsc
+	Bot             Bot
+	ContractAddresses []*ContractAddress
 }
 
 type Auth struct {
@@ -32,11 +35,20 @@ type DB struct {
 	Timezone string
 }
 
+type EPay struct {
+	NotifyUrl string
+}
+
+type Eth struct {
+	ChainId     uint16
+	GrpcNetwork string
+	ApiKey      string
+}
+
 type Bsc struct {
-	ChainId           uint16
-	GrpcNetwork       string
-	ApiKey            string
-	ContractAddresses []*ContractAddress
+	ChainId     uint16
+	GrpcNetwork string
+	ApiKey      string
 }
 
 type Tron struct {
@@ -56,6 +68,15 @@ type Bot struct {
 }
 
 type ContractAddress struct {
+	Chain    string
 	Address  string
 	Currency string
+}
+
+type EPayRequest struct {
+	MerchOrderId string  `json:"merch_order_id"`
+	FromHex      string  `json:"from_hex"`
+	ToHex        string  `json:"to_hex"`
+	Amount       float64 `json:"amount"`
+	Currency     string  `json:"currency"`
 }

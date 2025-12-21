@@ -66,7 +66,7 @@ func (m *ETHMonitor) newClient(chain global.ChainName) (client *ethclient.Client
 
 	client, err = ethclient.Dial(port)
 	if err != nil {
-		logx.Errorf("chain Dial 失败 err:%v", err)
+		logx.Errorf("EVM chain Dial 失败 err:%v", err)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (m *ETHMonitor) newClient(chain global.ChainName) (client *ethclient.Client
 
 func (m *ETHMonitor) RangeListen() {
 	type ListenRequest struct {
-		Chain    string `json:"chain"`
+		Chain    string `json:"EVM chain"`
 		Receiver string `json:"receiver"`
 		Seconds  int64  `json:"seconds"`
 	}
@@ -83,34 +83,34 @@ func (m *ETHMonitor) RangeListen() {
 	for i := 1; i <= 1000; i++ {
 		addr, err := m.addrservice.GetAddress(int64(i))
 		if err != nil {
-			logx.Errorf("chain 获取监听地址失败, err:%v", err)
+			logx.Errorf("EVM chain 获取监听地址失败, err:%v", err)
 			return
 		}
 		req := &ListenRequest{}
-		req.Chain = "chain"
+		req.Chain = "EVM chain"
 		req.Receiver = addr.AddressHex
 		req.Seconds = 1800
 
 		bs, err := json.Marshal(req)
 		if err != nil {
-			logx.Errorf("chain 监听请求序列化失败, err:%v", err)
+			logx.Errorf("EVM chain 监听请求序列化失败, err:%v", err)
 			return
 		}
 
 		resp, err := http.Post("http://127.0.0.1:7002/listen", "application/json", bytes.NewReader(bs))
 		if err != nil {
-			logx.Errorf("chain 发送监听请求失败, err:%v", err)
+			logx.Errorf("EVM chain 发送监听请求失败, err:%v", err)
 			return
 		}
 		defer resp.Body.Close()
 
 		respBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
-			logx.Errorf("chain 读取监听响应失败, err:%v", err)
+			logx.Errorf("EVM chain 读取监听响应失败, err:%v", err)
 			return
 		}
 
-		logx.Infof("chain 发送监听请求成功, resp:%s", string(respBytes))
+		logx.Infof("EVM chain 发送监听请求成功, resp:%s", string(respBytes))
 
 		time.Sleep(200 * time.Millisecond)
 	}
@@ -143,7 +143,7 @@ func (m *ETHMonitor) Listen(chain global.ChainName, oid string, receiver string,
 			if m.clilen < MonitorClientCount {
 				client, err := m.newClient(chain)
 				if err != nil {
-					logx.Errorf("chain Dial 失败, 尝试重连 err:%v", err)
+					logx.Errorf("EVM chain Dial 失败, 尝试重连 err:%v", err)
 					continue
 				}
 				name := uuid.NewString()
@@ -153,10 +153,10 @@ func (m *ETHMonitor) Listen(chain global.ChainName, oid string, receiver string,
 				item.Client = client
 				m.clients.Store(name, item)
 				m.clilen++
-				logx.Infof("chain 新增客户端, cname:%v, clen:%v", name, m.clilen)
+				logx.Infof("EVM chain 新增客户端, cname:%v, clen:%v", name, m.clilen)
 				break
 			} else {
-				logx.Errorf("chain 最大客户端已达到上限")
+				logx.Errorf("EVM chain 最大客户端已达到上限")
 				return
 			}
 		}
@@ -197,7 +197,7 @@ func (m *ETHMonitor) Listen(chain global.ChainName, oid string, receiver string,
 	logs := make(chan types.Log)
 	sub, err := item.Client.SubscribeFilterLogs(context.Background(), query, logs)
 	if err != nil {
-		logx.Errorf("chain 订阅失败:%v", err)
+		logx.Errorf("EVM chain 订阅失败:%v", err)
 		return
 	}
 
@@ -212,20 +212,20 @@ func (m *ETHMonitor) Listen(chain global.ChainName, oid string, receiver string,
 		order.Chain = string(chain)
 		err = m.saveOrder(order)
 		if err != nil {
-			logx.Errorf("chain 保存日志失败, txid:%v, err:%v", order.TxHash, err)
+			logx.Errorf("EVM chain 保存日志失败, txid:%v, err:%v", order.TxHash, err)
 		}
 
 		logx.Infof("🎉🎉🎉 chain 收到转账, [%v]:[%v], from:%v, to:%v", order.Currency, order.ReceivedAmount, order.FromHex, order.ToHex)
 
 		err = global.NotifyEPay(m.cfg.EPay.NotifyUrl, order.MerchOrderId, order.FromHex, order.ToHex, order.Currency, order.ReceivedAmount)
 		if err != nil {
-			logx.Errorf("chain 通知支付失败, moid:%v, txid:%v, err:%v", oid, order.TxHash, err)
+			logx.Errorf("EVM chain 通知支付失败, moid:%v, txid:%v, err:%v", oid, order.TxHash, err)
 			continue
 		}
 
 	}
 
-	logx.Infof("chain 事务结束, clen:%v, from:%v", m.clilen, receiver)
+	logx.Infof("EVM chain 事务结束, clen:%v, from:%v", m.clilen, receiver)
 }
 
 func (m *ETHMonitor) GenerateETHAddress() {
@@ -249,12 +249,12 @@ func (m *ETHMonitor) GenerateETHAddress() {
 		address := crypto.PubkeyToAddress(*publicKeyECDSA).Hex()
 
 		addr := &entity.Address{
-			Chain:       "chain",
+			Chain:       "EVM chain",
 			Typo:        "KEEP",
 			Status:      "ACTIVE",
 			AddressHex:  address,
 			Secrect:     privateKeyHex,
-			Description: fmt.Sprintf("chain KEEP 地址 %d", i+1),
+			Description: fmt.Sprintf("EVM chain KEEP 地址 %d", i+1),
 		}
 		addrs = append(addrs, addr)
 	}
@@ -270,7 +270,7 @@ func (m *ETHMonitor) clearClients() {
 			cli.Client.Close()
 			m.clients.Delete(key)
 			m.clilen--
-			logx.Infof("chain 删除客户端, cname:%v, clen:%v", cli.Name, m.clilen)
+			logx.Infof("EVM chain 删除客户端, cname:%v, clen:%v", cli.Name, m.clilen)
 		}
 
 		return true
@@ -279,32 +279,32 @@ func (m *ETHMonitor) clearClients() {
 }
 
 func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EthOrder, sub ethereum.Subscription, logs chan types.Log, receiver string) {
-	logx.Infof("chain 实时状态开始, cname:%v, count:%v", m.Name, m.RunningQueryCount)
+	logx.Infof("EVM chain 实时状态开始, cname:%v, count:%v", m.Name, m.RunningQueryCount)
 	defer func() {
 		sub.Unsubscribe()
 		close(logs)
 		close(ichan)
 		m.RunningQueryCount--
 
-		logx.Infof("chain 实时状态结束, unsub and close chans, cname:%v, count:%v", m.Name, m.RunningQueryCount)
+		logx.Infof("EVM chain 实时状态结束, unsub and close chans, cname:%v, count:%v", m.Name, m.RunningQueryCount)
 	}()
 
 	for {
 		select {
 		case <-ctx.Done():
-			logx.Infof("chain 订阅超时, 已退出单笔订阅, to:%v", receiver)
+			logx.Infof("EVM chain 订阅超时, 已退出单笔订阅, to:%v", receiver)
 			return
 		case err := <-sub.Err():
-			logx.Errorf("chain 订阅错误, 已退出单笔订阅, to:%v, err:%v", receiver, err)
+			logx.Errorf("EVM chain 订阅错误, 已退出单笔订阅, to:%v, err:%v", receiver, err)
 			return
 		case log := <-logs:
 			receipt, err1 := m.Client.TransactionReceipt(context.Background(), log.TxHash)
 			if err1 != nil {
-				logx.Errorf("chain 获取交易回执失败: %s: %v", log.TxHash, err1)
+				logx.Errorf("EVM chain 获取交易回执失败: %s: %v", log.TxHash, err1)
 				return
 			}
 			if receipt.Status != 1 {
-				logx.Errorf("chain 交易回执状态不为1, 可能已经挂起, txid:%s ", log.TxHash.String())
+				logx.Errorf("EVM chain 交易回执状态不为1, 可能已经挂起, txid:%s ", log.TxHash.String())
 				return
 			}
 
@@ -312,13 +312,13 @@ func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EthOrder, su
 			if receiver == to {
 				block, err := m.Client.BlockByNumber(context.Background(), big.NewInt(int64(log.BlockNumber)))
 				if err != nil {
-					logx.Errorf("chain log获取区块失败, txid:%v, err:%v", log.TxHash.String(), err)
+					logx.Errorf("EVM chain log获取区块失败, txid:%v, err:%v", log.TxHash.String(), err)
 					return
 				}
 
 				cid, err := m.Client.ChainID(context.Background())
 				if err != nil {
-					logx.Errorf("chain 获取链ID失败, txid:%v, err:%v", log.TxHash.String(), err)
+					logx.Errorf("EVM chain 获取链ID失败, txid:%v, err:%v", log.TxHash.String(), err)
 					return
 				}
 
@@ -337,7 +337,7 @@ func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EthOrder, su
 					}
 				}
 
-				blog := &entity.EthOrder{
+				order := &entity.EthOrder{
 					Typo:           string(global.BscTransactionTypoIn),
 					Status:         string(global.BscTransactionStatusSuccess),
 					Currency:       string(currency),
@@ -357,7 +357,7 @@ func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EthOrder, su
 					Description:    "",
 				}
 
-				ichan <- blog
+				ichan <- order
 			}
 
 			return
@@ -368,7 +368,7 @@ func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EthOrder, su
 func (m *ETHMonitor) saveOrder(order *entity.EthOrder) (err error) {
 	err = m.ethservice.SaveLog(order)
 	if err != nil {
-		logx.Errorf("chain 记录转账交易失败: err:%v \n", err)
+		logx.Errorf("EVM chain 记录转账交易失败: err:%v \n", err)
 		return
 	}
 

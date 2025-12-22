@@ -1,15 +1,15 @@
 # yaml 配置实例
 services:
   # frontadmin:
-  #   # image: eysirsduane/megitron-frontadmin:latest
-  #   image: eysirsduane/megitron-frontadmin:mac
+  #   # image: eysirsduane/megichains-frontadmin:latest
+  #   image: eysirsduane/megichains-frontadmin:mac
   #   restart: always
   #   environment:
   #     DB_HOST: db
   #     DB_PORT: 5432
   #     DB_USER: postgres
   #     DB_PASSWORD: 123456
-  #     DB_NAME: megitron
+  #     DB_NAME: megichains
   #     DB_CHARSET: utf8mb4
   #     DB_TIMEZONE: UTC
   #   ports:
@@ -19,17 +19,17 @@ services:
   #       condition: service_healthy
   #   volumes:
   #     - /Users/eysirs/logs:/app/logs
-  #     - /Users/eysirs/workspace/megitron/etc:/app/etc
+  #     - /Users/eysirs/workspace/megichains/etc:/app/etc
   
   # telegram:
-  #   image: eysirsduane/megitron-telegram:mac
+  #   image: eysirsduane/megichains-telegram:mac
   #   restart: always
   #   environment:
   #     DB_HOST: db
   #     DB_PORT: 5432
   #     DB_USER: postgres
   #     DB_PASSWORD: 123456
-  #     DB_NAME: megitron
+  #     DB_NAME: megichains
   #     DB_CHARSET: utf8mb4
   #     DB_TIMEZONE: UTC
   #   ports:
@@ -39,18 +39,18 @@ services:
   #       condition: service_healthy
   #   volumes:
   #     - /Users/eysirs/logs:/app/logs
-  #     - /Users/eysirs/workspace/megitron/etc:/app/etc
+  #     - /Users/eysirs/workspace/megichains/etc:/app/etc
 
   # backend:
-  #   # image: eysirsduane/megitron-web:latest
-  #   image: eysirsduane/megitron-backend:mac
+  #   # image: eysirsduane/megichains-web:latest
+  #   image: eysirsduane/megichains-backend:mac
   #   restart: always
   #   environment:
   #     DB_HOST: db
   #     DB_PORT: 5432
   #     DB_USER: postgres
   #     DB_PASSWORD: 123456
-  #     DB_NAME: megitron
+  #     DB_NAME: megichains
   #     DB_CHARSET: utf8mb4
   #     DB_TIMEZONE: UTC
   #   ports:
@@ -60,29 +60,29 @@ services:
   #       condition: service_healthy
   #   volumes:
   #     - /Users/eysirs/logs:/app/logs
-  #     - /Users/eysirs/workspace/megitron/etc:/app/etc
+  #     - /Users/eysirs/workspace/megichains/etc:/app/etc
   #     # - /home/test/logs:/app/logs
 
   job:
-    # image: eysirsduane/megitron-web:latest
-    image: eysirsduane/megitron-job:mac
+    # image: eysirsduane/megichains-web:latest
+    image: eysirsduane/megichains-job:mac
     restart: always
     environment:
       DB_HOST: db
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: 123456
-      DB_NAME: megitron
+      DB_NAME: megichains
       DB_CHARSET: utf8mb4
       DB_TIMEZONE: UTC
     ports:
-      - 5555
+      - 7002:7002
     depends_on:
       db:
         condition: service_healthy
     volumes:
-      - /home/test/megichains:/app/logs
-      - /home/test/megichains/etc:/app/etc
+      - /Users/eysirsduane/logs:/app/logs
+      - /Users/eysirsduane/etc:/app/etc
 
   # nginx:
   #   image: nginx:latest
@@ -96,23 +96,23 @@ services:
   #     - job
 
   db:
-    image: postgres:latest
+    image: postgres:alpine3.23
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: megitron
+      POSTGRES_DB: megichains
     ports:
       - 5432:5432
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d megitron']
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d megichains']
       interval: 3s
       retries: 5
       start_period: 20s
     volumes:
       - type: bind
         # source: /home/test/database/postgresql
-        source: /home/test/megichains/postgresql
+        source: /Users/eysirsduane/database/postgresql
         target: /var/lib/postgresql
 
 volumes:

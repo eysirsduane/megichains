@@ -298,14 +298,37 @@ func (m *ClientItem) listen(ctx context.Context, chain global.ChainName, ichan c
 			logx.Errorf("EVM chain 订阅错误, 已退出单笔订阅, to:%v, err:%v", receiver, err)
 			return
 		case log := <-logs:
-			receipt, err1 := m.Client.TransactionReceipt(context.Background(), log.TxHash)
-			if err1 != nil {
-				logx.Errorf("EVM chain 获取交易回执失败: %s: %v", log.TxHash, err1)
-				return
-			}
-			if receipt.Status != 1 {
-				logx.Errorf("EVM chain 交易回执状态不为1, 可能已经挂起, txid:%s ", log.TxHash.String())
-				return
+			// for i := 0; i < 5; i++ {
+			// 	receipt, err1 := m.Client.TransactionReceipt(context.Background(), log.TxHash)
+			// 	if err1 != nil {
+			// 		logx.Errorf("EVM chain 获取交易回执失败: %s: %v", log.TxHash, err1)
+			// 		continue
+			// 	}
+			// 	if receipt.Status != 1 {
+			// 		logx.Errorf("EVM chain 交易回执状态不为1, 可能已经挂起, txid:%s ", log.TxHash.String())
+			// 		continue
+			// 	}
+			// }
+			round := 0
+			for {
+				curblock, err1 := m.Client.BlockByNumber(context.Background(), nil)
+				if err1 != nil {
+					logx.Errorf("EVM chain 获取最新区块发生错误, err:%v", err1)
+					time.Sleep(time.Second * 3)
+					continue
+				}
+				if curblock.NumberU64()-log.BlockNumber > 7 {
+					break
+				} else {
+					time.Sleep(time.Second * 3)
+				}
+
+				if round > 10 {
+					logx.Errorf("EVM 经过11轮比较区块高度后还未稳定, 所以认为本次交易失败...!")
+					return
+				}
+
+				round++
 			}
 
 			to := common.HexToAddress(log.Topics[2].Hex()).Hex()

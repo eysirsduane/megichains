@@ -44,7 +44,7 @@ func main() {
 	logx.Info(starting)
 
 	http.HandleFunc("/listen", listen)
-	http.HandleFunc("/listens", listens)
+	// http.HandleFunc("/listens", listens)
 	fmt.Println("HTTP 服务启动 7002...")
 	err = http.ListenAndServe(":7002", nil)
 	if err != nil {

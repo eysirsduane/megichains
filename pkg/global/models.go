@@ -7,13 +7,13 @@ import "github.com/zeromicro/go-zero/rest"
 
 type Config struct {
 	rest.RestConf
-	Auth            *Auth
-	DB              *DB
-	EPay            *EPay
-	Tron            *Tron
-	Eth             *Eth
-	Bsc             *Bsc
-	Bot             Bot
+	Auth              *Auth
+	DB                *DB
+	EPay              *EPay
+	Tron              *Tron
+	Eth               *Eth
+	Bsc               *Bsc
+	Bot               *Bot
 	ContractAddresses []*ContractAddress
 }
 

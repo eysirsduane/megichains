@@ -19,7 +19,7 @@ import (
 )
 
 var configFile = flag.String("f", "../../etc/megichains.dev.yaml", "the config file")
-var eth *keeps.ETHMonitor
+var evm *keeps.EvmMonitor
 
 func main() {
 	flag.Parse()
@@ -35,9 +35,9 @@ func main() {
 		panic(err)
 	}
 
-	ethservice := service.NewEthService(db)
+	ethservice := service.NewEvmService(db)
 	addrservice := service.NewAddressService(db)
-	eth = keeps.NewETHMonitor(&cfg, ethservice, addrservice)
+	evm = keeps.NewEvmMonitor(&cfg, ethservice, addrservice)
 
 	starting := "Starting job..."
 	fmt.Println(starting)
@@ -58,7 +58,7 @@ func main() {
 	logx.Infof("收到信号:%s, 准备退出...", sig)
 }
 func listens(w http.ResponseWriter, r *http.Request) {
-	eth.RangeListen()
+	evm.RangeListen()
 
 	fmt.Fprintf(w, "已启动批量监听")
 }
@@ -85,6 +85,10 @@ func listen(w http.ResponseWriter, r *http.Request) {
 		returnError(w, resp)
 		return
 	}
+	if req.MerchOrderId == "" {
+		resp.Message = "订单号不能为空"
+		returnError(w, resp)
+	}
 	if req.Chain == "" {
 		resp.Message = "链不能为空"
 		returnError(w, resp)
@@ -101,7 +105,7 @@ func listen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exist := startETHMonitor(global.ChainName(req.Chain), &req)
+	exist := startEvmMonitor(global.ChainName(req.Chain), &req)
 	if exist {
 		logx.Errorf("监听地址已存在, receiver:%s", req.Receiver)
 		resp.Message = "监听地址已存在"
@@ -125,8 +129,8 @@ func returnError(w http.ResponseWriter, resp *ResponseMessage) {
 	http.Error(w, string(byts), http.StatusInternalServerError)
 }
 
-func startETHMonitor(chain global.ChainName, req *ListenRequest) (exist bool) {
-	eth.Receivers.Range(func(key, val any) bool {
+func startEvmMonitor(chain global.ChainName, req *ListenRequest) (exist bool) {
+	evm.Receivers.Range(func(key, val any) bool {
 		if key.(string) == req.Receiver {
 			logx.Infof("ETH 已存在监听地址, to:%v", req.Receiver)
 			exist = true
@@ -139,7 +143,7 @@ func startETHMonitor(chain global.ChainName, req *ListenRequest) (exist bool) {
 		return
 	}
 
-	go eth.Listen(chain, req.MerchId, req.Receiver, req.Seconds-3)
+	go evm.Listen(chain, req.MerchOrderId, req.Receiver, req.Seconds-3)
 
 	return
 }
@@ -150,8 +154,8 @@ type ResponseMessage struct {
 }
 
 type ListenRequest struct {
-	MerchId  string `json:"merch_id"`
-	Chain    string `json:"chain"`
-	Receiver string `json:"receiver"`
-	Seconds  int64  `json:"seconds"`
+	MerchOrderId string `json:"merch_order_id"`
+	Chain        string `json:"chain"`
+	Receiver     string `json:"receiver"`
+	Seconds      int64  `json:"seconds"`
 }

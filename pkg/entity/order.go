@@ -1,6 +1,6 @@
 package entity
 
-type EthOrder struct {
+type EvmOrder struct {
 	Id           int64  `gorm:"primaryKey;autoIncrement"`
 	ChainId      uint64 `gorm:""`
 	Chain        string `gorm:"size:15"`

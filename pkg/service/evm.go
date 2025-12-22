@@ -8,28 +8,28 @@ import (
 	"gorm.io/gorm"
 )
 
-type EthService struct {
+type EvmService struct {
 	db *gorm.DB
 }
 
-func NewEthService(db *gorm.DB) *EthService {
-	return &EthService{db: db}
+func NewEvmService(db *gorm.DB) *EvmService {
+	return &EvmService{db: db}
 }
 
-func (s *EthService) SaveLog(blog *entity.EthOrder) (err error) {
+func (s *EvmService) SaveLog(blog *entity.EvmOrder) (err error) {
 	err = s.db.Create(blog).Error
 	if err != nil {
 		logx.Errorf("db eth service save transaction failed, err:%v", err)
-		err = biz.CodeParamsEmpty
+		err = biz.EvmOrderSaveFailed
 	}
 
 	return
 }
-func (s *EthService) CreateAddresses(addrs []*entity.Address) (err error) {
+func (s *EvmService) CreateAddresses(addrs []*entity.Address) (err error) {
 	err = s.db.Create(addrs).Error
 	if err != nil {
 		logx.Errorf("db eth service create address failed, err:%v", err)
-		err = biz.CodeParamsEmpty
+		err = biz.AddressCreateFailed
 	}
 	return
 }

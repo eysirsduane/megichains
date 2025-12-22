@@ -30,28 +30,28 @@ import (
 
 var emu sync.Mutex
 
-type ETHMonitor struct {
+type EvmMonitor struct {
 	cfg         *global.Config
 	clients     sync.Map
 	clilen      int
 	Receivers   sync.Map
-	ethservice  *service.EthService
+	evmservice  *service.EvmService
 	addrservice *service.AddressService
 }
 
-func NewETHMonitor(cfg *global.Config, ethservice *service.EthService, addrservice *service.AddressService) *ETHMonitor {
-	monitor := &ETHMonitor{
+func NewEvmMonitor(cfg *global.Config, evmservice *service.EvmService, addrservice *service.AddressService) *EvmMonitor {
+	monitor := &EvmMonitor{
 		cfg:         cfg,
 		clients:     sync.Map{},
 		Receivers:   sync.Map{},
-		ethservice:  ethservice,
+		evmservice:  evmservice,
 		addrservice: addrservice,
 	}
 
 	return monitor
 }
 
-func (m *ETHMonitor) newClient(chain global.ChainName) (client *ethclient.Client, err error) {
+func (m *EvmMonitor) newClient(chain global.ChainName) (client *ethclient.Client, err error) {
 	port := ""
 	switch chain {
 	case global.ChainNameBsc:
@@ -73,9 +73,9 @@ func (m *ETHMonitor) newClient(chain global.ChainName) (client *ethclient.Client
 	return
 }
 
-func (m *ETHMonitor) RangeListen() {
+func (m *EvmMonitor) RangeListen() {
 	type ListenRequest struct {
-		Chain    string `json:"EVM chain"`
+		Chain    string `json:"chain"`
 		Receiver string `json:"receiver"`
 		Seconds  int64  `json:"seconds"`
 	}
@@ -116,7 +116,7 @@ func (m *ETHMonitor) RangeListen() {
 	}
 }
 
-func (m *ETHMonitor) Listen(chain global.ChainName, oid string, receiver string, seconds int64) {
+func (m *EvmMonitor) Listen(chain global.ChainName, oid string, receiver string, seconds int64) {
 	m.Receivers.Store(receiver, true)
 	defer m.Receivers.Delete(receiver)
 	defer m.clearClients()
@@ -204,7 +204,7 @@ func (m *ETHMonitor) Listen(chain global.ChainName, oid string, receiver string,
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(seconds)*time.Second)
 	defer cancel()
 
-	ichan := make(chan *entity.EthOrder, 1)
+	ichan := make(chan *entity.EvmOrder, 1)
 	go item.listen(ctx, ichan, sub, logs, receiver)
 
 	for order := range ichan {
@@ -228,7 +228,7 @@ func (m *ETHMonitor) Listen(chain global.ChainName, oid string, receiver string,
 	logx.Infof("EVM chain 事务结束, clen:%v, from:%v", m.clilen, receiver)
 }
 
-func (m *ETHMonitor) GenerateETHAddress() {
+func (m *EvmMonitor) GenerateETHAddress() {
 	addrs := make([]*entity.Address, 0, 1000)
 
 	for i := 0; i < 1000; i++ {
@@ -259,10 +259,10 @@ func (m *ETHMonitor) GenerateETHAddress() {
 		addrs = append(addrs, addr)
 	}
 
-	m.ethservice.CreateAddresses(addrs)
+	m.evmservice.CreateAddresses(addrs)
 }
 
-func (m *ETHMonitor) clearClients() {
+func (m *EvmMonitor) clearClients() {
 	emu.Lock()
 	m.clients.Range(func(key, val any) bool {
 		cli := val.(*ClientItem)
@@ -278,7 +278,7 @@ func (m *ETHMonitor) clearClients() {
 	emu.Unlock()
 }
 
-func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EthOrder, sub ethereum.Subscription, logs chan types.Log, receiver string) {
+func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EvmOrder, sub ethereum.Subscription, logs chan types.Log, receiver string) {
 	logx.Infof("EVM chain 实时状态开始, cname:%v, count:%v", m.Name, m.RunningQueryCount)
 	defer func() {
 		sub.Unsubscribe()
@@ -328,16 +328,16 @@ func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EthOrder, su
 				sun := new(big.Int).SetBytes(log.Data)
 				amount := global.Amount(sun.Int64(), global.AmountTypoBsc)
 
-				var currency global.CurrenyTypo
+				var currency global.CurrencyTypo
 				contract := strings.ToUpper(log.Address.Hex())
 				for _, addr := range m.Cfg.ContractAddresses {
 					if strings.ToUpper(addr.Address) == contract {
-						currency = global.CurrenyTypo(addr.Currency)
+						currency = global.CurrencyTypo(addr.Currency)
 						break
 					}
 				}
 
-				order := &entity.EthOrder{
+				order := &entity.EvmOrder{
 					Typo:           string(global.BscTransactionTypoIn),
 					Status:         string(global.BscTransactionStatusSuccess),
 					Currency:       string(currency),
@@ -365,8 +365,8 @@ func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EthOrder, su
 	}
 }
 
-func (m *ETHMonitor) saveOrder(order *entity.EthOrder) (err error) {
-	err = m.ethservice.SaveLog(order)
+func (m *EvmMonitor) saveOrder(order *entity.EvmOrder) (err error) {
+	err = m.evmservice.SaveLog(order)
 	if err != nil {
 		logx.Errorf("EVM chain 记录转账交易失败: err:%v \n", err)
 		return

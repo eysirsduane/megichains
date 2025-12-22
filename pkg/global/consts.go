@@ -25,13 +25,13 @@ const (
 	ChainNameBsc  ChainName = "BSC"
 )
 
-type CurrenyTypo string
+type CurrencyTypo string
 
 const (
-	CurrencyTypoTrx    CurrenyTypo = "TRX"
-	CurrencyTypoUsdt   CurrenyTypo = "USDT"
-	CurrencyTypoUsdc   CurrenyTypo = "USDC"
-	CurrencyTypoEnergy CurrenyTypo = "ENERGY"
+	CurrencyTypoTrx    CurrencyTypo = "TRX"
+	CurrencyTypoUsdt   CurrencyTypo = "USDT"
+	CurrencyTypoUsdc   CurrencyTypo = "USDC"
+	CurrencyTypoEnergy CurrencyTypo = "ENERGY"
 )
 
 type ExchangeRateTypo string

@@ -138,17 +138,20 @@ func NotifyEPay(url, merchOrderId, fromHex, toHex, currency string, receivedAmou
 
 	byts, err := json.Marshal(req)
 	if err != nil {
-		return err
+		logx.Errorf("notify epay marshal req failed, req:%+v, err:%v", req, err)
+		return
 	}
 
 	resp, err := http.Post(url, "application/json", bytes.NewReader(byts))
 	if err != nil {
-		return err
+		logx.Errorf("notify epay post req failed, req:%+v, err:%v", req, err)
+		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("notify epay service failed, status code:%v", resp.StatusCode)
+		err = fmt.Errorf("notify epay response status is not ok, req:%+v, status:%v", req, resp.StatusCode)
+		return
 	}
 
 	return

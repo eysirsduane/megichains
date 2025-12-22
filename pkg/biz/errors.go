@@ -34,7 +34,20 @@ var (
 )
 
 var (
-	//Exchange Bill
+	AddressCreateFailed = NewSpecificError(3001, "地址创建失败")
+)
+
+var (
+	EvmTransactionSaveFailed      = NewSpecificError(4001, "Evm交易失败")
+	EvmTransactionDeleteFailed    = NewSpecificError(4002, "Evm交易删除失败")
+	EvmTransactionUpdateFailed    = NewSpecificError(4003, "Evm交易更新失败")
+	EvmTransactionFindFailed      = NewSpecificError(4004, "Evm交易查询失败")
+	EvmTransactionContractInvalid = NewSpecificError(4005, "Evm交易合约地址无效")
+	EvmTransactionStatusInvalid   = NewSpecificError(4006, "Evm交易状态无效")
+	EvmOrderSaveFailed            = NewSpecificError(4007, "Evm订单保存失败")
+)
+
+var (
 	BscTransactionSaveFailed      = NewSpecificError(4001, "BSC交易失败")
 	BscTransactionDeleteFailed    = NewSpecificError(4002, "BSC交易删除失败")
 	BscTransactionUpdateFailed    = NewSpecificError(4003, "BSC交易更新失败")
@@ -42,15 +55,4 @@ var (
 	BscTransactionContractInvalid = NewSpecificError(4005, "BSC交易合约地址无效")
 	BscTransactionStatusInvalid   = NewSpecificError(4006, "BSC交易状态无效")
 	BscOrderSaveFailed            = NewSpecificError(4007, "BSC订单保存失败")
-)
-
-var (
-	//Exchange Bill
-	EthTransactionSaveFailed      = NewSpecificError(4001, "ETH交易失败")
-	EthTransactionDeleteFailed    = NewSpecificError(4002, "ETH交易删除失败")
-	EthTransactionUpdateFailed    = NewSpecificError(4003, "ETH交易更新失败")
-	EthTransactionFindFailed      = NewSpecificError(4004, "ETH交易查询失败")
-	EthTransactionContractInvalid = NewSpecificError(4005, "ETH交易合约地址无效")
-	EthTransactionStatusInvalid   = NewSpecificError(4006, "ETH交易状态无效")
-	EthOrderSaveFailed            = NewSpecificError(4007, "ETH订单保存失败")
 )

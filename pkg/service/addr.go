@@ -3,6 +3,7 @@ package service
 import (
 	"megichains/pkg/entity"
 
+	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/gorm"
 )
 
@@ -17,7 +18,8 @@ func NewAddressService(db *gorm.DB) *AddressService {
 func (s *AddressService) GetAddress(id int64) (addr *entity.Address, err error) {
 	err = s.db.Where("id = ?", id).First(&addr).Error
 	if err != nil {
-		return nil, err
+		logx.Errorf("db get address failed, id:%v, err:%v", id, err)
+		return
 	}
 
 	return

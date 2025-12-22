@@ -217,7 +217,7 @@ func (m *EvmMonitor) Listen(chain global.ChainName, oid string, receiver string,
 
 		logx.Infof("🎉🎉🎉 chain 收到转账, [%v]:[%v], from:%v, to:%v", order.Currency, order.ReceivedAmount, order.FromHex, order.ToHex)
 
-		err = global.NotifyEPay(m.cfg.EPay.NotifyUrl, order.MerchOrderId, order.FromHex, order.ToHex, order.Currency, order.ReceivedAmount)
+		err = global.NotifyEPay(m.cfg.EPay.NotifyUrl, order.MerchOrderId, order.TxHash, order.FromHex, order.ToHex, order.Currency, order.ReceivedAmount)
 		if err != nil {
 			logx.Errorf("EVM chain 通知支付失败, moid:%v, txid:%v, err:%v", oid, order.TxHash, err)
 			continue

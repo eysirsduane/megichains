@@ -127,9 +127,10 @@ func CheckPassword(hash, pwd string) (ok bool) {
 	return err == nil
 }
 
-func NotifyEPay(url, merchOrderId, fromHex, toHex, currency string, receivedAmount float64) (err error) {
+func NotifyEPay(url, merchOrderId, txid, fromHex, toHex, currency string, receivedAmount float64) (err error) {
 	req := EPayRequest{
 		MerchOrderId: merchOrderId,
+		TxId:         txid,
 		FromHex:      fromHex,
 		ToHex:        toHex,
 		Amount:       receivedAmount,

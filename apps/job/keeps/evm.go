@@ -310,17 +310,28 @@ func (m *ClientItem) listen(ctx context.Context, chain global.ChainName, ichan c
 			// 	}
 			// }
 			round := 0
+			threshold := 0
+			switch chain {
+			case global.ChainNameEth:
+				threshold = 1
+			case global.ChainNameBsc:
+				threshold = 7
+			default:
+				logx.Errorf("EVM 计算区块阈值失败, 不支持这个链, chain:%v", chain)
+				return
+			}
 			for {
 				curblock, err1 := m.Client.BlockByNumber(context.Background(), nil)
 				if err1 != nil {
 					logx.Errorf("EVM chain 获取最新区块发生错误, err:%v", err1)
-					time.Sleep(time.Second * 3)
+					time.Sleep(time.Second * 5)
 					continue
 				}
-				if curblock.NumberU64()-log.BlockNumber > 7 {
+
+				logx.Infof("EVM 获取区块高度, cur:%v, log:%v", curblock.NumberU64(), log.BlockNumber)
+
+				if curblock.NumberU64()-log.BlockNumber >= uint64(threshold) {
 					break
-				} else {
-					time.Sleep(time.Second * 3)
 				}
 
 				if round > 10 {
@@ -328,6 +339,7 @@ func (m *ClientItem) listen(ctx context.Context, chain global.ChainName, ichan c
 					return
 				}
 
+				time.Sleep(time.Second * 5)
 				round++
 			}
 

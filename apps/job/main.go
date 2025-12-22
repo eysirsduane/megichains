@@ -18,7 +18,7 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-var configFile = flag.String("f", "../../etc/megichains.prod.yaml", "the config file")
+var configFile = flag.String("f", "../../etc/megichains.dev.yaml", "the config file")
 var evm *keeps.EvmMonitor
 
 func main() {

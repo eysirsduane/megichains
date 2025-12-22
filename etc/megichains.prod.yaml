@@ -20,7 +20,7 @@ Auth:
 DB:
   User: postgres
   Password: "123456"
-  Host: 127.0.0.1
+  Host: db
   Port: 5432
   Name: megichains
   Charset: utf8mb4

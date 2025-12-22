@@ -81,19 +81,19 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - /Users/eysirs/logs:/app/logs
-      - /Users/eysirs/workspace/megitron/etc:/app/etc
+      - /home/test/megichains:/app/logs
+      - /home/test/megichains/etc:/app/etc
 
-  nginx:
-    image: nginx:latest
-    restart: always
-    ports:
-      - "80:80" #
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro 
-      - ./html:/usr/share/nginx/html:ro 
-    depends_on:
-      - job
+  # nginx:
+  #   image: nginx:latest
+  #   restart: always
+  #   ports:
+  #     - "80:80" #
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro 
+  #     - ./html:/usr/share/nginx/html:ro 
+  #   depends_on:
+  #     - job
 
   db:
     image: postgres:latest
@@ -112,7 +112,7 @@ services:
     volumes:
       - type: bind
         # source: /home/test/database/postgresql
-        source: /Users/eysirs/database/postgresql
+        source: /home/test/megichains/postgresql
         target: /var/lib/postgresql
 
 volumes:

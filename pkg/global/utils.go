@@ -9,6 +9,7 @@ import (
 type AmountTypo int64
 
 const (
+	AmountTypoEth AmountTypo = 1_000_000
 	AmountTypoBsc AmountTypo = 1_000_000_000_000_000_000
 	AmountTypoSun AmountTypo = 1_000_000
 )

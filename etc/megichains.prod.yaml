@@ -26,15 +26,22 @@ DB:
   Charset: utf8mb4
   Timezone: UTC
 
+Bot:
+  Token: "8365546663:AAHzYZpB0KvwSguCNzLLYsR9DbtvMjrJSEg"
+  Service: "@eysirs2233"
+
+EPay:
+  NotifyUrl: "http://localhost:8080/api/v1/epay/notify"
+
+Eth:
+  ChainId: 1
+  GrpcNetwork: wss://eth-mainnet.g.alchemy.com/v2/
+  ApiKey: e9NHfWClRByVJCAgbZsq7
+    
 BSC:
   ChainId: 56
-  GrpcNetwork: wss://bnb-testnet.g.alchemy.com/v2/
+  GrpcNetwork: wss://bnb-mainnet.g.alchemy.com/v2/
   ApiKey: e9NHfWClRByVJCAgbZsq7 
-  ContractAddresses: 
-    - Address: "0x337610d27c682E347C9cD60BD4b3b107C9d34dDd"
-      Currency: "USDT"
-    - Address: "0x64544969ed7EBf5f083679233325356EbE738930"
-      Currency: "USDC"
 
 Tron:
   GrpcNetwork: grpc://grpc.nile.trongrid.io:50051
@@ -44,6 +51,19 @@ Tron:
   MonitorAddress: TD9ryFrcJd74nd24P7ToHjqjSfcaHqk92G
   TRC20USDTAddress: TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf
 
-Bot:
-  Token: "8365546663:AAHzYZpB0KvwSguCNzLLYsR9DbtvMjrJSEg"
-  Service: "@eysirs2233"
+ContractAddresses: 
+  - Chain: ETH
+    Address: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+    Currency: "USDT"
+  - Chain: ETH
+    Address: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
+    Currency: "USDC"
+  - Chain: BSC
+    Address: "0x55d398326f99059fF775485246999027B3197955"
+    Currency: "USDT"
+  - Chain: BSC
+    Address: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
+    Currency: "USDC"
+
+
+

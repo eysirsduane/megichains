@@ -205,7 +205,7 @@ func (m *EvmMonitor) Listen(chain global.ChainName, oid string, receiver string,
 	defer cancel()
 
 	ichan := make(chan *entity.EvmOrder, 1)
-	go item.listen(ctx, ichan, sub, logs, receiver)
+	go item.listen(ctx, chain, ichan, sub, logs, receiver)
 
 	for order := range ichan {
 		order.MerchOrderId = oid
@@ -278,7 +278,7 @@ func (m *EvmMonitor) clearClients() {
 	emu.Unlock()
 }
 
-func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EvmOrder, sub ethereum.Subscription, logs chan types.Log, receiver string) {
+func (m *ClientItem) listen(ctx context.Context, chain global.ChainName, ichan chan *entity.EvmOrder, sub ethereum.Subscription, logs chan types.Log, receiver string) {
 	logx.Infof("EVM chain 实时状态开始, cname:%v, count:%v", m.Name, m.RunningQueryCount)
 	defer func() {
 		sub.Unsubscribe()
@@ -309,7 +309,7 @@ func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EvmOrder, su
 			}
 
 			to := common.HexToAddress(log.Topics[2].Hex()).Hex()
-			if receiver == to {
+			if strings.EqualFold(receiver, to) {
 				block, err := m.Client.BlockByNumber(context.Background(), big.NewInt(int64(log.BlockNumber)))
 				if err != nil {
 					logx.Errorf("EVM chain log获取区块失败, txid:%v, err:%v", log.TxHash.String(), err)
@@ -326,12 +326,21 @@ func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EvmOrder, su
 				to := common.HexToAddress(log.Topics[2].Hex())
 
 				sun := new(big.Int).SetBytes(log.Data)
-				amount := global.Amount(sun.Int64(), global.AmountTypoBsc)
+				amount := float64(0)
+				switch chain {
+				case global.ChainNameEth:
+					amount = global.Amount(sun.Int64(), global.AmountTypoEth)
+				case global.ChainNameBsc:
+					amount = global.Amount(sun.Int64(), global.AmountTypoBsc)
+				default:
+					logx.Errorf("EVM chain 未知链SUN/AMOUNT比值, chain:%v", chain)
+					return
+				}
 
 				var currency global.CurrencyTypo
 				contract := strings.ToUpper(log.Address.Hex())
 				for _, addr := range m.Cfg.ContractAddresses {
-					if strings.ToUpper(addr.Address) == contract {
+					if strings.EqualFold(addr.Address, contract) {
 						currency = global.CurrencyTypo(addr.Currency)
 						break
 					}
@@ -343,12 +352,12 @@ func (m *ClientItem) listen(ctx context.Context, ichan chan *entity.EvmOrder, su
 					Currency:       string(currency),
 					ChainId:        cid.Uint64(),
 					TxHash:         log.TxHash.Hex(),
+					Index:          log.Index,
 					TxIndex:        log.TxIndex,
 					ReceivedAmount: amount,
 					ReceivedSun:    sun.Int64(),
 					FromHex:        from.Hex(),
 					ToHex:          to.Hex(),
-					Index:          log.Index,
 					Contract:       log.Address.Hex(),
 					BlockHash:      log.BlockHash.Hex(),
 					BlockNumber:    log.BlockNumber,

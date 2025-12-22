@@ -18,7 +18,7 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-var configFile = flag.String("f", "../../etc/megichains.dev.yaml", "the config file")
+var configFile = flag.String("f", "../../etc/megichains.prod.yaml", "the config file")
 var evm *keeps.EvmMonitor
 
 func main() {
@@ -88,6 +88,7 @@ func listen(w http.ResponseWriter, r *http.Request) {
 	if req.MerchOrderId == "" {
 		resp.Message = "订单号不能为空"
 		returnError(w, resp)
+		return
 	}
 	if req.Chain == "" {
 		resp.Message = "链不能为空"

@@ -2,10 +2,10 @@ package entity
 
 type EvmOrder struct {
 	Id           int64  `gorm:"primaryKey;autoIncrement"`
-	ChainId      uint64 `gorm:""`
-	Chain        string `gorm:"size:15"`
 	MerchOrderId string `gorm:"size:63"`
 
+	Chain   string `gorm:"size:15"`
+	ChainId uint64 `gorm:"uniqueIndex:idx_trans_index"`
 	TxHash  string `gorm:"size:255;uniqueIndex:idx_trans_index"`
 	Index   uint   `gorm:"uniqueIndex:idx_trans_index"`
 	TxIndex uint   `gorm:""`

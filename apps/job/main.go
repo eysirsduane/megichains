@@ -78,7 +78,7 @@ func listen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req global.ListenRequest
+	var req global.ListenReq
 	err = json.Unmarshal(bytes, &req)
 	if err != nil {
 		resp.Message = "解析请求体失败"
@@ -130,7 +130,7 @@ func returnError(w http.ResponseWriter, resp *ResponseMessage) {
 	http.Error(w, string(byts), http.StatusInternalServerError)
 }
 
-func startEvmMonitor(chain global.ChainName, req *global.ListenRequest) (exist bool) {
+func startEvmMonitor(chain global.ChainName, req *global.ListenReq) (exist bool) {
 	evm.Receivers.Range(func(key, val any) bool {
 		if key.(string) == req.Receiver {
 			logx.Infof("ETH 已存在监听地址, to:%v", req.Receiver)

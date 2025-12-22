@@ -73,14 +73,14 @@ type ContractAddress struct {
 	Currency string
 }
 
-type ListenRequest struct {
+type ListenReq struct {
 	MerchOrderId string `json:"merch_order_id"`
 	Chain        string `json:"chain"`
 	Receiver     string `json:"receiver"`
 	Seconds      int64  `json:"seconds"`
 }
 
-type EPayRequest struct {
+type EPayNotifyReq struct {
 	MerchOrderId string  `json:"merch_order_id"`
 	TxId         string  `json:"txid"`
 	FromHex      string  `json:"from_hex"`

@@ -145,7 +145,7 @@ func startListen(chain global.ChainName, req *global.ListenReq) (exist bool) {
 		return
 	}
 
-	go monitor.Listen(chain, req.MerchOrderId, req.Receiver, req.Seconds-3)
+	go monitor.Listen(chain, req.MerchOrderId, req.Receiver, req.Seconds+120)
 
 	return
 }

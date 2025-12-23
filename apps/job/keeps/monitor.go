@@ -267,14 +267,13 @@ func (m *ChainMonitor) listenEvm(chain global.ChainName, oid, receiver string, s
 			logx.Errorf("EVM chain 保存日志失败, txid:%v, err:%v", order.TxHash, err)
 		}
 
-		logx.Infof("🎉🎉🎉 EVM 收到转账, [%v]:[%v]:[%v], from:%v, to:%v", chain, order.Currency, order.ReceivedAmount, order.FromHex, order.ToHex)
+		logx.Infof("🎉🎉🎉 EVM 收到转账, [%v]:[%v]:[%v], from:%v, to:%v", chain, order.Currency, global.GetFloat64String(order.ReceivedAmount), order.FromHex, order.ToHex)
 
 		err = global.NotifyEPay(m.cfg.EPay.NotifyUrl, order.MerchOrderId, order.TxHash, order.FromHex, order.ToHex, order.Currency, order.ReceivedAmount)
 		if err != nil {
 			logx.Errorf("EVM chain 通知支付失败, moid:%v, txid:%v, err:%v", oid, order.TxHash, err)
 			continue
 		}
-
 	}
 }
 
@@ -327,14 +326,13 @@ func (m *ChainMonitor) listenSolana(chain global.ChainName, oid, receiver string
 			logx.Errorf("Solana chain 保存日志失败, txid:%v, err:%v", order.TxHash, err)
 		}
 
-		logx.Infof("🎉🎉🎉 SOLANA 收到转账, [%v]:[%v]:[%v], from:%v, to:%v", chain, order.Currency, order.ReceivedAmount, order.FromBase58, order.ToBase58)
+		logx.Infof("🎉🎉🎉 SOLANA 收到转账, [%v]:[%v]:[%v], from:%v, to:%v", chain, order.Currency, global.GetFloat64String(order.ReceivedAmount), order.FromBase58, order.ToBase58)
 
 		err = global.NotifyEPay(m.cfg.EPay.NotifyUrl, order.MerchOrderId, order.TxHash, order.FromBase58, order.ToBase58, order.Currency, order.ReceivedAmount)
 		if err != nil {
 			logx.Errorf("Solana chain 通知支付失败, moid:%v, txid:%v, err:%v", oid, order.TxHash, err)
 			continue
 		}
-
 	}
 
 	log.Println("✅ Listening USDT transfers for wallet...")
@@ -427,7 +425,7 @@ func (m *ChainMonitor) saveSolanaOrder(order *entity.SolanaOrder) (err error) {
 
 func (m *ChainMonitor) RangeListen() {
 
-	for i := 1; i <= 1000; i++ {
+	for i := 1; i <= 100; i++ {
 		addr, err := m.addrservice.GetAddress(int64(i))
 		if err != nil {
 			logx.Errorf("EVM chain 获取监听地址失败, err:%v", err)
@@ -435,9 +433,9 @@ func (m *ChainMonitor) RangeListen() {
 		}
 		req := &global.ListenReq{}
 		req.MerchOrderId = "123"
-		req.Chain = "BSC"
+		req.Chain = "ETH"
 		req.Receiver = addr.AddressHex
-		req.Seconds = 1200
+		req.Seconds = 120
 
 		bs, err := json.Marshal(req)
 		if err != nil {
@@ -460,6 +458,6 @@ func (m *ChainMonitor) RangeListen() {
 
 		logx.Infof("EVM chain 发送监听请求成功, resp:%s", string(respBytes))
 
-		time.Sleep(200 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 }

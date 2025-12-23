@@ -1,6 +1,7 @@
 package global
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -65,4 +66,8 @@ func TimeInHourMilli() (milli uint64) {
 
 func TimeLastHourMilli() (milli uint64) {
 	return uint64(time.Now().Add(-time.Hour).UnixMilli())
+}
+
+func GetFloat64String(f float64) (s string) {
+	return strconv.FormatFloat(f, 'f', 10, 64)
 }

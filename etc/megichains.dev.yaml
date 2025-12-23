@@ -60,9 +60,6 @@ ContractAddresses:
     Address: "0x64544969ed7EBf5f083679233325356EbE738930"
     Currency: "USDC"
     
-
-
-
 Tron:
   GrpcNetwork: grpc://grpc.nile.trongrid.io:50051
   HttpNetwork: https://nile.trongrid.io

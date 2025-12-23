@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"math"
-	"megichains/pkg/biz"
 	"net/http"
 	"time"
 
@@ -20,33 +18,6 @@ func Offset(page, limit int) (offset int) {
 }
 
 func GetTrx2UsdtRateFromHtx(url string) (rate float64, err error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		logx.Infof("funcs get trx2usdt rate http request failed, err:%v", err)
-		return
-	}
-
-	body, _ := io.ReadAll(resp.Body)
-	resp.Body.Close()
-
-	wrapper := &struct {
-		Status string `json:"status"`
-		Tick   struct {
-			Open float64 `json:"open"`
-		} `json:"tick"`
-	}{}
-
-	if err = json.Unmarshal(body, wrapper); err != nil {
-		logx.Infof("funcs get trx2usdt rate unmarshal json failed, err:%v", err)
-		return
-	}
-
-	rate = wrapper.Tick.Open
-	if rate >= 1 || rate <= 0 {
-		logx.Errorf("funcs get trx2usdt rate value is incorrect, rate:%v", rate)
-		err = biz.ExchangeTrx2UsdtRateIncorrect
-		return
-	}
 
 	return
 }

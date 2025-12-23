@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"megichains/pkg/biz"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
 	"megichains/pkg/service"
@@ -42,6 +43,15 @@ type ChainMonitor struct {
 	addrservice *service.AddressService
 }
 
+type ClientItem struct {
+	Cfg               *global.Config
+	Name              string
+	Chain             global.ChainName
+	Client            *ethclient.Client
+	Status            int // 0: 空闲, 1: 使用中
+	RunningQueryCount int
+}
+
 func NewChainMonitor(cfg *global.Config, evmservice *service.EvmService, addrservice *service.AddressService, solaservice *service.SolanaService) *ChainMonitor {
 	monitor := &ChainMonitor{
 		cfg:         cfg,
@@ -60,7 +70,6 @@ func (m *ChainMonitor) newEvmClient(chain global.ChainName) (client *ethclient.C
 	switch chain {
 	case global.ChainNameBsc:
 		port = fmt.Sprintf("%v%v", m.cfg.Bsc.GrpcNetwork, m.cfg.Bsc.ApiKey)
-
 	case global.ChainNameEth:
 		port = fmt.Sprintf("%v%v", m.cfg.Eth.GrpcNetwork, m.cfg.Eth.ApiKey)
 	default:
@@ -94,95 +103,24 @@ func (m *ChainMonitor) Listen(chain global.ChainName, oid string, receiver strin
 	defer m.clearClients()
 
 	switch chain {
-	case global.ChainNameEth:
-	case global.ChainNameBsc:
-		item := &EvmClientItem{}
-		found := false
-		emu.Lock()
-		m.clients.Range(func(key, val any) bool {
-			cli, ok := val.(*EvmClientItem)
-			if ok {
-				if cli.Chain == chain && cli.RunningQueryCount < MonitorClientSingleQueryLimit {
-					item = cli
-					found = true
-
-					return false
-				}
-			}
-
-			return true
-		})
-		item.RunningQueryCount++
-		emu.Unlock()
-
-		if !found {
-			for {
-				if m.clilen < MonitorClientCount {
-					client, err := m.newEvmClient(chain)
-					if err != nil {
-						logx.Errorf("EVM chain Dial 失败, 尝试重连 err:%v", err)
-						continue
-					}
-					name := uuid.NewString()
-					item.Cfg = m.cfg
-					item.Chain = chain
-					item.Name = name
-					item.Client = client
-					m.clients.Store(name, item)
-					m.clilen++
-					logx.Infof("EVM chain 新增客户端, cname:%v, clen:%v", name, m.clilen)
-					break
-				} else {
-					logx.Errorf("EVM chain 最大客户端已达到上限")
-					return
-				}
-			}
+	case global.ChainNameEth, global.ChainNameBsc:
+		c, err := m.getClientItem(chain)
+		if err != nil {
+			logx.Errorf("EVM 获取客户端失败, 已退出事务.")
+			return
 		}
+		item := c.(*EvmClientItem)
+		item.RunningQueryCount++
 
 		m.listenEvm(chain, oid, receiver, seconds, item)
 	case global.ChainNameSolana:
-		item := &SolanaClientItem{}
-		found := false
-		emu.Lock()
-		m.clients.Range(func(key, val any) bool {
-			cli, ok := val.(*SolanaClientItem)
-			if ok {
-				if cli.Chain == chain && cli.RunningQueryCount < MonitorClientSingleQueryLimit {
-					item = cli
-					found = true
-
-					return false
-				}
-			}
-
-			return true
-		})
-		item.RunningQueryCount++
-		emu.Unlock()
-
-		if !found {
-			for {
-				if m.clilen < MonitorClientCount {
-					client, err := m.newSolanaClient(chain)
-					if err != nil {
-						logx.Errorf("SOLANA chain Dial 失败, 尝试重连 err:%v", err)
-						continue
-					}
-					name := uuid.NewString()
-					item.Cfg = m.cfg
-					item.Chain = chain
-					item.Name = name
-					item.Client = client
-					m.clients.Store(name, item)
-					m.clilen++
-					logx.Infof("SOLANA chain 新增客户端, cname:%v, clen:%v", name, m.clilen)
-					break
-				} else {
-					logx.Errorf("SOLANA chain 最大客户端已达到上限")
-					return
-				}
-			}
+		c, err := m.getClientItem(chain)
+		if err != nil {
+			logx.Errorf("SOLANA 获取客户端失败, 已退出事务.")
+			return
 		}
+		item := c.(*SolanaClientItem)
+		item.RunningQueryCount++
 
 		m.listenSolana(chain, oid, receiver, seconds, item)
 	default:
@@ -190,6 +128,89 @@ func (m *ChainMonitor) Listen(chain global.ChainName, oid string, receiver strin
 	}
 
 	logx.Infof("chain 事务结束, chain:%v, clen:%v, from:%v", chain, m.clilen, receiver)
+}
+
+func (m *ChainMonitor) getClientItem(chain global.ChainName) (item any, err error) {
+	found := false
+	emu.Lock()
+	m.clients.Range(func(key, val any) bool {
+		ecli, ok := val.(*EvmClientItem)
+		if ok {
+			if ecli.Chain == chain && ecli.RunningQueryCount < MonitorClientSingleQueryLimit {
+				item = ecli
+				found = true
+
+				return false
+			}
+		}
+
+		scli, ok := val.(*SolanaClientItem)
+		if ok {
+			if scli.Chain == chain && scli.RunningQueryCount < MonitorClientSingleQueryLimit {
+				item = scli
+				found = true
+
+				return false
+			}
+		}
+
+		return true
+	})
+	emu.Unlock()
+
+	if !found {
+		for {
+			if m.clilen < MonitorClientCount {
+				switch chain {
+				case global.ChainNameEth, global.ChainNameBsc:
+					client, err1 := m.newEvmClient(chain)
+					if err1 != nil {
+						logx.Errorf("EVM chain Dial 失败, 尝试重连 err:%v", err1)
+						continue
+					}
+
+					c := &EvmClientItem{}
+					name := uuid.NewString()
+					c.Cfg = m.cfg
+					c.Chain = chain
+					c.Name = name
+					c.Client = client
+					item = c
+					m.clients.Store(name, item)
+					m.clilen++
+					logx.Infof("EVM chain 新增客户端, cname:%v, clen:%v", name, m.clilen)
+
+					return
+				case global.ChainNameSolana:
+					client, err1 := m.newSolanaClient(chain)
+					if err1 != nil {
+						logx.Errorf("SOLANA chain Dial 失败, 尝试重连 err:%v", err1)
+						continue
+					}
+
+					c := &SolanaClientItem{}
+					name := uuid.NewString()
+					c.Cfg = m.cfg
+					c.Chain = chain
+					c.Name = name
+					c.Client = client
+					item = c
+					m.clients.Store(name, item)
+					m.clilen++
+
+					logx.Infof("SOLANA chain 新增客户端, cname:%v, clen:%v", name, m.clilen)
+
+					return
+				}
+			} else {
+				err = biz.ChainClientUpToMaxCount
+				logx.Errorf("最大客户端已达到上限, chain:%v", chain)
+				return
+			}
+		}
+	}
+
+	return
 }
 
 func (m *ChainMonitor) listenEvm(chain global.ChainName, oid, receiver string, seconds int64, item *EvmClientItem) {
@@ -246,7 +267,7 @@ func (m *ChainMonitor) listenEvm(chain global.ChainName, oid, receiver string, s
 			logx.Errorf("EVM chain 保存日志失败, txid:%v, err:%v", order.TxHash, err)
 		}
 
-		logx.Infof("🎉🎉🎉 Evm 收到转账, [%v]:[%v], from:%v, to:%v", order.Currency, order.ReceivedAmount, order.FromHex, order.ToHex)
+		logx.Infof("🎉🎉🎉 EVM 收到转账, [%v]:[%v]:[%v], from:%v, to:%v", chain, order.Currency, order.ReceivedAmount, order.FromHex, order.ToHex)
 
 		err = global.NotifyEPay(m.cfg.EPay.NotifyUrl, order.MerchOrderId, order.TxHash, order.FromHex, order.ToHex, order.Currency, order.ReceivedAmount)
 		if err != nil {
@@ -306,7 +327,7 @@ func (m *ChainMonitor) listenSolana(chain global.ChainName, oid, receiver string
 			logx.Errorf("Solana chain 保存日志失败, txid:%v, err:%v", order.TxHash, err)
 		}
 
-		logx.Infof("🎉🎉🎉 Solana 收到转账, [%v]:[%v], from:%v, to:%v", order.Currency, order.ReceivedAmount, order.FromBase58, order.ToBase58)
+		logx.Infof("🎉🎉🎉 SOLANA 收到转账, [%v]:[%v]:[%v], from:%v, to:%v", chain, order.Currency, order.ReceivedAmount, order.FromBase58, order.ToBase58)
 
 		err = global.NotifyEPay(m.cfg.EPay.NotifyUrl, order.MerchOrderId, order.TxHash, order.FromBase58, order.ToBase58, order.Currency, order.ReceivedAmount)
 		if err != nil {
@@ -405,11 +426,6 @@ func (m *ChainMonitor) saveSolanaOrder(order *entity.SolanaOrder) (err error) {
 }
 
 func (m *ChainMonitor) RangeListen() {
-	type ListenRequest struct {
-		Chain    string `json:"chain"`
-		Receiver string `json:"receiver"`
-		Seconds  int64  `json:"seconds"`
-	}
 
 	for i := 1; i <= 1000; i++ {
 		addr, err := m.addrservice.GetAddress(int64(i))
@@ -417,10 +433,11 @@ func (m *ChainMonitor) RangeListen() {
 			logx.Errorf("EVM chain 获取监听地址失败, err:%v", err)
 			return
 		}
-		req := &ListenRequest{}
-		req.Chain = "EVM chain"
+		req := &global.ListenReq{}
+		req.MerchOrderId = "123"
+		req.Chain = "BSC"
 		req.Receiver = addr.AddressHex
-		req.Seconds = 1800
+		req.Seconds = 1200
 
 		bs, err := json.Marshal(req)
 		if err != nil {

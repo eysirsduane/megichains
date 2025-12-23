@@ -30,11 +30,8 @@ var (
 )
 
 var (
-	ExchangeTrx2UsdtRateIncorrect = NewSpecificError(2001, "TRX2USDT汇率获取失败")
-)
-
-var (
-	AddressCreateFailed = NewSpecificError(3001, "地址创建失败")
+	ChainClientUpToMaxCount = NewSpecificError(3001, "链客户端已达到数量上西安")
+	AddressCreateFailed     = NewSpecificError(3002, "地址创建失败")
 )
 
 var (

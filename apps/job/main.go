@@ -19,7 +19,7 @@ import (
 )
 
 var configFile = flag.String("f", "../../etc/megichains.dev.yaml", "the config file")
-var evm *keeps.ChainMonitor
+var monitor *keeps.ChainMonitor
 
 func main() {
 	flag.Parse()
@@ -38,14 +38,14 @@ func main() {
 	ethservice := service.NewEvmService(db)
 	solaservice := service.NewSolanaService(db)
 	addrservice := service.NewAddressService(db)
-	evm = keeps.NewChainMonitor(&cfg, ethservice, addrservice, solaservice)
+	monitor = keeps.NewChainMonitor(&cfg, ethservice, addrservice, solaservice)
 
 	starting := "Starting job..."
 	fmt.Println(starting)
 	logx.Info(starting)
 
 	http.HandleFunc("/listen", listen)
-	// http.HandleFunc("/listens", listens)
+	http.HandleFunc("/listens", listens)
 	fmt.Println("HTTP 服务启动 7002...")
 	err = http.ListenAndServe(":7002", nil)
 	if err != nil {
@@ -59,7 +59,7 @@ func main() {
 	logx.Infof("收到信号:%s, 准备退出...", sig)
 }
 func listens(w http.ResponseWriter, r *http.Request) {
-	evm.RangeListen()
+	monitor.RangeListen()
 
 	fmt.Fprintf(w, "已启动批量监听")
 }
@@ -107,7 +107,7 @@ func listen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exist := startEvmMonitor(global.ChainName(req.Chain), &req)
+	exist := startListen(global.ChainName(req.Chain), &req)
 	if exist {
 		logx.Errorf("监听地址已存在, receiver:%s", req.Receiver)
 		resp.Message = "监听地址已存在"
@@ -131,10 +131,10 @@ func returnError(w http.ResponseWriter, resp *ResponseMessage) {
 	http.Error(w, string(byts), http.StatusInternalServerError)
 }
 
-func startEvmMonitor(chain global.ChainName, req *global.ListenReq) (exist bool) {
-	evm.Receivers.Range(func(key, val any) bool {
+func startListen(chain global.ChainName, req *global.ListenReq) (exist bool) {
+	monitor.Receivers.Range(func(key, val any) bool {
 		if key.(string) == req.Receiver {
-			logx.Infof("ETH 已存在监听地址, to:%v", req.Receiver)
+			logx.Infof("已存在监听地址, chain:%v, to:%v", chain, req.Receiver)
 			exist = true
 			return false
 		}
@@ -145,7 +145,7 @@ func startEvmMonitor(chain global.ChainName, req *global.ListenReq) (exist bool)
 		return
 	}
 
-	go evm.Listen(chain, req.MerchOrderId, req.Receiver, req.Seconds-3)
+	go monitor.Listen(chain, req.MerchOrderId, req.Receiver, req.Seconds-3)
 
 	return
 }

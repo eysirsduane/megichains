@@ -19,7 +19,7 @@ import (
 )
 
 var configFile = flag.String("f", "../../etc/megichains.dev.yaml", "the config file")
-var evm *keeps.EvmMonitor
+var evm *keeps.ChainMonitor
 
 func main() {
 	flag.Parse()
@@ -36,8 +36,9 @@ func main() {
 	}
 
 	ethservice := service.NewEvmService(db)
+	solaservice := service.NewSolanaService(db)
 	addrservice := service.NewAddressService(db)
-	evm = keeps.NewEvmMonitor(&cfg, ethservice, addrservice)
+	evm = keeps.NewChainMonitor(&cfg, ethservice, addrservice, solaservice)
 
 	starting := "Starting job..."
 	fmt.Println(starting)

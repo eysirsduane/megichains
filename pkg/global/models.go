@@ -13,6 +13,7 @@ type Config struct {
 	Tron              *Tron
 	Eth               *Eth
 	Bsc               *Bsc
+	Solana            *Solana
 	Bot               *Bot
 	ContractAddresses []*ContractAddress
 }
@@ -49,6 +50,13 @@ type Bsc struct {
 	ChainId     uint16
 	GrpcNetwork string
 	ApiKey      string
+}
+
+type Solana struct {
+	ChainId     uint16
+	GrpcNetwork string
+	ApiKey      string
+	UsdtMint    string
 }
 
 type Tron struct {

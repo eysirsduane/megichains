@@ -40,6 +40,12 @@ BSC:
   GrpcNetwork: wss://bnb-testnet.g.alchemy.com/v2/
   ApiKey: e9NHfWClRByVJCAgbZsq7 
 
+Solana:
+  ChainId: 23
+  GrpcNetwork: wss://solana-devnet.g.alchemy.com/v2/
+  ApiKey: e9NHfWClRByVJCAgbZsq7
+  UsdtMint: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY5Yt1vZ1tcHTfb"
+
 ContractAddresses: 
   - Chain: ETH
     Address: "0xAA8E23Fb1079EA71e0A56F48a2Aa51851d8433D0"

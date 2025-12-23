@@ -19,7 +19,7 @@ func NewEvmService(db *gorm.DB) *EvmService {
 func (s *EvmService) SaveLog(blog *entity.EvmOrder) (err error) {
 	err = s.db.Create(blog).Error
 	if err != nil {
-		logx.Errorf("db eth service save transaction failed, err:%v", err)
+		logx.Errorf("db evm service save transaction failed, err:%v", err)
 		err = biz.EvmOrderSaveFailed
 	}
 
@@ -28,7 +28,7 @@ func (s *EvmService) SaveLog(blog *entity.EvmOrder) (err error) {
 func (s *EvmService) CreateAddresses(addrs []*entity.Address) (err error) {
 	err = s.db.Create(addrs).Error
 	if err != nil {
-		logx.Errorf("db eth service create address failed, err:%v", err)
+		logx.Errorf("db evm service create address failed, err:%v", err)
 		err = biz.AddressCreateFailed
 	}
 	return

@@ -20,9 +20,10 @@ const (
 type ChainName string
 
 const (
-	ChainNameTron ChainName = "TRON"
-	ChainNameEth  ChainName = "ETH"
-	ChainNameBsc  ChainName = "BSC"
+	ChainNameTron   ChainName = "TRON"
+	ChainNameEth    ChainName = "ETH"
+	ChainNameBsc    ChainName = "BSC"
+	ChainNameSolana ChainName = "SOLANA"
 )
 
 type CurrencyTypo string

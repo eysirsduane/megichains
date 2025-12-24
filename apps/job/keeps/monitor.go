@@ -104,6 +104,7 @@ func (m *ChainMonitor) Listen(chain global.ChainName, oid string, receiver strin
 
 	switch chain {
 	case global.ChainNameEth, global.ChainNameBsc:
+		emu.Lock()
 		c, err := m.getClientItem(chain)
 		if err != nil {
 			logx.Errorf("EVM 获取客户端失败, 已退出事务.")
@@ -111,9 +112,11 @@ func (m *ChainMonitor) Listen(chain global.ChainName, oid string, receiver strin
 		}
 		item := c.(*EvmClientItem)
 		item.RunningQueryCount++
+		emu.Unlock()
 
 		m.listenEvm(chain, oid, receiver, seconds, item)
 	case global.ChainNameSolana:
+		emu.Lock()
 		c, err := m.getClientItem(chain)
 		if err != nil {
 			logx.Errorf("SOLANA 获取客户端失败, 已退出事务.")
@@ -121,6 +124,7 @@ func (m *ChainMonitor) Listen(chain global.ChainName, oid string, receiver strin
 		}
 		item := c.(*SolanaClientItem)
 		item.RunningQueryCount++
+		emu.Unlock()
 
 		m.listenSolana(chain, oid, receiver, seconds, item)
 	default:
@@ -132,7 +136,6 @@ func (m *ChainMonitor) Listen(chain global.ChainName, oid string, receiver strin
 
 func (m *ChainMonitor) getClientItem(chain global.ChainName) (item any, err error) {
 	found := false
-	emu.Lock()
 	m.clients.Range(func(key, val any) bool {
 		ecli, ok := val.(*EvmClientItem)
 		if ok {
@@ -156,7 +159,6 @@ func (m *ChainMonitor) getClientItem(chain global.ChainName) (item any, err erro
 
 		return true
 	})
-	emu.Unlock()
 
 	if !found {
 		for {
@@ -435,7 +437,7 @@ func (m *ChainMonitor) RangeListen() {
 		req.MerchOrderId = "123"
 		req.Chain = "ETH"
 		req.Receiver = addr.AddressHex
-		req.Seconds = 120
+		req.Seconds = 60
 
 		bs, err := json.Marshal(req)
 		if err != nil {
@@ -458,6 +460,5 @@ func (m *ChainMonitor) RangeListen() {
 
 		logx.Infof("EVM chain 发送监听请求成功, resp:%s", string(respBytes))
 
-		time.Sleep(100 * time.Millisecond)
 	}
 }

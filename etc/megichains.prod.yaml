@@ -4,7 +4,7 @@ Port: 6666
 
 Log:
   ServiceName: "megichains_service"
-  Mode: console
+  Mode: file
   Path: "./logs"
   KeepDays: 30
   Stat: false
@@ -31,7 +31,7 @@ Bot:
   Service: "@eysirs2233"
 
 EPay:
-  NotifyUrl: "http://localhost:8080/api/v1/epay/notify"
+  NotifyUrl: "https://127.0.0.1:8093/payApi/PayApi/Notice/10108/merch_order_id"
 
 Eth:
   ChainId: 1
@@ -48,8 +48,6 @@ Solana:
   GrpcNetwork: wss://solana-devnet.g.alchemy.com/v2/
   ApiKey: e9NHfWClRByVJCAgbZsq7
   UsdtMint: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY5Yt1vZ1tcHTf
-
-  
 
 Tron:
   GrpcNetwork: grpc://grpc.nile.trongrid.io:50051

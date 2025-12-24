@@ -97,9 +97,10 @@ func (m *ChainMonitor) newSolanaClient(chain global.ChainName) (conn *websocket.
 	return
 }
 
-func (m *ChainMonitor) Listen(chain global.ChainName, oid string, receiver string, seconds int64) {
-	m.Receivers.Store(receiver, true)
-	defer m.Receivers.Delete(receiver)
+func (m *ChainMonitor) Listen(chain global.ChainName, currency, oid string, receiver string, seconds int64) {
+	key := global.GetOrderAddressKey(receiver, currency)
+	m.Receivers.Store(key, true)
+	defer m.Receivers.Delete(key)
 	defer m.clearClients()
 
 	switch chain {
@@ -114,7 +115,7 @@ func (m *ChainMonitor) Listen(chain global.ChainName, oid string, receiver strin
 		item.RunningQueryCount++
 		emu.Unlock()
 
-		m.listenEvm(chain, oid, receiver, seconds, item)
+		m.listenEvm(chain, currency, oid, receiver, seconds, item)
 	case global.ChainNameSolana:
 		emu.Lock()
 		c, err := m.getClientItem(chain)
@@ -215,18 +216,18 @@ func (m *ChainMonitor) getClientItem(chain global.ChainName) (item any, err erro
 	return
 }
 
-func (m *ChainMonitor) listenEvm(chain global.ChainName, oid, receiver string, seconds int64, item *EvmClientItem) {
-	contracts := make([]common.Address, 0, 2)
+func (m *ChainMonitor) listenEvm(chain global.ChainName, currency, oid, receiver string, seconds int64, item *EvmClientItem) {
+	contracts := make([]common.Address, 0, 1)
 	switch chain {
 	case global.ChainNameEth:
 		for _, addr := range m.cfg.ContractAddresses {
-			if global.ChainName(addr.Chain) == global.ChainNameEth {
+			if global.ChainName(addr.Chain) == global.ChainNameEth && addr.Currency == currency {
 				contracts = append(contracts, common.HexToAddress(addr.Address))
 			}
 		}
 	case global.ChainNameBsc:
 		for _, addr := range m.cfg.ContractAddresses {
-			if global.ChainName(addr.Chain) == global.ChainNameBsc {
+			if global.ChainName(addr.Chain) == global.ChainNameBsc && addr.Currency == currency {
 				contracts = append(contracts, common.HexToAddress(addr.Address))
 			}
 		}
@@ -259,7 +260,7 @@ func (m *ChainMonitor) listenEvm(chain global.ChainName, oid, receiver string, s
 	defer cancel()
 
 	ichan := make(chan *entity.EvmOrder, 1)
-	go item.listen(ctx, chain, ichan, sub, logs, receiver)
+	go item.listen(ctx, chain, currency, ichan, sub, logs, receiver)
 
 	for order := range ichan {
 		order.MerchOrderId = oid

@@ -97,6 +97,11 @@ func listen(w http.ResponseWriter, r *http.Request) {
 		returnError(w, resp)
 		return
 	}
+	if req.Currency == "" {
+		resp.Message = "币种不能为空"
+		returnError(w, resp)
+		return
+	}
 	if req.Seconds > 3600 || req.Seconds <= 0 {
 		resp.Message = "监听时间不合法"
 		returnError(w, resp)
@@ -133,12 +138,14 @@ func returnError(w http.ResponseWriter, resp *ResponseMessage) {
 }
 
 func startListen(chain global.ChainName, req *global.ListenReq) (exist bool) {
+	rkey := global.GetOrderAddressKey(req.Receiver, req.Currency)
 	monitor.Receivers.Range(func(key, val any) bool {
-		if key.(string) == req.Receiver {
-			logx.Infof("已存在监听地址, chain:%v, to:%v", chain, req.Receiver)
+		if key == rkey {
+			logx.Infof("已存在监听地址, chain:%v, receiver:%v, currency:%v", chain, req.Receiver, req.Currency)
 			exist = true
 			return false
 		}
+
 		return true
 	})
 
@@ -146,7 +153,7 @@ func startListen(chain global.ChainName, req *global.ListenReq) (exist bool) {
 		return
 	}
 
-	go monitor.Listen(chain, req.MerchOrderId, req.Receiver, req.Seconds+120)
+	go monitor.Listen(chain, req.Currency, req.MerchOrderId, req.Receiver, req.Seconds+120)
 
 	return
 }

@@ -28,15 +28,15 @@ type EvmClientItem struct {
 	RunningQueryCount int
 }
 
-func (m *EvmClientItem) listen(ctx context.Context, chain global.ChainName, ichan chan *entity.EvmOrder, sub ethereum.Subscription, logs chan types.Log, receiver string) {
-	logx.Infof("EVM chain 实时状态开始, cname:%v, count:%v", m.Name, m.RunningQueryCount)
+func (m *EvmClientItem) listen(ctx context.Context, chain global.ChainName, currency string, ichan chan *entity.EvmOrder, sub ethereum.Subscription, logs chan types.Log, receiver string) {
+	logx.Infof("EVM chain 实时状态开始, cname:%v, count:%v, chain:%v, currency:%v, receiver:%v", m.Name, m.RunningQueryCount, chain, currency, receiver)
 	defer func() {
 		sub.Unsubscribe()
 		close(logs)
 		close(ichan)
 		m.RunningQueryCount--
 
-		logx.Infof("EVM chain 实时状态结束, unsub and close chans, cname:%v, count:%v", m.Name, m.RunningQueryCount)
+		logx.Infof("EVM chain 实时状态结束, unsub and close chans, cname:%v, count:%v, chain:%v, currency:%v, receiver:%v", m.Name, m.RunningQueryCount, chain, currency, receiver)
 	}()
 
 	for {
@@ -85,7 +85,7 @@ func (m *EvmClientItem) listen(ctx context.Context, chain global.ChainName, icha
 				}
 
 				if round > 10 {
-					logx.Errorf("EVM 经过11轮比较区块高度后还未稳定, 所以认为本次交易失败...!")
+					logx.Errorf("EVM 经过11轮比较区块高度后还未稳定, 认为本次交易失败... chain:%v, currency:%v, receiver:%v", chain, currency, receiver)
 					return
 				}
 

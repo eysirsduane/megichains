@@ -84,6 +84,7 @@ type ContractAddress struct {
 type ListenReq struct {
 	MerchOrderId string `json:"merch_order_id"`
 	Chain        string `json:"chain"`
+	Currency     string `json:"currency"`
 	Receiver     string `json:"receiver"`
 	Seconds      int64  `json:"seconds"`
 }
@@ -95,4 +96,9 @@ type EPayNotifyReq struct {
 	ToHex        string  `json:"to_hex"`
 	Amount       float64 `json:"amount"`
 	Currency     string  `json:"currency"`
+}
+
+type EPayOrderAddress struct {
+	Address  string
+	Currency string
 }

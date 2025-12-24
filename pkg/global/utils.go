@@ -1,6 +1,7 @@
 package global
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -70,4 +71,9 @@ func TimeLastHourMilli() (milli uint64) {
 
 func GetFloat64String(f float64) (s string) {
 	return strconv.FormatFloat(f, 'f', 10, 64)
+}
+
+func GetOrderAddressKey(receiver, currency string) (key string) {
+	key = fmt.Sprintf("%v-%v", receiver, currency)
+	return
 }

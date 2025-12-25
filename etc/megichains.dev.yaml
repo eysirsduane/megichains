@@ -44,6 +44,19 @@ BSC:
   WssNetwork: wss://bnb-testnet.g.alchemy.com/v2/
   ApiKey: e9NHfWClRByVJCAgbZsq7 
 
+Solana:
+  ChainId: 23
+  WssNetwork: wss://solana-devnet.g.alchemy.com/v2/
+  GrpcNetwork: https://solana-devnet.g.alchemy.com/v2/
+  ApiKey: e9NHfWClRByVJCAgbZsq7
+  UsdtMint: "ArssLTduvvnue32EKwZtWcKDdg4dGWbm86EEW1Ci2CST"
+
+Tron:
+  WssNetwork: ""
+  GrpcNetwork: ""
+  HttpNetwork: https://nile.trongrid.io
+  ApiKey: ""
+
 ContractAddresses: 
   - Chain: ETH
     Address: "0xAA8E23Fb1079EA71e0A56F48a2Aa51851d8433D0"
@@ -64,17 +77,6 @@ ContractAddresses:
     Address: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf"
     Currency: "USDC"
 
-Solana:
-  ChainId: 23
-  WssNetwork: wss://solana-devnet.g.alchemy.com/v2/
-  GrpcNetwork: https://solana-devnet.g.alchemy.com/v2/
-  ApiKey: e9NHfWClRByVJCAgbZsq7
-  UsdtMint: "ArssLTduvvnue32EKwZtWcKDdg4dGWbm86EEW1Ci2CST"
 
-Tron:
-  WssNetwork: ""
-  GrpcNetwork: ""
-  HttpNetwork: https://nile.trongrid.io
-  ApiKey: ""
 
 

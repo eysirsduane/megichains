@@ -28,7 +28,7 @@ func (m *TronClientItem) listen(ctx context.Context, ichan chan *entity.TronOrde
 	defer func() {
 		close(ichan)
 		m.RunningQueryCount--
-		logx.Infof("TRON chain 实时状态结束, unsub and close chans, cname:%v, count:%v, receiver:%v", m.Name, m.RunningQueryCount, receiver)
+		logx.Infof("TRON chain 实时状态结束, close chans, cname:%v, count:%v, receiver:%v", m.Name, m.RunningQueryCount, receiver)
 	}()
 
 	for {
@@ -43,21 +43,22 @@ func (m *TronClientItem) listen(ctx context.Context, ichan chan *entity.TronOrde
 				url := fmt.Sprintf("%v/v1/accounts/%s/transactions/trc20?limit=200&contract_address=%v&only_confirmed=true&min_timestamp=%v", httpurl, receiver, caddr, min)
 				resp, err := http.Get(url)
 				if err != nil {
-					logx.Infof("Tron %v transaction listen request failed, err:%v", currency, err)
+					logx.Infof("Tron %v transaction 监听请求失败, err:%v", currency, err)
 					return
 				}
 
 				body, _ := io.ReadAll(resp.Body)
 				resp.Body.Close()
 
-				wrapper := &struct{ Data []*UsdtTransaction }{}
+				wrapper := &struct{ Data []*Trc20Transaction }{}
 				if err := json.Unmarshal(body, wrapper); err != nil {
-					logx.Infof("Tron %v transaction listen unmarshal json failed, err:%v", currency, err)
+					logx.Infof("Tron %v transaction 监听序列化json失败, err:%v", currency, err)
 					return
 				}
 
 				if len(wrapper.Data) > 0 {
 					for _, tx := range wrapper.Data {
+						logx.Infof("Tron 获得监听消息, [%v], receiver:%v", currency, receiver)
 						if tx != nil {
 							if tx.Type != global.TronTransactionTypoTransfer {
 								continue
@@ -69,7 +70,7 @@ func (m *TronClientItem) listen(ctx context.Context, ichan chan *entity.TronOrde
 							if tx.To == receiver {
 								sun, err := strconv.ParseInt(tx.Value, 10, 64)
 								if err != nil {
-									logx.Errorf("Tron transaction parse amount failed, [%v]:[%v], receiver:%v, err:%v", currency, tx.Value, receiver, err)
+									logx.Errorf("Tron transaction 转换金额是啊币, [%v]:[%v], receiver:%v, err:%v", currency, tx.Value, receiver, err)
 									continue
 								}
 
@@ -104,26 +105,7 @@ func (m *TronClientItem) listen(ctx context.Context, ichan chan *entity.TronOrde
 	}
 }
 
-func getTransaction[T *UsdtTransaction | UsdcTransaction]() (trans T) {
-	return
-}
-
-type UsdtTransaction struct {
-	TransactionId string `json:"transaction_id"`
-	TokenInfo     struct {
-		Symbol   string `json:"symbol"`
-		Address  string `json:"address"`
-		Decimals int32  `json:"decimals"`
-		Name     string `json:"name"`
-	} `json:"token_info"`
-	BlockTimestamp uint64 `json:"block_timestamp"`
-	From           string `json:"from"`
-	To             string `json:"to"`
-	Type           string `json:"type"`
-	Value          string `json:"value"`
-}
-
-type UsdcTransaction struct {
+type Trc20Transaction struct {
 	TransactionId string `json:"transaction_id"`
 	TokenInfo     struct {
 		Symbol   string `json:"symbol"`

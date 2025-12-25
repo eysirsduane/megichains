@@ -2,6 +2,7 @@ package manager
 
 import (
 	"fmt"
+	"megichains/apps/job/crons"
 
 	"github.com/robfig/cron/v3"
 )
@@ -33,12 +34,12 @@ func (m *CronManager) Register(spec string, job func()) {
 }
 
 func (m *CronManager) Start() {
-	// spec0 := "*/5 * * * * *"
-	// _, err := m.cron.AddFunc(spec0, m.troner.MonitorTrxTransaction)
-	// if err != nil {
-	// 	fmt.Printf("❌ cron task register MonitorTrxTransaction failed, [%s]: %v \n", spec0, err)
-	// 	panic(err)
-	// }
+	spec0 := "*/15 * * * * *"
+	_, err := m.cron.AddFunc(spec0, crons.GetSolanaAirdrop)
+	if err != nil {
+		fmt.Printf("❌ cron task register MonitorTrxTransaction failed, [%s]: %v \n", spec0, err)
+		panic(err)
+	}
 
 	// _, err = m.cron.AddFunc(spec0, m.troner.MonitorUsdtTransaction)
 	// if err != nil {

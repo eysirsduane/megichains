@@ -22,7 +22,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/gagliardetto/solana-go"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -69,9 +68,9 @@ func (m *ChainMonitor) newEvmClient(chain global.ChainName) (client *ethclient.C
 	port := ""
 	switch chain {
 	case global.ChainNameBsc:
-		port = fmt.Sprintf("%v%v", m.cfg.Bsc.GrpcNetwork, m.cfg.Bsc.ApiKey)
+		port = fmt.Sprintf("%v%v", m.cfg.Bsc.WssNetwork, m.cfg.Bsc.ApiKey)
 	case global.ChainNameEth:
-		port = fmt.Sprintf("%v%v", m.cfg.Eth.GrpcNetwork, m.cfg.Eth.ApiKey)
+		port = fmt.Sprintf("%v%v", m.cfg.Eth.WssNetwork, m.cfg.Eth.ApiKey)
 	default:
 		logx.Errorf("未知的链类型: %v", chain)
 		return nil, fmt.Errorf("未知的链类型: %v", chain)
@@ -87,7 +86,7 @@ func (m *ChainMonitor) newEvmClient(chain global.ChainName) (client *ethclient.C
 }
 
 func (m *ChainMonitor) newSolanaClient(chain global.ChainName) (conn *websocket.Conn, err error) {
-	port := fmt.Sprintf("%v%v", m.cfg.Solana.GrpcNetwork, m.cfg.Bsc.ApiKey)
+	port := fmt.Sprintf("%v%v", m.cfg.Solana.WssNetwork, m.cfg.Solana.ApiKey)
 	conn, _, err = websocket.DefaultDialer.Dial(port, nil)
 	if err != nil {
 		logx.Errorf("Solana chain connect failed, err:%v", err)
@@ -129,7 +128,8 @@ func (m *ChainMonitor) Listen(chain global.ChainName, currency, oid string, rece
 
 		m.listenSolana(chain, oid, receiver, seconds, item)
 	default:
-		logx.Errorf("监听未知的链")
+		logx.Errorf("=== 监听未知的链 ===")
+		return
 	}
 
 	logx.Infof("chain 事务结束, chain:%v, clen:%v, from:%v", chain, m.clilen, receiver)
@@ -281,31 +281,16 @@ func (m *ChainMonitor) listenEvm(chain global.ChainName, currency, oid, receiver
 }
 
 func (m *ChainMonitor) listenSolana(chain global.ChainName, oid, receiver string, seconds int64, item *SolanaClientItem) {
-	addr := solana.MustPublicKeyFromBase58(
-		receiver,
-	)
-
-	usdtMintPK := solana.MustPublicKeyFromBase58(m.cfg.Solana.UsdtMint)
-	ata, _, err := solana.FindAssociatedTokenAddress(
-		addr,
-		usdtMintPK,
-	)
-	if err != nil {
-		log.Fatal("find ATA error:", err)
-		return
-	}
-
-	fmt.Println("📌 Listening USDT ATA:", ata.String())
-
 	// 订阅该 ATA 的账户变化
-	req := map[string]interface{}{
-		"jsonrpc": "2.0",
-		"id":      1,
-		"method":  "accountSubscribe",
-		"params": []interface{}{
-			ata.String(),
-			map[string]interface{}{
-				"encoding":   "jsonParsed",
+	req := LogsSubscribeReq{
+		Jsonrpc: "2.0",
+		ID:      1,
+		Method:  "logsSubscribe",
+		Params: []any{
+			map[string]any{
+				"mentions": []string{receiver},
+			},
+			map[string]any{
 				"commitment": "confirmed",
 			},
 		},
@@ -319,12 +304,12 @@ func (m *ChainMonitor) listenSolana(chain global.ChainName, oid, receiver string
 	defer cancel()
 
 	ichan := make(chan *entity.SolanaOrder, 1)
-	go item.listen(ctx, ichan, receiver)
+	go item.listen(ctx, m.cfg.Solana.GrpcNetwork, m.cfg.Solana.UsdtMint, ichan, receiver)
 
 	for order := range ichan {
 		order.MerchOrderId = oid
 		order.Chain = string(chain)
-		err = m.saveSolanaOrder(order)
+		err := m.saveSolanaOrder(order)
 		if err != nil {
 			logx.Errorf("Solana chain 保存日志失败, txid:%v, err:%v", order.TxHash, err)
 		}
@@ -337,8 +322,6 @@ func (m *ChainMonitor) listenSolana(chain global.ChainName, oid, receiver string
 			continue
 		}
 	}
-
-	log.Println("✅ Listening USDT transfers for wallet...")
 }
 
 func (m *ChainMonitor) GenerateETHAddress() {

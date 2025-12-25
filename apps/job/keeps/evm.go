@@ -42,25 +42,18 @@ func (m *EvmClientItem) listen(ctx context.Context, chain global.ChainName, curr
 	for {
 		select {
 		case <-ctx.Done():
-			logx.Infof("EVM chain 订阅超时, 已退出单笔订阅, to:%v", receiver)
+			logx.Infof("EVM chain 订阅超时, 已退出单笔订阅, receiver:%v", receiver)
 			return
 		case err := <-sub.Err():
-			logx.Errorf("EVM chain 订阅错误, 已退出单笔订阅, to:%v, err:%v", receiver, err)
+			logx.Errorf("EVM chain 订阅错误, 已退出单笔订阅, receiver:%v, err:%v", receiver, err)
 			return
 		case log := <-logs:
-			// for i := 0; i < 5; i++ {
-			// 	receipt, err1 := m.Client.TransactionReceipt(context.Background(), log.TxHash)
-			// 	if err1 != nil {
-			// 		logx.Errorf("EVM chain 获取交易回执失败: %s: %v", log.TxHash, err1)
-			// 		continue
-			// 	}
-			// 	if receipt.Status != 1 {
-			// 		logx.Errorf("EVM chain 交易回执状态不为1, 可能已经挂起, txid:%s ", log.TxHash.String())
-			// 		continue
-			// 	}
-			// }
-			round := 0
-			threshold := 0
+			if log.Removed {
+				logx.Errorf("EVM log is removed, currency:%v, receiver:%v, txid:%v", currency, receiver, log.TxHash.String())
+				return
+			}
+
+			round, threshold := 0, 0
 			switch chain {
 			case global.ChainNameEth:
 				threshold = 1

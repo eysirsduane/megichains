@@ -19,7 +19,7 @@ func NewGormDB(cfg *global.Config) (db *gorm.DB, err error) {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&RangeConfig{}, &User{}, Address{}, &EvmOrder{})
+	err = db.AutoMigrate(&RangeConfig{}, &User{}, Address{}, &EvmOrder{}, &SolanaOrder{})
 	if err != nil {
 		panic(err)
 	}

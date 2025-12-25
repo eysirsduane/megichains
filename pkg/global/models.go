@@ -41,26 +41,27 @@ type EPay struct {
 }
 
 type Eth struct {
-	ChainId     uint16
-	GrpcNetwork string
-	ApiKey      string
+	ChainId    uint16
+	WssNetwork string
+	ApiKey     string
 }
 
 type Bsc struct {
-	ChainId     uint16
-	GrpcNetwork string
-	ApiKey      string
+	ChainId    uint16
+	WssNetwork string
+	ApiKey     string
 }
 
 type Solana struct {
 	ChainId     uint16
+	WssNetwork  string
 	GrpcNetwork string
 	ApiKey      string
 	UsdtMint    string
 }
 
 type Tron struct {
-	GrpcNetwork string
+	WssNetwork  string
 	HttpNetwork string
 
 	Trx2UsdtRateApi string

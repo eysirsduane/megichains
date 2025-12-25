@@ -14,6 +14,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/gagliardetto/solana-go"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,6 +35,15 @@ func main() {
 		logx.Errorf("init gorm db failed, err:%v", err)
 		panic(err)
 	}
+
+	key, err := solana.PrivateKeyFromSolanaKeygenFile(
+		"/Users/eysirsduane/.config/solana/id.json",
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(key.String()) // base58 私钥
 
 	ethservice := service.NewEvmService(db)
 	solaservice := service.NewSolanaService(db)

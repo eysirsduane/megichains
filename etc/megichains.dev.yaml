@@ -32,19 +32,20 @@ EPay:
 
 Eth:
   ChainId: 1
-  GrpcNetwork: wss://eth-sepolia.g.alchemy.com/v2/
+  WssNetwork: wss://eth-sepolia.g.alchemy.com/v2/
   ApiKey: e9NHfWClRByVJCAgbZsq7
     
 BSC:
   ChainId: 56
-  GrpcNetwork: wss://bnb-testnet.g.alchemy.com/v2/
+  WssNetwork: wss://bnb-testnet.g.alchemy.com/v2/
   ApiKey: e9NHfWClRByVJCAgbZsq7 
 
 Solana:
   ChainId: 23
-  GrpcNetwork: wss://solana-devnet.g.alchemy.com/v2/
+  WssNetwork: wss://solana-devnet.g.alchemy.com/v2/
+  GrpcNetwork: https://solana-devnet.g.alchemy.com/v2/
   ApiKey: e9NHfWClRByVJCAgbZsq7
-  UsdtMint: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY5Yt1vZ1tcHTfb"
+  UsdtMint: "ArssLTduvvnue32EKwZtWcKDdg4dGWbm86EEW1Ci2CST"
 
 ContractAddresses: 
   - Chain: ETH
@@ -61,6 +62,7 @@ ContractAddresses:
     Currency: "USDC"
     
 Tron:
+  WssNetwork: ""
   GrpcNetwork: grpc://grpc.nile.trongrid.io:50051
   HttpNetwork: https://nile.trongrid.io
   Trx2UsdtRateApi: https://api.htx.com/market/detail?symbol=trxusdt

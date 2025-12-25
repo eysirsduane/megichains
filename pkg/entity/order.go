@@ -5,9 +5,9 @@ type EvmOrder struct {
 	MerchOrderId string `gorm:"size:63"`
 
 	Chain   string `gorm:"size:15"`
-	ChainId uint64 `gorm:"uniqueIndex:idx_trans_index"`
-	TxHash  string `gorm:"size:255;uniqueIndex:idx_trans_index"`
-	Index   uint   `gorm:"uniqueIndex:idx_trans_index"`
+	ChainId uint64 `gorm:"uniqueIndex:idx_evm_trans_index"`
+	TxHash  string `gorm:"size:255;uniqueIndex:idx_evm_trans_index"`
+	Index   uint   `gorm:"uniqueIndex:idx_evm_trans_index"`
 	TxIndex uint   `gorm:""`
 
 	Typo     string `gorm:"size:15"`
@@ -26,6 +26,32 @@ type EvmOrder struct {
 	BlockTimestamp uint64 `gorm:""`
 
 	Removed     bool   `gorm:""`
+	Description string `gorm:"size:2047"`
+
+	TimeAts `gorm:"embedded"`
+}
+
+type TronOrder struct {
+	Id           int64  `gorm:"primaryKey;autoIncrement"`
+	MerchOrderId string `gorm:"size:63"`
+
+	Chain         string `gorm:"size:15;uniqueIndex:idx_tron_trans_index"`
+	ChainId       uint64 `gorm:""`
+	TransactionId string `gorm:"size:255;uniqueIndex:idx_tron_trans_index"`
+
+	Typo     string `gorm:"size:15"`
+	Status   string `gorm:"size:15"`
+	Currency string `gorm:"size:15"`
+
+	ReceivedAmount float64 `gorm:""`
+	ReceivedSun    int64   `gorm:""`
+
+	FromBase58 string `gorm:"size:255"`
+	ToBase58   string `gorm:"size:255"`
+
+	Contract       string `gorm:"size:255"`
+	BlockTimestamp uint64 `gorm:""`
+
 	Description string `gorm:"size:2047"`
 
 	TimeAts `gorm:"embedded"`

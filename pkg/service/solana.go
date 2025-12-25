@@ -20,11 +20,12 @@ func (s *SolanaService) Save(order *entity.SolanaOrder) (err error) {
 	err = s.db.Create(order).Error
 	if err != nil {
 		logx.Errorf("db solana service save transaction failed, err:%v", err)
-		err = biz.EvmOrderSaveFailed
+		err = biz.SolanaOrderSaveFailed
 	}
 
 	return
 }
+
 func (s *SolanaService) CreateAddresses(addrs []*entity.Address) (err error) {
 	err = s.db.Create(addrs).Error
 	if err != nil {

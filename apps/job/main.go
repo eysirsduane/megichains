@@ -48,7 +48,8 @@ func main() {
 	ethservice := service.NewEvmService(db)
 	solaservice := service.NewSolanaService(db)
 	addrservice := service.NewAddressService(db)
-	monitor = keeps.NewChainMonitor(&cfg, ethservice, addrservice, solaservice)
+	tronservice := service.NewTronService(db)
+	monitor = keeps.NewChainMonitor(&cfg, ethservice, addrservice, solaservice, tronservice)
 
 	starting := "Starting job..."
 	fmt.Println(starting)
@@ -148,7 +149,7 @@ func returnError(w http.ResponseWriter, resp *ResponseMessage) {
 }
 
 func startListen(chain global.ChainName, req *global.ListenReq) (exist bool) {
-	rkey := global.GetOrderAddressKey(req.Receiver, req.Currency)
+	rkey := global.GetOrderAddressKey(string(chain), req.Receiver, req.Currency)
 	monitor.Receivers.Range(func(key, val any) bool {
 		if key == rkey {
 			logx.Infof("已存在监听地址, chain:%v, receiver:%v, currency:%v", chain, req.Receiver, req.Currency)

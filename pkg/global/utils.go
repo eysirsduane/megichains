@@ -11,9 +11,10 @@ import (
 type AmountTypo int64
 
 const (
-	AmountTypoEth AmountTypo = 1_000_000
-	AmountTypoBsc AmountTypo = 1_000_000_000_000_000_000
-	AmountTypoSun AmountTypo = 1_000_000
+	AmountTypoEth  AmountTypo = 1_000_000
+	AmountTypoBsc  AmountTypo = 1_000_000_000_000_000_000
+	AmountTypoSun  AmountTypo = 1_000_000
+	AmountTypoTron AmountTypo = 1_000_000
 )
 
 func Amount(sun int64, typo AmountTypo) (amount float64) {
@@ -73,7 +74,7 @@ func GetFloat64String(f float64) (s string) {
 	return strconv.FormatFloat(f, 'f', 10, 64)
 }
 
-func GetOrderAddressKey(receiver, currency string) (key string) {
-	key = fmt.Sprintf("%v-%v", receiver, currency)
+func GetOrderAddressKey(chain, receiver, currency string) (key string) {
+	key = fmt.Sprintf("%v-%v-%v", chain, receiver, currency)
 	return
 }

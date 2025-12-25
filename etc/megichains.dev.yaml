@@ -27,6 +27,10 @@ DB:
   Charset: utf8mb4
   Timezone: UTC
 
+Bot:
+  Token: "8365546663:AAHzYZpB0KvwSguCNzLLYsR9DbtvMjrJSEg"
+  Service: "@eysirslocal"
+
 EPay:
   NotifyUrl: "http://localhost:8080/api/v1/epay/notify"
 
@@ -39,13 +43,6 @@ BSC:
   ChainId: 56
   WssNetwork: wss://bnb-testnet.g.alchemy.com/v2/
   ApiKey: e9NHfWClRByVJCAgbZsq7 
-
-Solana:
-  ChainId: 23
-  WssNetwork: wss://solana-devnet.g.alchemy.com/v2/
-  GrpcNetwork: https://solana-devnet.g.alchemy.com/v2/
-  ApiKey: e9NHfWClRByVJCAgbZsq7
-  UsdtMint: "ArssLTduvvnue32EKwZtWcKDdg4dGWbm86EEW1Ci2CST"
 
 ContractAddresses: 
   - Chain: ETH
@@ -60,17 +57,24 @@ ContractAddresses:
   - Chain: BSC
     Address: "0x64544969ed7EBf5f083679233325356EbE738930"
     Currency: "USDC"
-    
+  - Chain: TRON
+    Address: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf"
+    Currency: "USDT"
+  - Chain: TRON
+    Address: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf"
+    Currency: "USDC"
+
+Solana:
+  ChainId: 23
+  WssNetwork: wss://solana-devnet.g.alchemy.com/v2/
+  GrpcNetwork: https://solana-devnet.g.alchemy.com/v2/
+  ApiKey: e9NHfWClRByVJCAgbZsq7
+  UsdtMint: "ArssLTduvvnue32EKwZtWcKDdg4dGWbm86EEW1Ci2CST"
+
 Tron:
   WssNetwork: ""
-  GrpcNetwork: grpc://grpc.nile.trongrid.io:50051
+  GrpcNetwork: ""
   HttpNetwork: https://nile.trongrid.io
-  Trx2UsdtRateApi: https://api.htx.com/market/detail?symbol=trxusdt
-  OwnerPrivateKey: ab09942dcabd1e1a6ced3e7002dcadcd244104dffa8884eb67cde035659ccf86
-  MonitorAddress: TD9ryFrcJd74nd24P7ToHjqjSfcaHqk92G
-  TRC20USDTAddress: TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf
+  ApiKey: ""
 
-Bot:
-  Token: "8365546663:AAHzYZpB0KvwSguCNzLLYsR9DbtvMjrJSEg"
-  Service: "@eysirslocal"
-  
+

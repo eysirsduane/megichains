@@ -63,12 +63,8 @@ type Solana struct {
 type Tron struct {
 	WssNetwork  string
 	HttpNetwork string
-
-	Trx2UsdtRateApi string
-
-	OwnerPrivateKey  string
-	MonitorAddress   string
-	TRC20USDTAddress string
+	GrpcNetwork string
+	ApiKey      string
 }
 
 type Bot struct {

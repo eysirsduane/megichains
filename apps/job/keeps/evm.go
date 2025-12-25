@@ -6,7 +6,6 @@ import (
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -16,8 +15,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
-
-var emu sync.Mutex
 
 type EvmClientItem struct {
 	Cfg               *global.Config

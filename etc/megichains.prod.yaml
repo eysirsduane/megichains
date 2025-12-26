@@ -35,23 +35,23 @@ EPay:
 
 Tron:
   WssNetwork: ""
-  GrpcNetwork: ""
-  HttpNetwork: https://nile.trongrid.io
+  WssNetwork: ""
+  HttpNetwork: https://api.trongrid.io
   ApiKey: ""
 
 Eth:
   ChainId: 1
-  GrpcNetwork: wss://eth-mainnet.g.alchemy.com/v2/
+  WssNetwork: wss://eth-mainnet.g.alchemy.com/v2/
   ApiKey: e9NHfWClRByVJCAgbZsq7
     
 BSC:
   ChainId: 56
-  GrpcNetwork: wss://bnb-mainnet.g.alchemy.com/v2/
+  WssNetwork: wss://bnb-mainnet.g.alchemy.com/v2/
   ApiKey: e9NHfWClRByVJCAgbZsq7 
 
 Solana:
   ChainId: 23
-  GrpcNetwork: wss://solana-devnet.g.alchemy.com/v2/
+  WssNetwork: wss://solana-devnet.g.alchemy.com/v2/
   ApiKey: e9NHfWClRByVJCAgbZsq7
   UsdtMint: Es9vMFrzaCERmJfrF4H2FYD4KCoNkY5Yt1vZ1tcHTf
 
@@ -69,11 +69,8 @@ ContractAddresses:
     Address: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
     Currency: "USDC"
   - Chain: TRON
-    Address: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf"
+    Address: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
     Currency: "USDT"
-  - Chain: TRON
-    Address: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf"
-    Currency: "USDC"
 
 
 

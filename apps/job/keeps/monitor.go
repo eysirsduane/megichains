@@ -399,6 +399,11 @@ func (m *ChainMonitor) listenTron(chain global.ChainName, currency global.Curren
 			}
 		}
 	case global.CurrencyTypoUsdc:
+		for _, addr := range m.cfg.ContractAddresses {
+			if strings.EqualFold(addr.Chain, string(chain)) && strings.EqualFold(addr.Currency, string(currency)) {
+				caddr = addr.Address
+			}
+		}
 	default:
 		logx.Errorf("Tron 未知的币种...!, chain:%v, currency:%v", chain, currency)
 		return

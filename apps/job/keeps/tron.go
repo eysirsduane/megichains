@@ -89,6 +89,8 @@ func (m *TronClientItem) listen(ctx context.Context, ichan chan *entity.TronOrde
 								order.Status = string(global.BscTransactionStatusSuccess)
 								order.Description = ""
 
+								min = int64(tx.BlockTimestamp)
+
 								ichan <- order
 
 								return

@@ -4,11 +4,11 @@ const (
 	StringSuccess = "SUCCESS"
 )
 
-type BscTransactionTypo string
+type OrderTypo string
 
 const (
-	BscTransactionTypoIn  BscTransactionTypo = "入账"
-	BscTransactionTypoOut BscTransactionTypo = "出款"
+	OrderTypoIn  OrderTypo = "入账"
+	OrderTypoOut OrderTypo = "出款"
 )
 
 const (
@@ -56,9 +56,10 @@ const (
 	ExchangeTypoTrx2Usdt ExchangeTypo = "TRX2USDT"
 )
 
-type BscTransactionStatus string
+type EvmTransactionStatus string
 
 const (
-	BscTransactionStatusCreated BscTransactionStatus = "已创建"
-	BscTransactionStatusSuccess BscTransactionStatus = "成功"
+	EvmTransactionStatusCreated      EvmTransactionStatus = "已创建"
+	EvmTransactionStatusNotifyFailed EvmTransactionStatus = "通知失败"
+	EvmTransactionStatusSuccess      EvmTransactionStatus = "成功"
 )

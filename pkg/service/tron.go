@@ -16,8 +16,18 @@ func NewTronService(db *gorm.DB) *TronService {
 	return &TronService{db: db}
 }
 
-func (s *TronService) SaveOrder(order *entity.TronOrder) (err error) {
-	err = s.db.Create(order).Error
+func (s *TronService) OrderSave(order *entity.TronOrder) (err error) {
+	err = s.db.Save(order).Error
+	if err != nil {
+		logx.Errorf("db tron service save transaction failed, err:%v", err)
+		err = biz.EvmOrderSaveFailed
+	}
+
+	return
+}
+
+func (s *TronService) TransSave(order *entity.TronTransaction) (err error) {
+	err = s.db.Save(order).Error
 	if err != nil {
 		logx.Errorf("db tron service save transaction failed, err:%v", err)
 		err = biz.EvmOrderSaveFailed

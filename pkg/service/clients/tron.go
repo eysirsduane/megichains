@@ -23,7 +23,7 @@ type TronClientItem struct {
 	RunningQueryCount int
 }
 
-func (m *TronClientItem) Listen(ctx context.Context, ichan chan *entity.TronOrder, currency global.CurrencyTypo, httpurl, caddr, receiver string) {
+func (m *TronClientItem) Listen(ctx context.Context, ichan chan *entity.TronTransaction, currency global.CurrencyTypo, httpurl, caddr, receiver string) {
 	logx.Infof("TRON chain 实时状态开始, cname:%v, count:%v, receiver:%v", m.Name, m.RunningQueryCount, receiver)
 	defer func() {
 		close(ichan)
@@ -76,22 +76,19 @@ func (m *TronClientItem) Listen(ctx context.Context, ichan chan *entity.TronOrde
 
 								amount := global.Amount(sun, global.AmountTypoTron)
 
-								order := &entity.TronOrder{}
-								order.TransactionId = tx.TransactionId
-								order.BlockTimestamp = tx.BlockTimestamp
-								order.Contract = tx.TokenInfo.Address
-								order.Currency = tx.TokenInfo.Symbol
-								order.FromBase58 = tx.From
-								order.ToBase58 = tx.To
-								order.ReceivedAmount = amount
-								order.ReceivedSun = sun
-								order.Typo = string(global.BscTransactionTypoIn)
-								order.Status = string(global.BscTransactionStatusSuccess)
-								order.Description = ""
+								trans := &entity.TronTransaction{}
+								trans.Currency = tx.TokenInfo.Symbol
+								trans.TransactionId = tx.TransactionId
+								trans.Amount = amount
+								trans.Sun = sun
+								trans.FromBase58 = tx.From
+								trans.ToBase58 = tx.To
+								trans.Contract = tx.TokenInfo.Address
+								trans.BlockTimestamp = tx.BlockTimestamp
 
 								min = int64(tx.BlockTimestamp)
 
-								ichan <- order
+								ichan <- trans
 
 								return
 							}

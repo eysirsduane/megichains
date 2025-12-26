@@ -31,7 +31,6 @@ func NewChainListenLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Chain
 }
 
 func (l *ChainListenLogic) ChainListen(req *types.ChainListenReq) (resp *types.ChainListenResp, err error) {
-	// todo: add your logic here and delete this line
 	exist := false
 	rkey := global.GetOrderAddressKey(string(req.Chain), req.Receiver, req.Currency)
 	l.svcCtx.ListenService.Receivers.Range(func(key, val any) bool {

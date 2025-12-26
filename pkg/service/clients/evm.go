@@ -25,7 +25,7 @@ type EvmClientItem struct {
 	RunningQueryCount int
 }
 
-func (m *EvmClientItem) Listen(ctx context.Context, chain global.ChainName, currency string, ichan chan *entity.EvmOrder, sub ethereum.Subscription, logs chan types.Log, receiver string) {
+func (m *EvmClientItem) Listen(ctx context.Context, chain global.ChainName, currency string, ichan chan *entity.EvmLog, sub ethereum.Subscription, logs chan types.Log, receiver string) {
 	logx.Infof("EVM chain 实时状态开始, cname:%v, count:%v, chain:%v, currency:%v, receiver:%v", m.Name, m.RunningQueryCount, chain, currency, receiver)
 	defer func() {
 		sub.Unsubscribe()
@@ -121,16 +121,14 @@ func (m *EvmClientItem) Listen(ctx context.Context, chain global.ChainName, curr
 					}
 				}
 
-				order := &entity.EvmOrder{
-					Typo:           string(global.BscTransactionTypoIn),
-					Status:         string(global.BscTransactionStatusSuccess),
+				order := &entity.EvmLog{
 					Currency:       string(currency),
 					ChainId:        cid.Uint64(),
 					TxHash:         log.TxHash.Hex(),
 					Index:          log.Index,
 					TxIndex:        log.TxIndex,
-					ReceivedAmount: amount,
-					ReceivedSun:    sun.Int64(),
+					Amount:         amount,
+					Sun:            sun.Int64(),
 					FromHex:        from.Hex(),
 					ToHex:          to.Hex(),
 					Contract:       log.Address.Hex(),
@@ -138,7 +136,6 @@ func (m *EvmClientItem) Listen(ctx context.Context, chain global.ChainName, curr
 					BlockNumber:    log.BlockNumber,
 					BlockTimestamp: block.Time(),
 					Removed:        log.Removed,
-					Description:    "",
 				}
 
 				ichan <- order

@@ -27,13 +27,7 @@ func NewUserCreateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserCr
 }
 
 func (l *UserCreateLogic) UserCreate(req *types.UserCreateReq) (resp *types.UserCreateResp, err error) {
-	ok, err := l.svcCtx.UserService.Create(req.Username, req.Password)
-	if err != nil {
-		logx.Errorf("user create failed, err:%v", err)
-		return
-	}
-
-	resp = &types.UserCreateResp{Success: ok}
+	// todo: add your logic here and delete this line
 
 	return
 }

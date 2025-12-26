@@ -30,8 +30,10 @@ var (
 )
 
 var (
-	ChainClientUpToMaxCount = NewSpecificError(3001, "链客户端已达到数量上西安")
-	AddressCreateFailed     = NewSpecificError(3002, "地址创建失败")
+	ChainClientUpToMaxCount  = NewSpecificError(3001, "链客户端已达到数量上西安")
+	AddressCreateFailed      = NewSpecificError(3002, "地址创建失败")
+	ContractAddressNotFound  = NewSpecificError(3003, "不支持的币种")
+	AlreadyListenThisAddress = NewSpecificError(3004, "该地址已经被监听了")
 )
 
 var (

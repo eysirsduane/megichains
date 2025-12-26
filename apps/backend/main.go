@@ -21,7 +21,7 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-var configFile = flag.String("f", "../../etc/megichains.dev.yaml", "the config file")
+var configFile = flag.String("f", "../../etc/megichains.backend.dev.yaml", "the config file")
 
 func main() {
 	flag.Parse()
@@ -40,10 +40,14 @@ func main() {
 	server := rest.MustNewServer(cfg.RestConf)
 	defer server.Stop()
 
-	excfgservice := service.NewRangeConfigService(db)
-	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
 	userservice := service.NewUserService(db)
-	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice)
+	excfgservice := service.NewRangeConfigService(db)
+	evmservice := service.NewEvmService(db)
+	addrservice := service.NewAddressService(db)
+	tronservice := service.NewTronService(db)
+	clistenservice := service.NewChainListenService(&cfg, db, addrservice, evmservice, tronservice)
+	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
+	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, clistenservice)
 	handler.RegisterHandlers(server, ctx)
 
 	httpx.SetOkHandler(biz.OkHandler)

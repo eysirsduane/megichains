@@ -28,13 +28,6 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 
 func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err error) {
 	// todo: add your logic here and delete this line
-	atoken, rtoken, err := l.svcCtx.AuthService.Login(req.Username, req.Password)
-	if err != nil {
-		logx.Errorf("user login failed, username:%v, password:%v, err:%v", req.Username, req.Password, err)
-		return
-	}
 
-	resp = &types.LoginResp{Token: atoken, RefreshToken: rtoken}
-	
 	return
 }

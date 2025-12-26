@@ -9,7 +9,6 @@ import (
 	"megichains/apps/backend/internal/svc"
 	"megichains/apps/backend/internal/types"
 
-	"github.com/jinzhu/copier"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -28,14 +27,7 @@ func NewUserInfoGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserI
 }
 
 func (l *UserInfoGetLogic) UserInfoGet(req *types.UserInfoGetReq) (resp *types.UserInfoGetResp, err error) {
-	un := l.ctx.Value("username").(string)
-	info, err := l.svcCtx.UserService.Get(un)
-	if err != nil {
-		logx.Errorf("auth get user info failed, un:%v err:%v", un, err)
-		return
-	}
+	// todo: add your logic here and delete this line
 
-	resp = &types.UserInfoGetResp{}
-	copier.Copy(resp, info)
 	return
 }

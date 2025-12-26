@@ -3,16 +3,27 @@
 
 package types
 
-type BscTransactionItem struct {
+type BscLogItem struct {
 }
 
-type BscTransactionListReq struct {
+type BscLogListReq struct {
 }
 
-type BscTransactionListResp struct {
-	Records []*BscTransactionItem
+type BscLogListResp struct {
+	Records []*BscLogItem
 	Total   int64
 	PagesBody
+}
+
+type ChainListenReq struct {
+	MerchOrderId string `json:"merch_order_id"`
+	Chain        string `json:"chain"`
+	Currency     string `json:"currency"`
+	Receiver     string `json:"receiver"`
+	Seconds      int64  `json:"seconds"`
+}
+
+type ChainListenResp struct {
 }
 
 type Contacts struct {

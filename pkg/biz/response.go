@@ -28,7 +28,7 @@ func Fail(code int64, err string) *Response {
 
 func SpecificFail(err *SpecificError) *Response {
 	return &Response{
-		Code: 1,
+		Code: err.Code,
 		Msg:  err.Msg,
 	}
 }

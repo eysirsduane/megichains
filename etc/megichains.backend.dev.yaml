@@ -13,7 +13,7 @@ Log:
 
 Auth:
   AccessSecret: "d:Dcjm39vmdf9JF)(#MCV;ldj39(VJM#:V939fkLVJK%&*)_3o03ke0dflmff9(FJDF:LKM#9f(FJ3:FP(DF*()))*jf))"
-  AccessExpire: 3600  
+  AccessExpire: 3600
   RefreshSecret: "vmdf9JF)(#MCV;ldj:Dcjm39vmdf9JF)(#MCV39(VJM#:V93VJK%&*)_3o03ke0dflmff9M#9f(FJ3:FP(fkLdk3&*k3!"
   RefreshExpire: 604800
   Issuer: www.baidu.com
@@ -29,7 +29,7 @@ DB:
 
 Bot:
   Token: "8365546663:AAHzYZpB0KvwSguCNzLLYsR9DbtvMjrJSEg"
-  Service: "@eysirslocal"
+  Service: "@eysirs"
 
 EPay:
   NotifyUrl: "http://localhost:8080/api/v1/epay/notify"

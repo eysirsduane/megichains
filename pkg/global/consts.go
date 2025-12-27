@@ -71,10 +71,10 @@ const (
 	ExchangeTypoTrx2Usdt ExchangeTypo = "TRX2USDT"
 )
 
-type EvmTransactionStatus string
+type OrderStatus string
 
 const (
-	EvmTransactionStatusCreated      EvmTransactionStatus = "已创建"
-	EvmTransactionStatusNotifyFailed EvmTransactionStatus = "通知失败"
-	EvmTransactionStatusSuccess      EvmTransactionStatus = "成功"
+	OrderStatusCreated      OrderStatus = "已创建"
+	OrderStatusNotifyFailed OrderStatus = "通知失败"
+	OrderStatusSuccess      OrderStatus = "成功"
 )

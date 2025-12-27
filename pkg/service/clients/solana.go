@@ -69,7 +69,7 @@ type TokenBalance struct {
 	} `json:"uiTokenAmount"`
 }
 
-func (m *SolanaClientItem) listen(ctx context.Context, rpcurl, mint string, ichan chan *entity.SolanaOrder, receiver string) {
+func (m *SolanaClientItem) listen(ctx context.Context, rpcurl, mint string, ichan chan *entity.MerchOrder, receiver string) {
 	logx.Infof("SOLANA chain 实时状态开始, cname:%v, count:%v, receiver:%v", m.Name, m.RunningQueryCount, receiver)
 	defer func() {
 		close(ichan)

@@ -34,26 +34,28 @@ const (
 )
 
 type ChainListenService struct {
-	db          *gorm.DB
-	cfg         *global.Config
-	clients     sync.Map
-	clilen      int
-	qclilen     int
-	Receivers   sync.Map
-	addrservice *AddressService
-	evmservice  *EvmService
-	tronservice *TronService
+	db           *gorm.DB
+	cfg          *global.Config
+	clients      sync.Map
+	clilen       int
+	qclilen      int
+	Receivers    sync.Map
+	addrservice  *AddressService
+	orderservice *MerchOrderService
+	evmservice   *EvmService
+	tronservice  *TronService
 }
 
-func NewChainListenService(cfg *global.Config, db *gorm.DB, addrservice *AddressService, evmservice *EvmService, tronservice *TronService) *ChainListenService {
+func NewChainListenService(cfg *global.Config, db *gorm.DB, addrservice *AddressService, orderservice *MerchOrderService, evmservice *EvmService, tronservice *TronService) *ChainListenService {
 	return &ChainListenService{
-		db:          db,
-		cfg:         cfg,
-		clients:     sync.Map{},
-		Receivers:   sync.Map{},
-		addrservice: addrservice,
-		evmservice:  evmservice,
-		tronservice: tronservice,
+		db:           db,
+		cfg:          cfg,
+		clients:      sync.Map{},
+		Receivers:    sync.Map{},
+		addrservice:  addrservice,
+		orderservice: orderservice,
+		evmservice:   evmservice,
+		tronservice:  tronservice,
 	}
 }
 
@@ -101,11 +103,11 @@ func (s *ChainListenService) Listen(req *converter.ChainListenReq) {
 
 		s.listenTron(req.Chain, global.CurrencyTypo(req.Currency), req.MerchOrderId, req.Receiver, req.Seconds, item)
 	default:
-		logx.Errorf("=== 监听未知的链 ===")
+		logx.Errorf("=== 监听了未知的链 ===")
 		return
 	}
 
-	logx.Infof("req.Chain 事务结束, req.Chain:%v, clen:%v, from:%v", req.Chain, s.clilen, req.Receiver)
+	logx.Infof("监听事务结束, chain:%v, clen:%v, from:%v", req.Chain, s.clilen, req.Receiver)
 }
 
 func (s *ChainListenService) newEvmClient(chain global.ChainName) (client *ethclient.Client, err error) {
@@ -116,13 +118,12 @@ func (s *ChainListenService) newEvmClient(chain global.ChainName) (client *ethcl
 	case global.ChainNameEth:
 		port = fmt.Sprintf("%v%v", s.cfg.Eth.WssNetwork, s.cfg.Eth.ApiKey)
 	default:
-		logx.Errorf("未知的链类型: %v", chain)
-		return nil, fmt.Errorf("未知的链类型: %v", chain)
+		return nil, fmt.Errorf("unknown chain: %v", chain)
 	}
 
 	client, err = ethclient.Dial(port)
 	if err != nil {
-		logx.Errorf("EVM req.Chain Dial 失败 err:%v", err)
+		logx.Errorf("EVM req.Chain Dial failed err:%v", err)
 		return
 	}
 
@@ -192,7 +193,7 @@ func (s *ChainListenService) getClientItem(chain global.ChainName) (item any, er
 			if chain == global.ChainNameTron {
 				client, err1 := s.newTronClient(chain)
 				if err1 != nil {
-					logx.Errorf("TRON chain Dial 失败, 尝试重连 err:%v", err1)
+					logx.Errorf("TRON chain Dial failed, try again err:%v", err1)
 					time.Sleep(time.Second * 2)
 					continue
 				}
@@ -213,7 +214,7 @@ func (s *ChainListenService) getClientItem(chain global.ChainName) (item any, er
 					case global.ChainNameEth, global.ChainNameBsc:
 						client, err1 := s.newEvmClient(chain)
 						if err1 != nil {
-							logx.Errorf("EVM chain Dial 失败, 尝试重连 err:%v", err1)
+							logx.Errorf("EVM chain Dial failed, try again err:%v", err1)
 							time.Sleep(time.Second * 2)
 							continue
 						}
@@ -227,13 +228,13 @@ func (s *ChainListenService) getClientItem(chain global.ChainName) (item any, er
 						item = c
 						s.clients.Store(name, item)
 						s.clilen++
-						logx.Infof("EVM chain 新增客户端, cname:%v, clen:%v", name, s.clilen)
+						logx.Infof("EVM chain 创建新客户端, cname:%v, clen:%v", name, s.clilen)
 
 						return
 					case global.ChainNameSolana:
 						client, err1 := s.newSolanaClient(chain)
 						if err1 != nil {
-							logx.Errorf("SOLANA chain Dial 失败, 尝试重连 err:%v", err1)
+							logx.Errorf("SOLANA chain Dial failed, try again err:%v", err1)
 							time.Sleep(time.Second * 2)
 							continue
 						}
@@ -248,7 +249,7 @@ func (s *ChainListenService) getClientItem(chain global.ChainName) (item any, er
 						s.clients.Store(name, item)
 						s.clilen++
 
-						logx.Infof("SOLANA chain 新增客户端, cname:%v, clen:%v", name, s.clilen)
+						logx.Infof("SOLANA chain 创建新客户端, cname:%v, clen:%v", name, s.clilen)
 
 						return
 					}
@@ -279,8 +280,7 @@ func (s *ChainListenService) getContractAddress(currency global.CurrencyTypo, ch
 			}
 		}
 	default:
-		logx.Errorf("Tron 不支持的币种...!, chain:%v, currency:%v", chain, currency)
-		err = biz.ContractAddressNotFound
+		err = fmt.Errorf("contract address get failed...!, chain:%v, currency:%v", chain, currency)
 		return
 	}
 
@@ -297,7 +297,7 @@ func (s *ChainListenService) clearClients() {
 				ecli.Client.Close()
 				s.clients.Delete(key)
 				s.clilen--
-				logx.Infof("EVM chain 删除客户端, cname:%v, clen:%v", ecli.Name, s.clilen)
+				logx.Infof("EVM chain delete client, cname:%v, clen:%v", ecli.Name, s.clilen)
 			}
 		}
 
@@ -307,7 +307,7 @@ func (s *ChainListenService) clearClients() {
 				scli.Client.Close()
 				s.clients.Delete(key)
 				s.clilen--
-				logx.Infof("SOLANA chain 删除客户端, cname:%v, clen:%v", scli.Name, s.clilen)
+				logx.Infof("SOLANA chain delete client, cname:%v, clen:%v", scli.Name, s.clilen)
 			}
 
 		}
@@ -334,7 +334,7 @@ func (s *ChainListenService) listenEvm(chain global.ChainName, currency, moid, r
 			}
 		}
 	default:
-		logx.Errorf("未知的链类型: %v", chain)
+		logx.Errorf("Evm contract address get failed, chain:%v, currency:%v", chain, currency)
 		return
 	}
 
@@ -354,25 +354,25 @@ func (s *ChainListenService) listenEvm(chain global.ChainName, currency, moid, r
 	logs := make(chan types.Log)
 	sub, err := item.Client.SubscribeFilterLogs(context.Background(), query, logs)
 	if err != nil {
-		logx.Errorf("EVM chain 订阅失败:%v", err)
+		logx.Errorf("EVM chain subscribe failed:%v", err)
 		return
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(seconds)*time.Second)
 	defer cancel()
 
-	order := &entity.EvmOrder{
+	order := &entity.MerchOrder{
 		MerchOrderId: moid,
 		Chain:        string(chain),
 		Typo:         string(global.OrderTypoIn),
-		Status:       string(global.EvmTransactionStatusCreated),
+		Status:       string(global.OrderStatusCreated),
 		Currency:     currency,
-		ToHex:        receiver,
+		ToAddress:    receiver,
 		Description:  "",
 	}
-	err = s.evmservice.OrderSave(order)
+	err = s.orderservice.Save(order)
 	if err != nil {
-		logx.Errorf("evm service create order failed, moid:%v, receiver:%v, err:%v", moid, receiver, err)
+		logx.Errorf("order service evm order create failed, moid:%v, receiver:%v, err:%v", moid, receiver, err)
 		return
 	}
 
@@ -392,21 +392,21 @@ func (s *ChainListenService) listenEvm(chain global.ChainName, currency, moid, r
 
 		order.LogId = log.Id
 		order.MerchOrderId = moid
-		order.TxHash = log.TxHash
-		order.FromHex = log.FromHex
+		order.TransactionId = log.TxHash
+		order.FromAddress = log.FromHex
 		order.ReceivedAmount = log.Amount
 		order.ReceivedSun = log.Sun
-		order.Status = string(global.EvmTransactionStatusSuccess)
+		order.Status = string(global.OrderStatusSuccess)
 
-		err = global.NotifyEPay(s.cfg.EPay.NotifyUrl, order.MerchOrderId, log.TxHash, order.FromHex, order.ToHex, order.Currency, order.ReceivedAmount)
+		err = global.NotifyEPay(s.cfg.EPay.NotifyUrl, order.MerchOrderId, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount)
 		if err != nil {
-			logx.Errorf("EVM chain 通知支付失败, moid:%v, txid:%v, err:%v", moid, log.TxHash, err)
-			order.Status = string(global.EvmTransactionStatusNotifyFailed)
+			logx.Errorf("EVM chain notify failed, moid:%v, txid:%v, err:%v", moid, log.TxHash, err)
+			order.Status = string(global.OrderStatusNotifyFailed)
 		}
 
-		err = s.evmservice.OrderSave(order)
+		err = s.orderservice.Save(order)
 		if err != nil {
-			logx.Errorf("EVM chain 保存日志失败, moid:%v, txid:%v, err:%v", moid, log.TxHash, err)
+			logx.Errorf("EVM chain order service save order failed, moid:%v, txid:%v, err:%v", moid, order.TransactionId, err)
 			return
 		}
 	}
@@ -422,22 +422,24 @@ func (s *ChainListenService) listenTron(chain global.ChainName, currency global.
 
 	caddr, err := s.getContractAddress(currency, string(chain))
 	if err != nil {
-		logx.Errorf("Tron 发现不支持的币种, err:%v", err)
+		logx.Errorf("Tron contract address get failed, chain:%v, currency:%v, err:%v", chain, currency, err)
+		err = biz.ContractAddressNotFound
 		return
 	}
 
-	order := &entity.TronOrder{
+	order := &entity.MerchOrder{
 		MerchOrderId: moid,
 		Chain:        string(chain),
 		Typo:         string(global.OrderTypoIn),
-		Status:       string(global.EvmTransactionStatusCreated),
+		Status:       string(global.OrderStatusCreated),
 		Currency:     string(currency),
-		ToBase58:     receiver,
+		ToAddress:    receiver,
 		Description:  "",
 	}
-	err = s.tronservice.OrderSave(order)
+	err = s.orderservice.Save(order)
 	if err != nil {
-		logx.Errorf("tron service create order failed, moid:%v, receiver:%v, err:%v", moid, receiver, err)
+		logx.Errorf("order service create tron order failed, moid:%v, receiver:%v, err:%v", moid, receiver, err)
+		err = biz.TronOrderSaveFailed
 		return
 	}
 
@@ -448,8 +450,8 @@ func (s *ChainListenService) listenTron(chain global.ChainName, currency global.
 		trans.Chain = string(chain)
 		err = s.tronservice.TransSave(trans)
 		if err != nil {
-			logx.Errorf("tron service save log failed, err:%v", err)
-			err = biz.EvmOrderSaveFailed
+			logx.Errorf("tron service save trans failed, err:%v", err)
+			err = biz.TronTransSaveFailed
 			continue
 		}
 
@@ -459,18 +461,23 @@ func (s *ChainListenService) listenTron(chain global.ChainName, currency global.
 		order.MerchOrderId = moid
 		order.TransactionId = trans.TransactionId
 		order.Chain = string(chain)
-		order.FromBase58 = trans.FromBase58
+		order.FromAddress = trans.FromBase58
 		order.ReceivedAmount = trans.Amount
 		order.ReceivedSun = trans.Sun
-		order.Status = string(global.EvmTransactionStatusSuccess)
+		order.Status = string(global.OrderStatusSuccess)
 
-		err = global.NotifyEPay(s.cfg.EPay.NotifyUrl, order.MerchOrderId, trans.TransactionId, trans.FromBase58, trans.ToBase58, trans.Currency, order.ReceivedAmount)
+		err = global.NotifyEPay(s.cfg.EPay.NotifyUrl, order.MerchOrderId, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount)
 		if err != nil {
-			logx.Errorf("Tron chain 通知支付失败, moid:%v, txid:%v, err:%v", moid, trans.TransactionId, err)
-			order.Status = string(global.EvmTransactionStatusNotifyFailed)
+			logx.Errorf("Tron chain notify failed, moid:%v, txid:%v, err:%v", moid, trans.TransactionId, err)
+			order.Status = string(global.OrderStatusNotifyFailed)
 		}
 
-		s.tronservice.OrderSave(order)
+		err = s.orderservice.Save(order)
+		if err != nil {
+			logx.Errorf("Tron chain order service save order failed, moid:%v, txid:%v, err:%v", moid, order.TransactionId, err)
+			err = biz.TronOrderSaveFailed
+			return
+		}
 	}
 }
 

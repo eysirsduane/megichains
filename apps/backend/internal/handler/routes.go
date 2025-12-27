@@ -54,8 +54,18 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodPost,
+				Path:    "/chain/address/create",
+				Handler: chain.ChainAddressCreateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
 				Path:    "/chain/listen",
 				Handler: chain.ChainListenHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/chain/listens",
+				Handler: chain.ChainListensHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/v1"),

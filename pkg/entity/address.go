@@ -1,18 +1,18 @@
 package entity
 
 type Address struct {
-	Id      int64 `gorm:"type:bigserial;primaryKey;autoIncrement"`
+	Id      int64 `gorm:"primaryKey;autoIncrement"`
 	GroupId int64 `gorm:""`
 
 	Chain      string `gorm:"size:31"`
 	Typo       string `gorm:"size:31"`
 	Status     string `gorm:"size:15"`
-	AddressHex string `gorm:"size:255"`
-	Secrect    string `gorm:"size:2047"`
+	Address    string `gorm:"size:255"`
+	Address2   string `gorm:"size:255"`
+	PrivateKey string `gorm:"size:2047"`
+	PublicKey  string `gorm:"size:2047"`
 
 	Description string `gorm:"size:2047"`
-
-	TimeAts `gorm:"embedded"`
 }
 
 type AddressGroup struct {
@@ -20,6 +20,4 @@ type AddressGroup struct {
 
 	Name        string `gorm:"size:31"`
 	Description string `gorm:"size:2047"`
-
-	TimeAts `gorm:"embedded"`
 }

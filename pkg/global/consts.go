@@ -4,6 +4,21 @@ const (
 	StringSuccess = "SUCCESS"
 )
 
+type AddressTypo string
+
+const (
+	AddressTypoIn  AddressTypo = "IN"
+	AddressTypoOut AddressTypo = "OUT"
+)
+
+type AddressStatus string
+
+const (
+	AddressTypoCreated AddressStatus = "CREATED"
+	AddressTypoInUse   AddressStatus = "INUSE"
+	AddressTypoVacant  AddressStatus = "VACANT"
+)
+
 type OrderTypo string
 
 const (

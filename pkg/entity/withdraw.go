@@ -1,7 +1,7 @@
 package entity
 
 type DelegateWithdrawal struct {
-	Id            int64  `gorm:"type:bigserial;primaryKey;autoIncrement"`
+	Id            int64  `gorm:"primaryKey;autoIncrement"`
 	UserId        int64  `gorm:""`
 	OrderId       int64  `gorm:""`
 	TransactionId string `gorm:"size:255;uniqueIndex"`

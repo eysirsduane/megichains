@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"math/rand/v2"
 	"megichains/pkg/biz"
 	"megichains/pkg/converter"
 	"megichains/pkg/entity"
@@ -263,6 +264,60 @@ func (s *ChainListenService) getClientItem(chain global.ChainName) (item any, er
 	return
 }
 
+func (s *ChainListenService) getContractAddress(currency global.CurrencyTypo, chain string) (caddr string, err error) {
+	switch currency {
+	case global.CurrencyTypoUsdt:
+		for _, addr := range s.cfg.ContractAddresses {
+			if strings.EqualFold(addr.Chain, string(chain)) && strings.EqualFold(addr.Currency, string(currency)) {
+				caddr = addr.Address
+			}
+		}
+	case global.CurrencyTypoUsdc:
+		for _, addr := range s.cfg.ContractAddresses {
+			if strings.EqualFold(addr.Chain, string(chain)) && strings.EqualFold(addr.Currency, string(currency)) {
+				caddr = addr.Address
+			}
+		}
+	default:
+		logx.Errorf("Tron 不支持的币种...!, chain:%v, currency:%v", chain, currency)
+		err = biz.ContractAddressNotFound
+		return
+	}
+
+	return
+}
+
+func (s *ChainListenService) clearClients() {
+	emu.Lock()
+
+	s.clients.Range(func(key, val any) bool {
+		ecli, ok := val.(*clients.EvmClientItem)
+		if ok {
+			if ecli.RunningQueryCount <= 0 {
+				ecli.Client.Close()
+				s.clients.Delete(key)
+				s.clilen--
+				logx.Infof("EVM chain 删除客户端, cname:%v, clen:%v", ecli.Name, s.clilen)
+			}
+		}
+
+		scli, ok := val.(*clients.SolanaClientItem)
+		if ok {
+			if scli.RunningQueryCount <= 0 {
+				scli.Client.Close()
+				s.clients.Delete(key)
+				s.clilen--
+				logx.Infof("SOLANA chain 删除客户端, cname:%v, clen:%v", scli.Name, s.clilen)
+			}
+
+		}
+
+		return true
+	})
+
+	emu.Unlock()
+}
+
 func (s *ChainListenService) listenEvm(chain global.ChainName, currency, moid, receiver string, seconds int64, item *clients.EvmClientItem) {
 	contracts := make([]common.Address, 0, 1)
 	switch chain {
@@ -322,7 +377,7 @@ func (s *ChainListenService) listenEvm(chain global.ChainName, currency, moid, r
 	}
 
 	ichan := make(chan *entity.EvmLog, 1)
-	go item.Listen(ctx, chain, currency, ichan, sub, logs, receiver)
+	go item.Listen(ctx, chain, ichan, currency, sub, logs, receiver)
 
 	for log := range ichan {
 		log.Chain = string(chain)
@@ -387,7 +442,7 @@ func (s *ChainListenService) listenTron(chain global.ChainName, currency global.
 	}
 
 	ichan := make(chan *entity.TronTransaction, 1)
-	go item.Listen(ctx, ichan, currency, s.cfg.Tron.HttpNetwork, caddr, receiver)
+	go item.Listen(ctx, chain, ichan, currency, s.cfg.Tron.HttpNetwork, caddr, receiver)
 
 	for trans := range ichan {
 		trans.Chain = string(chain)
@@ -420,71 +475,34 @@ func (s *ChainListenService) listenTron(chain global.ChainName, currency global.
 }
 
 func (s *ChainListenService) ListenMany() {
-	for i := 1; i < 100; i++ {
-		addr, _ := s.addrservice.GetAddress(int64(i))
+	cnames := []string{"BSC", "ETH", "TRON"}
+	currencys := []string{"USDT", "USDC"}
+
+	for i := 1; i < 500; i++ {
+		chain := ""
+		iaddr := rand.IntN(1000)
+		addr, _ := s.addrservice.GetAddress(int64(iaddr))
+		switch addr.Chain {
+		case "EVM":
+			iname := rand.IntN(2)
+			chain = cnames[iname]
+		case "TRON":
+			chain = cnames[2]
+		default:
+			continue
+		}
+
+		icurr := rand.IntN(2)
+		currency := currencys[icurr]
 
 		go s.Listen(&converter.ChainListenReq{
 			MerchOrderId: uuid.NewString(),
-			Chain:        global.ChainNameBsc,
-			Currency:     "USDT",
-			Receiver:     addr.AddressHex,
-			Seconds:      600,
+			Chain:        global.ChainName(chain),
+			Currency:     currency,
+			Receiver:     addr.Address,
+			Seconds:      180,
 		})
 
 		time.Sleep(time.Millisecond * 100)
 	}
-}
-
-func (s *ChainListenService) getContractAddress(currency global.CurrencyTypo, chain string) (caddr string, err error) {
-	switch currency {
-	case global.CurrencyTypoUsdt:
-		for _, addr := range s.cfg.ContractAddresses {
-			if strings.EqualFold(addr.Chain, string(chain)) && strings.EqualFold(addr.Currency, string(currency)) {
-				caddr = addr.Address
-			}
-		}
-	case global.CurrencyTypoUsdc:
-		for _, addr := range s.cfg.ContractAddresses {
-			if strings.EqualFold(addr.Chain, string(chain)) && strings.EqualFold(addr.Currency, string(currency)) {
-				caddr = addr.Address
-			}
-		}
-	default:
-		logx.Errorf("Tron 不支持的币种...!, chain:%v, currency:%v", chain, currency)
-		err = biz.ContractAddressNotFound
-		return
-	}
-
-	return
-}
-
-func (s *ChainListenService) clearClients() {
-	emu.Lock()
-
-	s.clients.Range(func(key, val any) bool {
-		ecli, ok := val.(*clients.EvmClientItem)
-		if ok {
-			if ecli.RunningQueryCount <= 0 {
-				ecli.Client.Close()
-				s.clients.Delete(key)
-				s.clilen--
-				logx.Infof("EVM chain 删除客户端, cname:%v, clen:%v", ecli.Name, s.clilen)
-			}
-		}
-
-		scli, ok := val.(*clients.SolanaClientItem)
-		if ok {
-			if scli.RunningQueryCount <= 0 {
-				scli.Client.Close()
-				s.clients.Delete(key)
-				s.clilen--
-				logx.Infof("SOLANA chain 删除客户端, cname:%v, clen:%v", scli.Name, s.clilen)
-			}
-
-		}
-
-		return true
-	})
-
-	emu.Unlock()
 }

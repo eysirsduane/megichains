@@ -23,8 +23,8 @@ type TronClientItem struct {
 	RunningQueryCount int
 }
 
-func (m *TronClientItem) Listen(ctx context.Context, ichan chan *entity.TronTransaction, currency global.CurrencyTypo, httpurl, caddr, receiver string) {
-	logx.Infof("TRON chain 实时状态开始, cname:%v, count:%v, receiver:%v", m.Name, m.RunningQueryCount, receiver)
+func (m *TronClientItem) Listen(ctx context.Context, chain global.ChainName, ichan chan *entity.TronTransaction, currency global.CurrencyTypo, httpurl, caddr, receiver string) {
+	logx.Infof("TRON chain 实时状态开始, chain:%v, currency:%v, receiver:%v, cname:%v, count:%v, ", chain, currency, receiver, m.Name, m.RunningQueryCount)
 	defer func() {
 		close(ichan)
 		m.RunningQueryCount--

@@ -9,3 +9,8 @@ type ChainListenReq struct {
 	Receiver     string           `json:"receiver"`
 	Seconds      int64            `json:"seconds"`
 }
+
+type ChainAddressCreateReq struct {
+	Chain string `json:"chain"`
+	Count int16  `json:"count"`
+}

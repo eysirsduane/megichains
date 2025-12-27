@@ -5,7 +5,9 @@ type Request {
 }
 
 type Response {
-	Msg string `json:"msg"`
+	Code    int           `json:"msg"`
+	Msg     string        `json:"msg"`
+	Records []interface{} `json:"records"`
 }
 
 type LoginReq {
@@ -97,6 +99,11 @@ type ChainListenReq {
 
 type ChainListenResp {}
 
+type ChainAddressCreateReq {
+	Chain string `json:"chain"`
+	Count int16  `json:"count"`
+}
+
 @server (
 	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
 	// goctl 生成代码时会将当前 service 代码块下的接口
@@ -150,8 +157,14 @@ service backend {
 	prefix: /v1
 )
 service backend {
+	@handler ChainAddressCreateHandler
+	post /chain/address/create (ChainAddressCreateReq) returns (Response)
+
 	@handler ChainListenHandler
 	post /chain/listen (ChainListenReq) returns (ChainListenResp)
+
+	@handler ChainListensHandler
+	post /chain/listens returns (Response)
 }
 
 @server (

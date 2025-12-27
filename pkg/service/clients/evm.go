@@ -25,7 +25,7 @@ type EvmClientItem struct {
 	RunningQueryCount int
 }
 
-func (m *EvmClientItem) Listen(ctx context.Context, chain global.ChainName, currency string, ichan chan *entity.EvmLog, sub ethereum.Subscription, logs chan types.Log, receiver string) {
+func (m *EvmClientItem) Listen(ctx context.Context, chain global.ChainName, ichan chan *entity.EvmLog, currency string, sub ethereum.Subscription, logs chan types.Log, receiver string) {
 	logx.Infof("EVM chain 实时状态开始, cname:%v, count:%v, chain:%v, currency:%v, receiver:%v", m.Name, m.RunningQueryCount, chain, currency, receiver)
 	defer func() {
 		sub.Unsubscribe()

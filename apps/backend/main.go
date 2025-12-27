@@ -47,7 +47,7 @@ func main() {
 	tronservice := service.NewTronService(db)
 	clistenservice := service.NewChainListenService(&cfg, db, addrservice, evmservice, tronservice)
 	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
-	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, clistenservice)
+	ctx := svc.NewServiceContext(cfg, excfgservice, userservice, authservice, addrservice, clistenservice)
 	handler.RegisterHandlers(server, ctx)
 
 	httpx.SetOkHandler(biz.OkHandler)

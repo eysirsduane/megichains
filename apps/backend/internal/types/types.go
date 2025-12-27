@@ -15,6 +15,11 @@ type BscLogListResp struct {
 	PagesBody
 }
 
+type ChainAddressCreateReq struct {
+	Chain string `json:"chain"`
+	Count int16  `json:"count"`
+}
+
 type ChainListenReq struct {
 	MerchOrderId string `json:"merch_order_id"`
 	Chain        string `json:"chain"`
@@ -76,7 +81,9 @@ type Request struct {
 }
 
 type Response struct {
-	Msg string `json:"msg"`
+	Code    int           `json:"msg"`
+	Msg     string        `json:"msg"`
+	Records []interface{} `json:"records"`
 }
 
 type TronAccountCreateReq struct {

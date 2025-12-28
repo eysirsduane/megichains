@@ -39,7 +39,7 @@ declare namespace Api {
     /** user */
     type User = Common.CommonRecord<{
       /** user name */
-      userName: string;
+      username: string;
       /** user gender */
       userGender: UserGender | undefined;
       /** user nick name */
@@ -54,7 +54,7 @@ declare namespace Api {
 
     /** user search params */
     type UserSearchParams = CommonType.RecordNullable<
-      Pick<Api.SystemManage.User, 'userName' | 'userGender' | 'nickName' | 'userPhone' | 'userEmail' | 'status'> &
+      Pick<Api.SystemManage.User, 'username' | 'userGender' | 'nickName' | 'userPhone' | 'userEmail' | 'status'> &
         CommonSearchParams
     >;
 

@@ -343,6 +343,18 @@ declare namespace App {
           no: string;
         };
         timerange: string;
+        created_at: string;
+        updated_at: string;
+        all: string;
+        usdt: string;
+        usdc: string;
+        tron: string;
+        bsc: string;
+        eth: string;
+        payin: string;
+        created: string;
+        notifyfailed: string;
+        success: string;
       };
       request: {
         logout: string;
@@ -421,7 +433,7 @@ declare namespace App {
         login: {
           common: {
             loginOrRegister: string;
-            usernamePlaceholder: string;
+            userNamePlaceholder: string;
             phonePlaceholder: string;
             codePlaceholder: string;
             passwordPlaceholder: string;
@@ -558,82 +570,6 @@ declare namespace App {
             triggerAllRequest: string;
           };
         };
-        proNaive: {
-          form: {
-            basic: {
-              title: string;
-              appName: string;
-              appStatus: string;
-              createTime: string;
-              responseDate: string;
-              specificationInfo: string;
-              specificate: string;
-              specificationName: string;
-              specificationValue: string;
-              specificationColorRed: string;
-              specificationColorOrange: string;
-              addSpecificateItem: string;
-              fillValue: string;
-              reset: string;
-              submit: string;
-              add: string;
-              delete: string;
-              color: string;
-              normal: string;
-              anomaly: string;
-            };
-            query: {
-              title1: string;
-              title2: string;
-              appName: string;
-              appStatus: string;
-              createTime: string;
-              responseDate: string;
-              endDate: string;
-              field: string;
-            };
-            step: {
-              title: string;
-              step1: {
-                title: string;
-                field: string;
-                nextStep: string;
-              };
-              step2: {
-                title: string;
-                field: string;
-                prevStep: string;
-                submit: string;
-              };
-            };
-          };
-          table: {
-            remote: {
-              filterCondition: string;
-              name: string;
-              createTime: string;
-              responseTime: string;
-              title: string;
-              replicableText: string;
-              tags: string;
-              dateFormatting: string;
-              image: string;
-            };
-            rowEdit: {
-              title: string;
-              reset: string;
-              submit: string;
-              edit: string;
-              delete: string;
-              save: string;
-              task: string;
-              score: string;
-              time: string;
-              name: string;
-              action: string;
-            };
-          };
-        };
         manage: {
           common: {
             status: {
@@ -660,7 +596,7 @@ declare namespace App {
           };
           user: {
             title: string;
-            userName: string;
+            username: string;
             userGender: string;
             nickName: string;
             userPhone: string;
@@ -668,7 +604,7 @@ declare namespace App {
             userStatus: string;
             userRole: string;
             form: {
-              userName: string;
+              username: string;
               userGender: string;
               nickName: string;
               userPhone: string;
@@ -752,78 +688,26 @@ declare namespace App {
             };
           };
         };
-        transaction: {
+        order: {
           common: {
-            all: string;
-            typo: string;
+            title: string;
+            merch_order_id: string;
             transaction_id: string;
+            chain: string;
+            typo: string;
             status: string;
-            order_id: string;
-            user_id: string;
             currency: string;
-            from_base58: string;
-            to_base58: string;
-            description: string;
-            created_at: string;
-            telegram: string;
-            whatsapp: string;
-            wechat: string;
-            other: string;
-            bill: string;
-            withdraweral: string;
-            bandwidth: string;
-            energy: string;
-            usdt2trx: string;
-            created: string;
-            pending: string;
-            expired: string;
-            canceled: string;
-            delegated: string;
-            error: string;
-            finished: string;
-            start: string;
-            end: string;
-            withdrawfailed: string;
-          };
-          delegate: {
-            order: {
-              title: string;
-              received_amount: string;
-              received_sun: string;
-              delegate_amount: string;
-              delegate_sun: string;
-              withdraw_time: string;
-            };
-            bill: {
-              title: string;
-              delegated_amount: string;
-              delegated_sun: string;
-            };
-            withdraweral: {
-              title: string;
-              un_delegated_amount: string;
-              un_delegated_sun: string;
-            };
-          };
-          exchange: {
-            order: {
-              title: string;
-              exchange_amount: string;
-              exchange_sun: string;
-              then_rate: string;
-              exchange_rate: string;
-              exchange_discount: string;
-            };
-            bill: {
-              exchanged_amount: string;
-              exchanged_sun: string;
-            };
+            from_address: string;
+            to_address: string;
+            received_amount: string;
+            received_sun: string;
+            detail: string;
           };
         };
       };
       form: {
         required: string;
-        userName: FormMsg;
+        username: FormMsg;
         phone: FormMsg;
         pwd: FormMsg;
         confirmPwd: FormMsg;
@@ -900,7 +784,7 @@ declare namespace App {
     /** The backend service response data */
     type Response<T = unknown> = {
       /** The backend service response code */
-      code: string;
+      code: number;
       /** The backend service response message */
       msg: string;
       /** The backend service response data */

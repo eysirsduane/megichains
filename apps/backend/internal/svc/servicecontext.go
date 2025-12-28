@@ -9,7 +9,7 @@ import (
 )
 
 type ServiceContext struct {
-	Config        global.Config
+	Config        global.BackendesConfig
 	ExcfgService  *service.RangeConfigService
 	UserService   *service.UserService
 	AuthService   *service.AuthService
@@ -17,7 +17,7 @@ type ServiceContext struct {
 	ListenService *service.ChainListenService
 }
 
-func NewServiceContext(c global.Config, excfg *service.RangeConfigService, user *service.UserService, auth *service.AuthService, addrservice *service.AddressService, listen *service.ChainListenService) *ServiceContext {
+func NewServiceContext(c global.BackendesConfig, excfg *service.RangeConfigService, user *service.UserService, auth *service.AuthService, addrservice *service.AddressService, listen *service.ChainListenService) *ServiceContext {
 	return &ServiceContext{
 		Config:        c,
 		ExcfgService:  excfg,

@@ -34,12 +34,12 @@ func GetUsdt2TrxAmount(rate float64, amount float64, discount float64) (eamount,
 }
 
 type Claims struct {
-	UserID   int64 `json:"user_id"`
+	UserID   string `json:"user_id"`
 	Username string `json:"username"`
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(uid int64, username, secret string, expire int64, issuer string) (token string, err error) {
+func GenerateToken(uid string, username, secret string, expire int64, issuer string) (token string, err error) {
 	claims := Claims{
 		uid,
 		username,
@@ -58,7 +58,7 @@ func GenerateToken(uid int64, username, secret string, expire int64, issuer stri
 	return
 }
 
-func GenerateRefreshToken(uid int64, username, secret string, expire int64, issuer string) (token string, err error) {
+func GenerateRefreshToken(uid string, username, secret string, expire int64, issuer string) (token string, err error) {
 	claims := Claims{
 		UserID:   uid,
 		Username: username,

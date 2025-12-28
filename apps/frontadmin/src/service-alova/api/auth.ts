@@ -3,7 +3,7 @@ import { alova } from '../request';
 /**
  * Login
  *
- * @param userName User name
+ * @param username User name
  * @param password Password
  */
 export function fetchLogin(username: string, password: string) {

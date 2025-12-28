@@ -16,7 +16,6 @@ import (
 )
 
 type SolanaClientItem struct {
-	Cfg               *global.Config
 	Name              string
 	Chain             global.ChainName
 	Client            *websocket.Conn

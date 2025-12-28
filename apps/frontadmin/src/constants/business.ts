@@ -1,29 +1,30 @@
 import { transformNumberRecordToOption, transformRecordToOption } from '@/utils/common';
 
-export const delegateTyposRecord: Record<Api.Common.DelegateTypos, App.I18n.I18nKey> = {
-  '-1': 'page.transaction.common.all',
-  0: 'page.transaction.common.bandwidth',
-  1: 'page.transaction.common.energy'
+export const chainTyposRecord: Record<Api.Common.ChainTypos, App.I18n.I18nKey> = {
+  '': 'common.all',
+  TRON: 'common.tron',
+  ETH: 'common.eth',
+  BSC: 'common.bsc'
 };
 
-export const exchangeTyposRecord: Record<Api.Common.ExchangeTypos, App.I18n.I18nKey> = {
-  '': 'page.transaction.common.all',
-  USDT2TRX: 'page.transaction.common.usdt2trx'
+export const currencyTyposRecord: Record<Api.Common.CurrencyTypos, App.I18n.I18nKey> = {
+  '': 'common.all',
+  USDT: 'common.usdt',
+  USDC: 'common.usdc'
+};
+
+export const orderTyposRecord: Record<Api.Common.OrderTypos, App.I18n.I18nKey> = {
+  '': 'common.all',
+  入账: 'common.payin'
 };
 
 export const orderStatusRecord: Record<Api.Common.OrderStatus, App.I18n.I18nKey> = {
-  '': 'page.transaction.common.all',
-  已创建: 'page.transaction.common.created',
-  已挂起: 'page.transaction.common.pending',
-  已过期: 'page.transaction.common.expired',
-  已取消: 'page.transaction.common.canceled',
-  已委托: 'page.transaction.common.delegated',
-  回收失败: 'page.transaction.common.withdrawfailed',
-  错误: 'page.transaction.common.error',
-  已完成: 'page.transaction.common.finished'
+  '': 'common.all',
+  已创建: 'common.created',
+  通知失败: 'common.notifyfailed',
+  成功: 'common.success'
 };
 
-export const delegateTypoOptions = transformNumberRecordToOption(delegateTyposRecord);
-export const exchangeTypoOptions = transformNumberRecordToOption(exchangeTyposRecord);
+export const exchangeTypoOptions = transformNumberRecordToOption(orderTyposRecord);
 
 export const orderStatusOptions = transformRecordToOption(orderStatusRecord);

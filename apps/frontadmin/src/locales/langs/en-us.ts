@@ -396,7 +396,7 @@ const local: App.I18n.Schema = {
       },
       user: {
         title: 'User List',
-        userName: 'User Name',
+        username: 'User Name',
         userGender: 'Gender',
         nickName: 'Nick Name',
         userPhone: 'Phone Number',
@@ -404,7 +404,7 @@ const local: App.I18n.Schema = {
         userStatus: 'User Status',
         userRole: 'User Role',
         form: {
-          userName: 'Please enter user name',
+          username: 'Please enter user name',
           userGender: 'Please select gender',
           nickName: 'Please enter nick name',
           userPhone: 'Please enter phone number',

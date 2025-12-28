@@ -35,7 +35,7 @@ const (
 
 type ChainListenService struct {
 	db           *gorm.DB
-	cfg          *global.Config
+	cfg          *global.BackendesConfig
 	clients      sync.Map
 	clilen       int
 	qclilen      int
@@ -46,7 +46,7 @@ type ChainListenService struct {
 	tronservice  *TronService
 }
 
-func NewChainListenService(cfg *global.Config, db *gorm.DB, addrservice *AddressService, orderservice *MerchOrderService, evmservice *EvmService, tronservice *TronService) *ChainListenService {
+func NewChainListenService(cfg *global.BackendesConfig, db *gorm.DB, addrservice *AddressService, orderservice *MerchOrderService, evmservice *EvmService, tronservice *TronService) *ChainListenService {
 	return &ChainListenService{
 		db:           db,
 		cfg:          cfg,
@@ -221,7 +221,6 @@ func (s *ChainListenService) getClientItem(chain global.ChainName) (item any, er
 
 						c := &clients.EvmClientItem{}
 						name := uuid.NewString()
-						c.Cfg = s.cfg
 						c.Chain = chain
 						c.Name = name
 						c.Client = client
@@ -241,7 +240,6 @@ func (s *ChainListenService) getClientItem(chain global.ChainName) (item any, er
 
 						c := &clients.SolanaClientItem{}
 						name := uuid.NewString()
-						c.Cfg = s.cfg
 						c.Chain = chain
 						c.Name = name
 						c.Client = client

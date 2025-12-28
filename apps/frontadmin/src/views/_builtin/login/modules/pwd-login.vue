@@ -18,8 +18,8 @@ interface FormModel {
 }
 
 const model = ref<FormModel>({
-  username: '',
-  password: ''
+  username: 'eysirs',
+  password: 'duanben'
 });
 
 const rules = computed<Record<keyof FormModel, App.Global.FormRule[]>>(() => {
@@ -42,7 +42,7 @@ type AccountKey = 'super' | 'admin' | 'user';
 interface Account {
   key: AccountKey;
   label: string;
-  userName: string;
+  username: string;
   password: string;
 }
 
@@ -50,32 +50,32 @@ const accounts = computed<Account[]>(() => [
   {
     key: 'super',
     label: $t('page.login.pwdLogin.superAdmin'),
-    userName: 'Super',
+    username: 'Super',
     password: '123456'
   },
   {
     key: 'admin',
     label: $t('page.login.pwdLogin.admin'),
-    userName: 'Admin',
+    username: 'Admin',
     password: '123456'
   },
   {
     key: 'user',
     label: $t('page.login.pwdLogin.user'),
-    userName: 'User',
+    username: 'User',
     password: '123456'
   }
 ]);
 
 async function handleAccountLogin(account: Account) {
-  await authStore.login(account.userName, account.password);
+  await authStore.login(account.username, account.password);
 }
 </script>
 
 <template>
   <ElForm ref="formRef" :model="model" :rules="rules" size="large" :show-label="false" @keyup.enter="handleSubmit">
-    <ElFormItem prop="userName">
-      <ElInput v-model="model.username" :placeholder="$t('page.login.common.usernamePlaceholder')" />
+    <ElFormItem prop="username">
+      <ElInput v-model="model.username" :placeholder="$t('page.login.common.userNamePlaceholder')" />
     </ElFormItem>
     <ElFormItem prop="password">
       <ElInput

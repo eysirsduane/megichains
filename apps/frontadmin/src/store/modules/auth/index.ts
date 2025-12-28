@@ -90,7 +90,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
   /**
    * Login
    *
-   * @param userName User name
+   * @param username User name
    * @param password Password
    * @param [redirect=true] Whether to redirect after login. Default is `true`
    */
@@ -115,7 +115,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
 
         window.$notification?.success({
           title: $t('page.login.common.loginSuccess'),
-          message: $t('page.login.common.welcomeBack', { userName: userInfo.username }),
+          message: $t('page.login.common.welcomeBack', { username: userInfo.username }),
           duration: 4500
         });
       }

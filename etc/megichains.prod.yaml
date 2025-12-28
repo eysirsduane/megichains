@@ -1,0 +1,82 @@
+Name: megichains-backend-prod
+Host: 0.0.0.0
+Port: 7002
+
+Log:
+  ServiceName: "megichains_service"
+  Mode: file
+  Path: "./logs"
+  KeepDays: 20
+  Stat: false
+  TimeFormat: "2006-01-02 15:04:05"
+
+Auth:
+  AccessSecret: "d:Dcjm39vmdf9JF)(#MCV;ldj39(VJM#:V939fkLVJK%&*)_3o03ke0dflmff9(FJDF:LKM#9f(FJ3:FP(DF*()))*jf))"
+  AccessExpire: 3600  
+  RefreshSecret: "vmdf9JF)(#MCV;ldj:Dcjm39vmdf9JF)(#MCV39(VJM#:V93VJK%&*)_3o03ke0dflmff9M#9f(FJ3:FP(fkLdk3&*k3!"
+  RefreshExpire: 604800
+  Issuer: www.baidu.com
+
+DB:
+  User: postgres
+  Password: "123456"
+  Host: db
+  Port: 5432
+  Name: megichains
+  Charset: utf8mb4
+  Timezone: UTC
+
+Bot:
+  Token: "8365546663:AAHzYZpB0KvwSguCNzLLYsR9DbtvMjrJSEg"
+  Service: "@eysirs2233"
+
+EPay:
+  NotifyUrl: "https://127.0.0.1:8093/payApi/PayApi/Notice/10108/merch_order_id"
+
+Tron:
+  WssNetwork: ""
+  WssNetwork: ""
+  HttpNetwork: https://api.trongrid.io
+  ApiKey: ""
+
+Eth:
+  ChainId: 1
+  WssNetwork: wss://eth-mainnet.g.alchemy.com/v2/
+  ApiKey: e9NHfWClRByVJCAgbZsq7
+    
+BSC:
+  ChainId: 56
+  WssNetwork: wss://bnb-mainnet.g.alchemy.com/v2/
+  ApiKey: e9NHfWClRByVJCAgbZsq7 
+
+Solana:
+  ChainId: 23
+  WssNetwork: wss://solana-devnet.g.alchemy.com/v2/
+  ApiKey: e9NHfWClRByVJCAgbZsq7
+  UsdtMint: Es9vMFrzaCERmJfrF4H2FYD4KCoNkY5Yt1vZ1tcHTf
+
+ContractAddresses: 
+  - Chain: ETH
+    Address: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+    Currency: "USDT"
+  - Chain: ETH
+    Address: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
+    Currency: "USDC"
+  - Chain: BSC
+    Address: "0x55d398326f99059fF775485246999027B3197955"
+    Currency: "USDT"
+  - Chain: BSC
+    Address: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
+    Currency: "USDC"
+  - Chain: TRON
+    Address: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+    Currency: "USDT"
+
+
+
+
+
+
+
+
+

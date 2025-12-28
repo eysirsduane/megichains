@@ -1,16 +1,97 @@
 package converter
 
-import "megichains/pkg/global"
+import (
+	"megichains/pkg/global"
+
+	"github.com/jinzhu/copier"
+)
+
+type RespConverter[T any] struct {
+	Records []T `json:"records"`
+	*PagesBody
+}
+
+func ConvertToResp[T any](items []T, current, size int, total int64) (resp *RespConverter[T]) {
+	resp = &RespConverter[T]{
+		PagesBody: &PagesBody{
+			Current: current,
+			Size:    size,
+			Total:   total,
+		},
+		Records: make([]T, size),
+	}
+
+	copier.Copy(&resp.Records, &items)
+
+	return
+}
+
+type Pages struct {
+	Current int `form:"current"`
+	Size    int `form:"size"`
+}
+
+type PagesBody struct {
+	Current int   `json:"current"`
+	Size    int   `json:"size"`
+	Total   int64 `json:"total"`
+}
+
+type StartEnd struct {
+	Start int64 `form:"start,optional"`
+	End   int64 `form:"end,optional"`
+}
+
+type TimeAts struct {
+	UpdatedAt uint64 `json:"update_at"`
+	DeletedAt uint64 `json:"delete_at"`
+	CreatedAt uint64 `json:"created_at"`
+}
 
 type ChainListenReq struct {
-	MerchOrderId string           `json:"merch_order_id"`
-	Chain        global.ChainName `json:"chain"`
-	Currency     string           `json:"currency"`
-	Receiver     string           `json:"receiver"`
-	Seconds      int64            `json:"seconds"`
+	MerchOrderId  string           `json:"merch_order_id"`
+	Chain    global.ChainName `json:"chain"`
+	Currency string           `json:"currency"`
+	Receiver string           `json:"receiver"`
+	Seconds  int64            `json:"seconds"`
 }
 
 type ChainAddressCreateReq struct {
 	Chain string `json:"chain"`
 	Count int16  `json:"count"`
+}
+
+type OrderListReq struct {
+	Pages
+	StartEnd
+	Id            int64  `form:"id,optional"`
+	MerchOrderId  int64  `form:"merch_order_id,optional"`
+	TransactionId string `form:"transaction_id,optional"`
+	Chain         string `form:"chain,optional"`
+	Typo          string `form:"typo,optional"`
+	Status        string `form:"status,optional"`
+	Currency      string `form:"currency,optional"`
+	FromAddress   string `form:"from_address,optional"`
+	ToAddress     string `form:"to_address,optional"`
+}
+
+type OrderItem struct {
+	Id             int64   `json:"id"`
+	MerchOrderId   string  `json:"merch_order_id"`
+	TransactionId  string  `json:"transaction_id"`
+	Chain          string  `json:"chain"`
+	Typo           string  `json:"typo"`
+	Status         string  `json:"status"`
+	Currency       string  `json:"currency"`
+	ReceivedAmount float64 `json:"received_amount"`
+	ReceivedSun    int64   `json:"received_sun"`
+	FromAddress    string  `json:"from_address"`
+	ToAddress      string  `json:"to_address"`
+	Description    string  `json:"description"`
+	TimeAts
+}
+
+type OrderListResp struct {
+	Records []*OrderItem `json:"records"`
+	*PagesBody
 }

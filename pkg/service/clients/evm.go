@@ -17,7 +17,6 @@ import (
 )
 
 type EvmClientItem struct {
-	Cfg               *global.Config
 	Name              string
 	Chain             global.ChainName
 	Client            *ethclient.Client
@@ -112,17 +111,8 @@ func (m *EvmClientItem) Listen(ctx context.Context, chain global.ChainName, icha
 					return
 				}
 
-				var currency global.CurrencyTypo
-				contract := strings.ToUpper(log.Address.Hex())
-				for _, addr := range m.Cfg.ContractAddresses {
-					if strings.EqualFold(addr.Address, contract) {
-						currency = global.CurrencyTypo(addr.Currency)
-						break
-					}
-				}
-
 				order := &entity.EvmLog{
-					Currency:       string(currency),
+					Currency:       currency,
 					ChainId:        cid.Uint64(),
 					TxHash:         log.TxHash.Hex(),
 					Index:          log.Index,

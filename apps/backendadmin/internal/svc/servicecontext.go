@@ -9,17 +9,19 @@ import (
 )
 
 type ServiceContext struct {
-	Config       global.Config
+	Config       global.BackendesConfig
 	ExcfgService *service.RangeConfigService
 	AuthService  *service.AuthService
 	UserService  *service.UserService
+	OrderService *service.MerchOrderService
 }
 
-func NewServiceContext(c global.Config, excfg *service.RangeConfigService, auth *service.AuthService, user *service.UserService) *ServiceContext {
+func NewServiceContext(c global.BackendesConfig, excfg *service.RangeConfigService, auth *service.AuthService, user *service.UserService, order *service.MerchOrderService) *ServiceContext {
 	return &ServiceContext{
 		Config:       c,
 		ExcfgService: excfg,
 		AuthService:  auth,
 		UserService:  user,
+		OrderService: order,
 	}
 }

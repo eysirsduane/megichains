@@ -37,17 +37,22 @@ var (
 )
 
 var (
-	EvmOrderSaveFailed   = NewSpecificError(4001, "Evm订单保存失败")
-	EvmLogSaveFailed     = NewSpecificError(4002, "Evm交易保存失败")
-	EvmOrderNotifyFailed = NewSpecificError(4003, "Evm订单保存失败")
+	OrderFindFailed  = NewSpecificError(4001, "订单查询失败")
+	OrderCountFailed = NewSpecificError(4002, "订单总数统计失败")
 )
 
 var (
-	SolanaOrderSaveFailed = NewSpecificError(5001, "Solana订单保存失败")
+	EvmOrderSaveFailed   = NewSpecificError(5001, "Evm订单保存失败")
+	EvmLogSaveFailed     = NewSpecificError(5002, "Evm交易保存失败")
+	EvmOrderNotifyFailed = NewSpecificError(5003, "Evm订单保存失败")
 )
 
 var (
-	TronOrderSaveFailed   = NewSpecificError(6001, "Tron订单保存失败")
-	TronTransSaveFailed   = NewSpecificError(6002, "Tron交易保存失败")
-	TronOrderNotifyFailed = NewSpecificError(6003, "Tron订单通知失败")
+	SolanaOrderSaveFailed = NewSpecificError(6001, "Solana订单保存失败")
+)
+
+var (
+	TronOrderSaveFailed   = NewSpecificError(7001, "Tron订单保存失败")
+	TronTransSaveFailed   = NewSpecificError(7002, "Tron交易保存失败")
+	TronOrderNotifyFailed = NewSpecificError(7003, "Tron订单通知失败")
 )

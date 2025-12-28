@@ -5,11 +5,41 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Job",
+            "name": "Launch BackendAdmin",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/apps/backend",
+            "program": "${workspaceFolder}/apps/backendadmin/main.go"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Vue Debugger",
+            "url": "http://localhost:9527",
+            "webRoot": "${workspaceFolder}/apps/backendadmin"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "TS Debugger",
+            "runtimeExecutable": "tsx",
+            "skipFiles": [
+                "<node_internals>/**",
+                "${workspaceFolder}/apps/backendadmin/node_modules/**"
+            ],
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Start Both (Frontend & Backend)",
+            "configurations": [
+                "Launch BackendAdmin",
+                "Vue Debugger",
+                "TS Debugger"
+            ]
         }
     ]
 }

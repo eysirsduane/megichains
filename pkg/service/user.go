@@ -5,6 +5,7 @@ import (
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
 
+	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
 	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/gorm"
@@ -26,7 +27,7 @@ func (s *UserService) Create(username, password string) (success bool, err error
 		return
 	}
 
-	user := &entity.User{Username: username, Password: hash}
+	user := &entity.User{Id: uuid.NewString(), Username: username, Password: hash}
 	err = s.db.Model(&entity.User{}).Create(user).Error
 	if err != nil {
 		logx.Errorf("user service create user failed, username:%v, password:%v, err:%v", username, password, err)

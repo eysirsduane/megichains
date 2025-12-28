@@ -3,18 +3,6 @@
 
 package types
 
-type BscLogItem struct {
-}
-
-type BscLogListReq struct {
-}
-
-type BscLogListResp struct {
-	Records []*BscLogItem
-	Total   int64
-	PagesBody
-}
-
 type Contacts struct {
 	Telegram string `json:"telegram"`
 	WhatsApp string `json:"whatsapp"`
@@ -32,14 +20,50 @@ type LoginResp struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
+type OrderItem struct {
+	Id             int64   `json:"id"`
+	MerchOrderId   string  `json:"merch_order_id"`
+	TransactionId  string  `json:"transaction_id"`
+	Chain          string  `json:"chain"`
+	Typo           string  `json:"typo"`
+	Status         string  `json:"status"`
+	Currency       string  `json:"currency"`
+	ReceivedAmount float64 `json:"received_amount"`
+	ReceivedSun    int64   `json:"received_sun"`
+	FromAddress    string  `json:"from_address"`
+	ToAddress      string  `json:"to_address"`
+	Description    string  `json:"description"`
+	TimeAts
+}
+
+type OrderListReq struct {
+	Pages
+	StartEnd
+	Id            int64  `form:"id,optional"`
+	MerchOrderId  string `form:"merch_order_id,optional"`
+	TransactionId string `form:"transaction_id,optional"`
+	Chain         string `form:"chain,optional"`
+	Typo          string `form:"typo,optional"`
+	Status        string `form:"status,optional"`
+	Currency      string `form:"currency,optional"`
+	FromAddress   string `form:"from_address,optional"`
+	ToAddress     string `form:"to_address,optional"`
+}
+
+type OrderListResp struct {
+	Records []*OrderItem `json:"records"`
+	PagesBody
+}
+
 type Pages struct {
 	Current int `form:"current"`
 	Size    int `form:"size"`
 }
 
 type PagesBody struct {
-	Current int `json:"current"`
-	Size    int `json:"size"`
+	Current int   `json:"current"`
+	Size    int   `json:"size"`
+	Total   int64 `json:"total"`
 }
 
 type RefreshTokenReq struct {
@@ -66,6 +90,17 @@ type Request struct {
 
 type Response struct {
 	Msg string `json:"msg"`
+}
+
+type StartEnd struct {
+	Start int64 `form:"start,optional"`
+	End   int64 `form:"end,optional"`
+}
+
+type TimeAts struct {
+	UpdatedAt uint64 `json:"update_at"`
+	DeletedAt uint64 `json:"delete_at"`
+	CreatedAt uint64 `json:"created_at"`
 }
 
 type TronAccountCreateReq struct {

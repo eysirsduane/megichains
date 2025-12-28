@@ -7,9 +7,8 @@ import (
 	"net/http"
 
 	auth "megichains/apps/backendadmin/internal/handler/auth"
-	bsc "megichains/apps/backendadmin/internal/handler/bsc"
 	open "megichains/apps/backendadmin/internal/handler/open"
-	tron "megichains/apps/backendadmin/internal/handler/tron"
+	order "megichains/apps/backendadmin/internal/handler/order"
 	"megichains/apps/backendadmin/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -41,18 +40,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				Method:  http.MethodGet,
-				Path:    "/bsc/log/list",
-				Handler: bsc.BscLogListHandler(serverCtx),
-			},
-		},
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/v1"),
-	)
-
-	server.AddRoutes(
-		[]rest.Route{
-			{
 				Method:  http.MethodPost,
 				Path:    "/auth/login",
 				Handler: open.LoginHandler(serverCtx),
@@ -70,15 +57,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodGet,
-				Path:    "/tron/account",
-				Handler: tron.TronAccountGetHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/tron/account/create",
-				Handler: tron.TronAccountCreateHandler(serverCtx),
+				Path:    "/order/list",
+				Handler: order.OrderListHandler(serverCtx),
 			},
 		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
 }

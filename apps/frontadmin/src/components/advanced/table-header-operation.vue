@@ -4,7 +4,6 @@ import { $t } from '@/locales';
 defineOptions({ name: 'TableHeaderOperation' });
 
 interface Props {
-  disabledAdd?: boolean;
   disabledDelete?: boolean;
   loading?: boolean;
 }
@@ -40,7 +39,7 @@ function refresh() {
   <ElSpace direction="horizontal" wrap justify="end" class="lt-sm:w-200px">
     <slot name="prefix"></slot>
     <slot name="default">
-      <ElButton plain type="primary" :disabled="disabledAdd" @click="add">
+      <ElButton plain type="primary" @click="add">
         <template #icon>
           <icon-ic-round-plus class="text-icon" />
         </template>

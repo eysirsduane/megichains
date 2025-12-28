@@ -1,7 +1,7 @@
 package entity
 
 type User struct {
-	Id int64 `gorm:"primaryKey;autoIncrement"`
+	Id string `gorm:"type:varchar(64);primaryKey;"`
 
 	DisplayId int32  `gorm:"uniqueIndex"`
 	Nickname  string `gorm:"size:63;uniqueIndex"`

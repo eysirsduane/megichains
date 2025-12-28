@@ -41,9 +41,10 @@ declare namespace Api {
      * - "2": disabled
      */
     type EnableStatus = '1' | '2';
-    type DelegateTypos = -1 | 0 | 1;
-    type ExchangeTypos = '' | 'USDT2TRX';
-    type OrderStatus = '' | '已创建' | '已挂起' | '已过期' | '已取消' | '已委托' | '回收失败' | '错误' | '已完成';
+    type OrderTypos = '' | '入账';
+    type CurrencyTypos = '' | 'USDT'|'USDC';
+    type ChainTypos = '' | 'TRON'|'ETH'|'BSC';
+    type OrderStatus = '' | '已创建' | '通知失败' | '成功' ;
 
     /** common record */
     type CommonRecord<T = any> = {
@@ -56,7 +57,7 @@ declare namespace Api {
       /** record updater */
       updateBy: string;
       /** record update time */
-      updateTime: string;
+      updated_at: number;
       /** record status */
       status: OrderStatus;
     } & T;

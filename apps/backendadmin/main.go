@@ -21,12 +21,12 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-var configFile = flag.String("f", "../../etc/megichains.backendadmin.dev.yaml", "the config file")
+var configFile = flag.String("f", "../../etc/megichains.dev.yaml", "the config file")
 
 func main() {
 	flag.Parse()
 
-	var cfg global.Config
+	var cfg global.BackendesConfig
 	conf.MustLoad(*configFile, &cfg)
 	logx.MustSetup(cfg.Log)
 	defer logx.Close()
@@ -43,7 +43,8 @@ func main() {
 	excfgservice := service.NewRangeConfigService(db)
 	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
 	userservice := service.NewUserService(db)
-	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice)
+	orderservice := service.NewMerchOrderService(db)
+	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, orderservice)
 	handler.RegisterHandlers(server, ctx)
 
 	httpx.SetOkHandler(biz.OkHandler)

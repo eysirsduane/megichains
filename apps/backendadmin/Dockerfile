@@ -23,4 +23,4 @@ ENV TZ Asia/Shanghai
 WORKDIR /app
 COPY --from=builder /app/main /app/main
 
-CMD ["./main", "-f", "etc/megichains.prod.yaml"]
+CMD ["./main", "-f", "etc/megichains.backendadmin.prod.yaml"]

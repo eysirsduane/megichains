@@ -20,7 +20,7 @@ var configFile = flag.String("f", "../../etc/megichains.dev.yaml", "the config f
 func main() {
 	flag.Parse()
 
-	var cfg global.Config
+	var cfg global.BackendesConfig
 	conf.MustLoad(*configFile, &cfg)
 	logx.MustSetup(cfg.Log)
 	defer logx.Close()

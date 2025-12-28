@@ -20,9 +20,14 @@ type LoginResp struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
+type OrderGetReq struct {
+	Id int64 `form:"id"`
+}
+
 type OrderItem struct {
 	Id             int64   `json:"id"`
 	MerchOrderId   string  `json:"merch_order_id"`
+	LogId          int64   `json:"log_id"`
 	TransactionId  string  `json:"transaction_id"`
 	Chain          string  `json:"chain"`
 	Typo           string  `json:"typo"`
@@ -113,6 +118,35 @@ type TronAccountGetReq struct {
 }
 
 type TronAccountGetResp struct {
+}
+
+type TronTransItem struct {
+	Id             int64   `json:"id"`
+	Chain          string  `json:"chain"`
+	Currency       string  `json:"currency"`
+	TransactionId  string  `json:"transaction_id"`
+	Amount         float64 `json:"amount"`
+	Sun            int64   `json:"sun"`
+	FromBase58     string  `json:"from_base58"`
+	ToBase58       string  `json:"to_base58"`
+	Contract       string  `json:"contract"`
+	BlockTimestamp int64   `json:"block_timestamp"`
+	TimeAts
+}
+
+type TronTransListReq struct {
+	Pages
+	StartEnd
+	Id            int64  `form:"id"`
+	Currency      string `form:"currency"`
+	TransactionId string `form:"transaction_id"`
+	FromBase58    string `form:"from_base58"`
+	ToBase58      string `form:"to_base58"`
+}
+
+type TronTransListResp struct {
+	Records []*TronTransItem `json:"records"`
+	PagesBody
 }
 
 type UserCreateReq struct {

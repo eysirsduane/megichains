@@ -9,6 +9,7 @@ import (
 	auth "megichains/apps/backendadmin/internal/handler/auth"
 	open "megichains/apps/backendadmin/internal/handler/open"
 	order "megichains/apps/backendadmin/internal/handler/order"
+	tron "megichains/apps/backendadmin/internal/handler/tron"
 	"megichains/apps/backendadmin/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -57,8 +58,30 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodGet,
+				Path:    "/order/get",
+				Handler: order.OrderGetHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
 				Path:    "/order/list",
 				Handler: order.OrderListHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/v1"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/tron/trans/get",
+				Handler: tron.TronTransGetHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/tron/trans/list",
+				Handler: tron.TronTransListHandler(serverCtx),
 			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),

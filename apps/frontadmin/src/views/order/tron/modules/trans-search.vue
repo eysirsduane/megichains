@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { delegateTypoOptions, orderStatusOptions } from '@/constants/business';
+import { orderStatusOptions, orderTypoOptions } from '@/constants/business';
 import { useForm } from '@/hooks/common/form';
 import { translateNumberOptions, translateOptions } from '@/utils/common';
 import { $t } from '@/locales';
@@ -100,7 +100,7 @@ const shortcuts = [
                   :placeholder="$t('page.transaction.common.typo')"
                 >
                   <ElOption
-                    v-for="(item, idx) in translateNumberOptions(delegateTypoOptions)"
+                    v-for="(item, idx) in translateNumberOptions(orderTypoOptions)"
                     :key="idx"
                     :label="item.label"
                     :value="item.value"

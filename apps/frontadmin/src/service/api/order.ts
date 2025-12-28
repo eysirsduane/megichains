@@ -8,9 +8,9 @@ export function fetchGetOrderList(params?: Api.Order.OrderSearchParams) {
   });
 }
 
-export function fetchGetExchangeBill(id: number) {
+export function fetchGetOrderDetail(id: number) {
   return request<Api.Order.OrderDetail>({
-    url: `/order?id=${id}`,
+    url: `/order/get?id=${id}`,
     method: 'get'
   });
 }

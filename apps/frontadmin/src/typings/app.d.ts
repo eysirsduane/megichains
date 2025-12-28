@@ -355,6 +355,7 @@ declare namespace App {
         created: string;
         notifyfailed: string;
         success: string;
+        description: string;
       };
       request: {
         logout: string;
@@ -691,6 +692,7 @@ declare namespace App {
         order: {
           common: {
             title: string;
+            log_id: string;
             merch_order_id: string;
             transaction_id: string;
             chain: string;
@@ -701,7 +703,15 @@ declare namespace App {
             to_address: string;
             received_amount: string;
             received_sun: string;
+            amount: string;
+            sun: string;
             detail: string;
+            trans: string;
+            contract: string;
+            block_timestamp: string;
+          };
+          tron: {
+            title: string;
           };
         };
       };

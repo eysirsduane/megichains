@@ -33,18 +33,7 @@ declare namespace Api {
 
     /** common search params of table */
     type CommonSearchParams = Pick<Common.PaginatingCommonParams, 'current' | 'size'>;
-
-    /**
-     * enable status
-     *
-     * - "1": enabled
-     * - "2": disabled
-     */
-    type EnableStatus = '1' | '2';
-    type OrderTypos = '' | '入账';
-    type CurrencyTypos = '' | 'USDT'|'USDC';
-    type ChainTypos = '' | 'TRON'|'ETH'|'BSC';
-    type OrderStatus = '' | '已创建' | '通知失败' | '成功' ;
+    type CommonTimeSearchParams = Pick<Common.PaginatingTimeCommonParams, 'current' | 'size' | 'start' | 'end'>;
 
     /** common record */
     type CommonRecord<T = any> = {
@@ -61,5 +50,13 @@ declare namespace Api {
       /** record status */
       status: OrderStatus;
     } & T;
+
+    type EnableStatus = '1' | '2';
+    type OrderTypos = '' | '输入';
+    type CurrencyTypos = '' | 'USDT' | 'USDC';
+    type ChainTypos = '' | 'TRON' | 'ETH' | 'BSC';
+    type OrderStatus = '' | '已创建' | '通知失败' | '成功';
+
+    type TronContractAddresses = '' | 'TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj' | 'TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf';
   }
 }

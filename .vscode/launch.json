@@ -12,20 +12,20 @@
             "program": "${workspaceFolder}/apps/backendadmin/main.go"
         },
         {
+            "name": "Vue Debugger",
             "type": "chrome",
             "request": "launch",
-            "name": "Vue Debugger",
             "url": "http://localhost:9527",
-            "webRoot": "${workspaceFolder}/apps/backendadmin"
+            "webRoot": "${workspaceFolder}/apps/frontadmin"
         },
         {
+            "name": "TS Debugger",
             "type": "node",
             "request": "launch",
-            "name": "TS Debugger",
             "runtimeExecutable": "tsx",
             "skipFiles": [
                 "<node_internals>/**",
-                "${workspaceFolder}/apps/backendadmin/node_modules/**"
+                "${workspaceFolder}/apps/frontadmin/node_modules/**"
             ],
             "program": "${file}",
             "console": "integratedTerminal",

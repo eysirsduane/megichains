@@ -5,9 +5,6 @@ declare namespace Api {
    * backend api module: "systemManage"
    */
   namespace Order {
-    type CommonSearchParams = Pick<Common.PaginatingCommonParams, 'current' | 'size'>;
-    type CommonTimeSearchParams = Pick<Common.PaginatingTimeCommonParams, 'current' | 'size' | 'start' | 'end'>;
-
     type Order = Common.CommonRecord<{
       merch_order_id: string;
       transaction_id: string;
@@ -26,7 +23,7 @@ declare namespace Api {
         Api.Order.Order,
         'chain' | 'transaction_id' | 'typo' | 'currency' | 'from_address' | 'to_address' | 'status' | 'id'
       > &
-        CommonTimeSearchParams
+        Api.Common.CommonTimeSearchParams
     >;
 
     /** user list */

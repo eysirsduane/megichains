@@ -15,7 +15,7 @@ export const currencyTyposRecord: Record<Api.Common.CurrencyTypos, App.I18n.I18n
 
 export const orderTyposRecord: Record<Api.Common.OrderTypos, App.I18n.I18nKey> = {
   '': 'common.all',
-  入账: 'common.payin'
+  输入: 'common.payin'
 };
 
 export const orderStatusRecord: Record<Api.Common.OrderStatus, App.I18n.I18nKey> = {
@@ -25,6 +25,6 @@ export const orderStatusRecord: Record<Api.Common.OrderStatus, App.I18n.I18nKey>
   成功: 'common.success'
 };
 
-export const exchangeTypoOptions = transformNumberRecordToOption(orderTyposRecord);
+export const orderTypoOptions = transformNumberRecordToOption(orderTyposRecord);
 
 export const orderStatusOptions = transformRecordToOption(orderStatusRecord);

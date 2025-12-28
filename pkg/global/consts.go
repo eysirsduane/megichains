@@ -22,8 +22,8 @@ const (
 type OrderTypo string
 
 const (
-	OrderTypoIn  OrderTypo = "入账"
-	OrderTypoOut OrderTypo = "出款"
+	OrderTypoIn  OrderTypo = "输入"
+	OrderTypoOut OrderTypo = "输出"
 )
 
 const (

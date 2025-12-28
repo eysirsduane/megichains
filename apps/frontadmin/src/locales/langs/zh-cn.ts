@@ -59,9 +59,10 @@ const local: App.I18n.Schema = {
     bsc: 'BSC',
     eth: 'ETH',
     payin: '输入',
-    created: '',
+    created: '已创建',
     notifyfailed: '通知失败',
-    success: '成功'
+    success: '成功',
+    description: '描述'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -242,8 +243,8 @@ const local: App.I18n.Schema = {
     plugin_tables: '表格',
     plugin_tables_vtable: 'VTable',
     order: '订单管理',
-    order_delegate: '委托订单',
-    order_list: '订单列表'
+    order_list: '订单列表',
+    order_tron: '波场交易'
   },
   page: {
     login: {
@@ -508,8 +509,9 @@ const local: App.I18n.Schema = {
     order: {
       common: {
         title: '订单列表',
+        log_id: '我方交易ID',
         merch_order_id: '商户订单ID',
-        transaction_id: '交易ID',
+        transaction_id: '链交易ID',
         chain: '链',
         typo: '出入类型',
         status: '状态',
@@ -518,7 +520,15 @@ const local: App.I18n.Schema = {
         to_address: '接受地址',
         received_amount: '收到金额',
         received_sun: '收到金额(SUN)',
-        detail: '订单详情'
+        amount: '收到金额',
+        sun: '收到金额(SUN)',
+        detail: '明细',
+        trans: '区块',
+        contract: '合约地址',
+        block_timestamp: '区块交易时间'
+      },
+      tron: {
+        title: '波场区块交易列表'
       }
     }
   },

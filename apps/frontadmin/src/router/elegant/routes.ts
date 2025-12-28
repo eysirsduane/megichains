@@ -385,21 +385,21 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
-        name: 'order_delegate',
-        path: '/order/delegate',
-        component: 'view.order_delegate',
-        meta: {
-          title: 'order_delegate',
-          i18nKey: 'route.order_delegate'
-        }
-      },
-      {
         name: 'order_list',
         path: '/order/list',
         component: 'view.order_list',
         meta: {
           title: 'order_list',
           i18nKey: 'route.order_list'
+        }
+      },
+      {
+        name: 'order_tron',
+        path: '/order/tron',
+        component: 'view.order_tron',
+        meta: {
+          title: 'order_tron',
+          i18nKey: 'route.order_tron'
         }
       }
     ]

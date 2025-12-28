@@ -18,7 +18,7 @@ func ConvertToResp[T any](items []T, current, size int, total int64) (resp *Resp
 			Size:    size,
 			Total:   total,
 		},
-		Records: make([]T, size),
+		Records: make([]T, 0, size),
 	}
 
 	copier.Copy(&resp.Records, &items)

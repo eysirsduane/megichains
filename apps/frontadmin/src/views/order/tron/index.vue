@@ -41,7 +41,6 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   columns: () => [
     // { prop: 'selection', type: 'selection', width: 48 },
     { prop: 'id', type: 'id', label: $t('common.id') },
-    { prop: 'transaction_id', label: $t('page.order.common.transaction_id'), width: 570 },
     { prop: 'chain', label: $t('page.order.common.chain') },
     {
       prop: 'currency',
@@ -63,8 +62,9 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
         );
       }
     },
-    { prop: 'contract', label: $t('page.order.common.contract'), width: 180 },
-    { prop: 'amount', label: $t('page.order.common.amount'), width: 100 },
+    { prop: 'contract', label: $t('page.order.common.contract'), width: 340 },
+    { prop: 'transaction_id', label: $t('page.order.common.transaction_id'), width: 560 },
+    { prop: 'amount', label: $t('page.order.common.amount'), width: 160 },
     { prop: 'sun', label: $t('page.order.common.sun'), width: 180 },
     { prop: 'from_base58', label: $t('page.order.common.from_address'), width: 320 },
     { prop: 'to_base58', label: $t('page.order.common.to_address'), width: 320 },

@@ -62,7 +62,9 @@ const local: App.I18n.Schema = {
     created: '已创建',
     notifyfailed: '通知失败',
     success: '成功',
-    description: '描述'
+    description: '描述',
+    start: '开始时间',
+    end: '结束时间'
   },
   request: {
     logout: '请求失败后登出用户',

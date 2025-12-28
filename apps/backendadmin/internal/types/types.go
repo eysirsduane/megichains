@@ -137,11 +137,11 @@ type TronTransItem struct {
 type TronTransListReq struct {
 	Pages
 	StartEnd
-	Id            int64  `form:"id"`
-	Currency      string `form:"currency"`
-	TransactionId string `form:"transaction_id"`
-	FromBase58    string `form:"from_base58"`
-	ToBase58      string `form:"to_base58"`
+	Id            int64  `form:"id,optional"`
+	Currency      string `form:"currency,optional"`
+	TransactionId string `form:"transaction_id,optional"`
+	FromBase58    string `form:"from_base58,optional"`
+	ToBase58      string `form:"to_base58,optional"`
 }
 
 type TronTransListResp struct {

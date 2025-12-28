@@ -33,7 +33,7 @@ func (l *TronTransListLogic) TronTransList(req *types.TronTransListReq) (resp *t
 	reqc := &converter.TronTransListReq{}
 	copier.Copy(reqc, req)
 
-	res, err := l.svcCtx.OrderService.TronTransFind(l.ctx, reqc)
+	res, err := l.svcCtx.TronService.Find(l.ctx, reqc)
 	if err != nil {
 		logx.Errorf("find tron trans list failed, err:%v", err)
 		return

@@ -356,6 +356,8 @@ declare namespace App {
         notifyfailed: string;
         success: string;
         description: string;
+        start: string;
+        end: string;
       };
       request: {
         logout: string;

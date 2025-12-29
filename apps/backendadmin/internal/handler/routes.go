@@ -6,6 +6,7 @@ package handler
 import (
 	"net/http"
 
+	address "megichains/apps/backendadmin/internal/handler/address"
 	auth "megichains/apps/backendadmin/internal/handler/auth"
 	evm "megichains/apps/backendadmin/internal/handler/evm"
 	open "megichains/apps/backendadmin/internal/handler/open"
@@ -17,6 +18,23 @@ import (
 )
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/address/edit",
+				Handler: address.AddressEditHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/address/list",
+				Handler: address.AddressListHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/v1"),
+	)
+
 	server.AddRoutes(
 		[]rest.Route{
 			{

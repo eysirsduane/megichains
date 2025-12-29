@@ -15,13 +15,12 @@ function getInitSearchParams(): Api.Tron.TransSearchParams {
   return {
     current: 1,
     size: 20,
-    id: 0,
+    start: 0,
+    end: 0,
     currency: '',
     transaction_id: '',
     from_base58: '',
-    to_base58: '',
-    start: 0,
-    end: 0
+    to_base58: ''
   };
 }
 
@@ -54,7 +53,6 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
         };
 
         const label = $t(currencyTyposRecord[row.currency]);
-
         return (
           <el-tag effect="dark" round type={tagMap[row.currency]}>
             {label}

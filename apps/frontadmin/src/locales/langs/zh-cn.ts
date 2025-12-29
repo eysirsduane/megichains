@@ -64,7 +64,10 @@ const local: App.I18n.Schema = {
     success: '成功',
     description: '描述',
     start: '开始时间',
-    end: '结束时间'
+    end: '结束时间',
+    in: '入',
+    out: '出',
+    collect: '归集'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -247,7 +250,10 @@ const local: App.I18n.Schema = {
     order: '订单管理',
     order_list: '订单列表',
     order_tron: '波场交易',
-    order_evm: 'EVM交易'
+    order_evm: 'EVM交易',
+    address: '地址管理',
+    address_list: '地址列表',
+    address_group: '地址分组'
   },
   page: {
     login: {
@@ -536,6 +542,19 @@ const local: App.I18n.Schema = {
       },
       tron: {
         title: '波场区块交易列表'
+      }
+    },
+    address: {
+      common: {
+        chain: '链',
+        address: '地址',
+        address2: '地址2',
+        status: '状态',
+        typo: '类型',
+        group_id: '分组'
+      },
+      list: {
+        title: '地址列表'
       }
     }
   },

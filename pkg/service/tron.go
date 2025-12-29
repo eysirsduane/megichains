@@ -50,13 +50,13 @@ func (s *TronService) Find(ctx context.Context, req *converter.TronTransListReq)
 	items, err := db.Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Find(ctx)
 	if err != nil {
 		logx.Errorf("tron trans list find failed, err:%v", err)
-		err = biz.OrderFindFailed
+		err = biz.TronTransactionFindFailed
 		return
 	}
 	total, err := db.Count(ctx, "id")
 	if err != nil {
 		logx.Errorf("tron trans list count failed, err:%v", err)
-		err = biz.OrderCountFailed
+		err = biz.TronTransactionCountFailed
 		return
 	}
 

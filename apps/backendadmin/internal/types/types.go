@@ -3,6 +3,33 @@
 
 package types
 
+type AddressItem struct {
+	Id          int64  `json:"id"`
+	GroupId     int64  `json:"group_id"`
+	Chain       string `json:"chain"`
+	Typo        string `json:"typo"`
+	Status      string `json:"status"`
+	Address     string `json:"address"`
+	Address2    string `json:"address2"`
+	Description string `json:"description"`
+	TimeAts
+}
+
+type AddressListReq struct {
+	Pages
+	StartEnd
+	Address string `form:"address,optional"`
+	Chain   string `form:"chain,optional"`
+	Typo    string `form:typo,optional`
+	Status  string `form:"status,optional"`
+	GroupId int64  `form:"group_id,optional"`
+}
+
+type AddressListResp struct {
+	Records []*AddressItem `json:"records"`
+	PagesBody
+}
+
 type Contacts struct {
 	Telegram string `json:"telegram"`
 	WhatsApp string `json:"whatsapp"`
@@ -33,7 +60,7 @@ type EvmLogListReq struct {
 	Pages
 	StartEnd
 	Id       int64  `form:"id,optional"`
-	Chain    string `json:"chain,optional"`
+	Chain    string `form:"chain,optional"`
 	Currency string `form:"currency,optional"`
 	TxHash   string `form:"tx_hash,optional"`
 	FromHex  string `form:"from_hex,optional"`
@@ -138,8 +165,8 @@ type StartEnd struct {
 }
 
 type TimeAts struct {
-	UpdatedAt uint64 `json:"update_at"`
-	DeletedAt uint64 `json:"delete_at"`
+	UpdatedAt uint64 `json:"updated_at"`
+	DeletedAt uint64 `json:"deleted_at"`
 	CreatedAt uint64 `json:"created_at"`
 }
 

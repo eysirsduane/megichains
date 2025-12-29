@@ -358,6 +358,9 @@ declare namespace App {
         description: string;
         start: string;
         end: string;
+        in: string;
+        out: string;
+        collect: string;
       };
       request: {
         logout: string;
@@ -717,6 +720,19 @@ declare namespace App {
             title: string;
           };
           tron: {
+            title: string;
+          };
+        };
+        address: {
+          common: {
+            chain: string;
+            address: string;
+            address2: string;
+            status: string;
+            typo: string;
+            group_id: string;
+          };
+          list: {
             title: string;
           };
         };

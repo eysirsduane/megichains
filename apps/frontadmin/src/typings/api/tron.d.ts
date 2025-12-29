@@ -18,7 +18,7 @@ declare namespace Api {
     }>;
 
     type TransSearchParams = CommonType.RecordNullable<
-      Pick<Api.Tron.Trans, 'currency' | 'contract' | 'transaction_id' | 'from_base58' | 'to_base58' | 'id'> &
+      Pick<Api.Tron.Trans, 'currency' |  'transaction_id' | 'from_base58' | 'to_base58' | 'id'> &
         Api.Common.CommonTimeSearchParams
     >;
 

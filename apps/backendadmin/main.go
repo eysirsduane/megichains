@@ -44,10 +44,11 @@ func main() {
 	excfgservice := service.NewRangeConfigService(db)
 	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
 	userservice := service.NewUserService(db)
+	addrservice := service.NewAddressService(db)
 	orderservice := service.NewMerchOrderService(db)
 	tronservice := service.NewTronService(db)
 	evmservice := service.NewEvmService(db)
-	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, orderservice, tronservice, evmservice)
+	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, addrservice, orderservice, tronservice, evmservice)
 	handler.RegisterHandlers(server, ctx)
 
 	httpx.SetOkHandler(biz.OkHandler)

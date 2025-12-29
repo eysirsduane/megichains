@@ -28,7 +28,6 @@ func NewOrderGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *OrderGet
 }
 
 func (l *OrderGetLogic) OrderGet(req *types.OrderGetReq) (resp *types.OrderItem, err error) {
-	// todo: add your logic here and delete this line
 	order, err := l.svcCtx.OrderService.Get(req.Id)
 	if err != nil {
 		logx.Errorf("order get failed, oid:%v, err:%v", req.Id, err)

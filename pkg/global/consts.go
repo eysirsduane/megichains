@@ -7,8 +7,9 @@ const (
 type AddressTypo string
 
 const (
-	AddressTypoIn  AddressTypo = "IN"
-	AddressTypoOut AddressTypo = "OUT"
+	AddressTypoIn      AddressTypo = "IN"
+	AddressTypoOut     AddressTypo = "OUT"
+	AddressTypoCollect AddressTypo = "COLLECT"
 )
 
 type AddressStatus string

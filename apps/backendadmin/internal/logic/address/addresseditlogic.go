@@ -1,7 +1,7 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package order
+package address
 
 import (
 	"context"
@@ -14,32 +14,29 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type OrderListLogic struct {
+type AddressEditLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewOrderListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *OrderListLogic {
-	return &OrderListLogic{
+func NewAddressEditLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddressEditLogic {
+	return &AddressEditLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *OrderListLogic) OrderList(req *types.OrderListReq) (resp *types.OrderListResp, err error) {
-	reqc := &converter.OrderListReq{}
+func (l *AddressEditLogic) AddressEdit(req *types.AddressItem) (err error) {
+	reqc := &converter.AddressItem{}
 	copier.Copy(reqc, req)
 
-	res, err := l.svcCtx.OrderService.Find(l.ctx, reqc)
+	err = l.svcCtx.AddressService.Edit(l.ctx, reqc)
 	if err != nil {
-		logx.Errorf("find order failed, err:%v", err)
+		logx.Errorf("find address list failed, err:%v", err)
 		return
 	}
-
-	resp = &types.OrderListResp{}
-	copier.Copy(resp, res)
 
 	return
 }

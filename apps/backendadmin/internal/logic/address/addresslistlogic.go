@@ -1,7 +1,7 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package tron
+package address
 
 import (
 	"context"
@@ -14,31 +14,31 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type TronTransListLogic struct {
+type AddressListLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewTronTransListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TronTransListLogic {
-	return &TronTransListLogic{
+func NewAddressListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddressListLogic {
+	return &AddressListLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *TronTransListLogic) TronTransList(req *types.TronTransListReq) (resp *types.TronTransListResp, err error) {
-	reqc := &converter.TronTransListReq{}
+func (l *AddressListLogic) AddressList(req *types.AddressListReq) (resp *types.AddressListResp, err error) {
+	reqc := &converter.AddressListReq{}
 	copier.Copy(reqc, req)
 
-	res, err := l.svcCtx.TronService.Find(l.ctx, reqc)
+	res, err := l.svcCtx.AddressService.Find(l.ctx, reqc)
 	if err != nil {
-		logx.Errorf("find tron trans list failed, err:%v", err)
+		logx.Errorf("find address list failed, err:%v", err)
 		return
 	}
 
-	resp = &types.TronTransListResp{}
+	resp = &types.AddressListResp{}
 	copier.Copy(resp, res)
 
 	return

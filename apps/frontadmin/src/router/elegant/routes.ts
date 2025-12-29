@@ -51,6 +51,39 @@ export const generatedRoutes: GeneratedRoute[] = [
     }
   },
   {
+    name: 'address',
+    path: '/address',
+    component: 'layout.base',
+    meta: {
+      title: 'address',
+      i18nKey: 'route.address',
+      icon: 'ant-design:exception-outlined',
+      order: 3
+    },
+    children: [
+      {
+        name: 'address_list',
+        path: '/address/list',
+        component: 'view.address_list',
+        meta: {
+          title: 'address_list',
+          i18nKey: 'route.address_list',
+          icon: 'mdi:file-document-multiple-outline'
+        }
+      },
+      {
+        name: 'address_group',
+        path: '/address/group',
+        component: 'view.address_group',
+        meta: {
+          title: 'address_group',
+          i18nKey: 'route.address_group',
+          icon: 'ep:element-plus'
+        }
+      }
+    ]
+  },
+  {
     name: 'alova',
     path: '/alova',
     component: 'layout.base',
@@ -390,7 +423,16 @@ export const generatedRoutes: GeneratedRoute[] = [
       icon: 'cbi:scene-dynamic'
     },
     children: [
-
+      {
+        name: 'order_evm',
+        path: '/order/evm',
+        component: 'view.order_evm',
+        meta: {
+          title: 'order_evm',
+          i18nKey: 'route.order_evm',
+          icon: 'carbon:network-overlay'
+        }
+      },
       {
         name: 'order_list',
         path: '/order/list',
@@ -408,16 +450,6 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'order_tron',
           i18nKey: 'route.order_tron',
-          icon: 'carbon:network-overlay'
-        }
-      },
-      {
-        name: 'order_evm',
-        path: '/order/evm',
-        component: 'view.order_evm',
-        meta: {
-          title: 'order_evm',
-          i18nKey: 'route.order_evm',
           icon: 'carbon:network-overlay'
         }
       }

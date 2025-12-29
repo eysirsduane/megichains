@@ -15,14 +15,13 @@ function getInitSearchParams(): Api.Evm.LogSearchParams {
   return {
     current: 1,
     size: 20,
-    id: 0,
+    start: 0,
+    end: 0,
     chain: '',
     currency: '',
     tx_hash: '',
     from_hex: '',
-    to_hex: '',
-    start: 0,
-    end: 0
+    to_hex: ''
   };
 }
 

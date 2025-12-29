@@ -382,7 +382,7 @@ func (s *ChainListenService) listenEvm(chain global.ChainName, currency, moid, r
 		err = s.evmservice.LogSave(log)
 		if err != nil {
 			logx.Errorf("evm service save log failed, err:%v", err)
-			err = biz.EvmOrderSaveFailed
+			err = biz.EvmLogSaveFailed
 			continue
 		}
 
@@ -406,6 +406,7 @@ func (s *ChainListenService) listenEvm(chain global.ChainName, currency, moid, r
 		err = s.orderservice.Save(order)
 		if err != nil {
 			logx.Errorf("EVM chain order service save order failed, moid:%v, txid:%v, err:%v", moid, order.TransactionId, err)
+			err = biz.EvmOrderSaveFailed
 			return
 		}
 	}
@@ -450,7 +451,7 @@ func (s *ChainListenService) listenTron(chain global.ChainName, currency global.
 		err = s.tronservice.TransSave(trans)
 		if err != nil {
 			logx.Errorf("tron service save trans failed, err:%v", err)
-			err = biz.TronTransSaveFailed
+			err = biz.TronTransactionSaveFailed
 			continue
 		}
 

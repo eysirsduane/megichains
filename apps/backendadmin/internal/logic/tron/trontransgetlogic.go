@@ -25,7 +25,6 @@ func NewTronTransGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Tron
 }
 
 func (l *TronTransGetLogic) TronTransGet() error {
-	// todo: add your logic here and delete this line
 
 	return nil
 }

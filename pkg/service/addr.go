@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"crypto/ecdsa"
 	"crypto/sha256"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 	"github.com/btcsuite/btcd/btcec/v2"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/jinzhu/copier"
 	"github.com/mr-tron/base58/base58"
 	"github.com/zeromicro/go-zero/core/logx"
 	"golang.org/x/crypto/sha3"
@@ -32,6 +34,61 @@ func (s *AddressService) GetAddress(id int64) (addr *entity.Address, err error) 
 		logx.Errorf("db get address failed, id:%v, err:%v", id, err)
 		return
 	}
+
+	return
+}
+
+func (s *AddressService) Edit(ctx context.Context, req *converter.AddressItem) (err error) {
+	addr := entity.Address{}
+	copier.Copy(&addr, req)
+	_, err = gorm.G[entity.Address](s.db).Updates(ctx, addr)
+	if err != nil {
+		logx.Errorf("db edit address failed, id:%v, err:%v", req.Id, err)
+		err = biz.AddressEditFailed
+		return
+	}
+
+	return
+}
+
+func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq) (resp *converter.RespConverter[entity.Address], err error) {
+	db := gorm.G[entity.Address](s.db).Order("updated_at desc")
+	if req.Address != "" {
+		db = db.Where("address = ?", req.Address)
+	}
+	if req.Chain != "" {
+		db = db.Where("chain = ?", req.Chain)
+	}
+	if req.Status != "" {
+		db = db.Where("status = ?", req.Status)
+	}
+	if req.Typo != "" {
+		db = db.Where("typo = ?", req.Typo)
+	}
+	if req.GroupId > 0 {
+		db = db.Where("group_id = ?", req.GroupId)
+	}
+	if req.Start > 0 {
+		db = db.Where("created_at >= ?", req.Start)
+	}
+	if req.End > 0 {
+		db = db.Where("created_at <= ?", req.End)
+	}
+
+	items, err := db.Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Find(ctx)
+	if err != nil {
+		logx.Errorf("address list find failed, err:%v", err)
+		err = biz.AddressFindFailed
+		return
+	}
+	total, err := db.Count(ctx, "id")
+	if err != nil {
+		logx.Errorf("address list count failed, err:%v", err)
+		err = biz.AddressCountFailed
+		return
+	}
+
+	resp = converter.ConvertToResp(items, req.Current, req.Size, total)
 
 	return
 }

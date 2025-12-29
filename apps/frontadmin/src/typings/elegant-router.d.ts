@@ -35,6 +35,9 @@ declare module "@elegant-router/types" {
     "404": "/404";
     "500": "/500";
     "about": "/about";
+    "address": "/address";
+    "address_group": "/address/group";
+    "address_list": "/address/list";
     "alova": "/alova";
     "alova_request": "/alova/request";
     "alova_scenes": "/alova/scenes";
@@ -141,6 +144,7 @@ declare module "@elegant-router/types" {
     | "404"
     | "500"
     | "about"
+    | "address"
     | "alova"
     | "function"
     | "home"
@@ -175,6 +179,8 @@ declare module "@elegant-router/types" {
     | "iframe-page"
     | "login"
     | "about"
+    | "address_group"
+    | "address_list"
     | "alova_request"
     | "alova_scenes"
     | "alova_user"

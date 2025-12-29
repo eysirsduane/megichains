@@ -147,15 +147,42 @@ type EvmLogItem struct {
 type EvmLogListReq struct {
 	Pages
 	StartEnd
-	Id            int64  `form:"id,optional"`
-	Chain         string `json:"chain"`
-	Currency      string `form:"currency,optional"`
-	TxHash string `form:"tx_hash,optional"`
-	FromHex       string `form:"from_hex,optional"`
-	ToHex         string `form:"to_hex,optional"`
+	Id       int64  `form:"id,optional"`
+	Chain    string `json:"chain"`
+	Currency string `form:"currency,optional"`
+	TxHash   string `form:"tx_hash,optional"`
+	FromHex  string `form:"from_hex,optional"`
+	ToHex    string `form:"to_hex,optional"`
 }
 
 type EvmLogListResp struct {
 	Records []*EvmLogItem `json:"records"`
+	PagesBody
+}
+
+type AddressItem struct {
+	Id          int64
+	GroupId     int64
+	Chain       string
+	Typo        string
+	Status      string
+	Address     string
+	Address2    string
+	Description string
+	TimeAts
+}
+
+type AddressListReq struct {
+	Pages
+	StartEnd
+	Address string
+	Chain   string
+	Typo    string
+	Status  string
+	GroupId int64
+}
+
+type AddressListResp struct {
+	Records []*AddressItem `json:"records"`
 	PagesBody
 }

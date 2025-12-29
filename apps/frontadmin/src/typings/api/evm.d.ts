@@ -19,7 +19,7 @@ declare namespace Api {
     }>;
 
     type LogSearchParams = CommonType.RecordNullable<
-      Pick<Api.Evm.Log, 'chain' | 'currency' | 'contract' | 'tx_hash' | 'from_hex' | 'to_hex' | 'id'> &
+      Pick<Api.Evm.Log, 'chain' | 'currency'  | 'tx_hash' | 'from_hex' | 'to_hex' | 'id'> &
         Api.Common.CommonTimeSearchParams
     >;
 

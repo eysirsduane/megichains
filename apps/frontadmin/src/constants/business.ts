@@ -25,7 +25,15 @@ export const orderStatusRecord: Record<Api.Common.OrderStatus, App.I18n.I18nKey>
   成功: 'common.success'
 };
 
+export const addressTyposRecord: Record<Api.Common.AddressTypos, App.I18n.I18nKey> = {
+  '': 'common.all',
+  IN: 'common.in',
+  OUT: 'common.out',
+  COLLECT: 'common.collect'
+};
+
 export const orderTypoOptions = transformRecordToOption(orderTyposRecord);
 export const orderStatusOptions = transformRecordToOption(orderStatusRecord);
 export const currencyTyposOptions = transformRecordToOption(currencyTyposRecord);
 export const chainTyposOptions = transformRecordToOption(chainTyposRecord);
+export const addressTyposOptions = transformRecordToOption(addressTyposRecord);

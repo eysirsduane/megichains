@@ -13,6 +13,8 @@ type Address struct {
 	PublicKey  string `gorm:"size:2047"`
 
 	Description string `gorm:"size:2047"`
+
+	TimeAts
 }
 
 type AddressGroup struct {
@@ -20,4 +22,6 @@ type AddressGroup struct {
 
 	Name        string `gorm:"size:31"`
 	Description string `gorm:"size:2047"`
+
+	TimeAts
 }

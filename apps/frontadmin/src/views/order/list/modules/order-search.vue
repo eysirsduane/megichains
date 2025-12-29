@@ -8,7 +8,6 @@ import { $t } from '@/locales';
 defineOptions({ name: 'OrderSearch' });
 
 interface Emits {
-  (e: 'reset'): void;
   (e: 'search'): void;
 }
 const rtvalue = ref('');

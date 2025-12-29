@@ -9,7 +9,7 @@ declare namespace Api {
       merch_order_id: string;
       transaction_id: string;
       typo: Api.Common.OrderTypos;
-      currency: string;
+      currency: Api.Common.CurrencyTypos;
       chain: string;
       received_amount: number;
       received_sun: number;

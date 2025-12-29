@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import { ref, watch } from 'vue';
 import { currencyTyposOptions } from '@/constants/business';
 import { useForm } from '@/hooks/common/form';
@@ -8,7 +8,6 @@ import { $t } from '@/locales';
 defineOptions({ name: 'TransSearch' });
 
 interface Emits {
-  (e: 'reset'): void;
   (e: 'search'): void;
 }
 const rtvalue = ref('');
@@ -93,7 +92,7 @@ const shortcuts = [
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
-              <ElFormItem :label="$t('page.order.common.currency')" prop="to_base58">
+              <ElFormItem :label="$t('page.order.common.currency')" prop="currency">
                 <ElSelect
                   v-model="model.currency"
                   clearable

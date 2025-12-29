@@ -529,6 +529,9 @@ const local: App.I18n.Schema = {
         contract: '合约地址',
         block_timestamp: '区块交易时间'
       },
+      detail: {
+        title: '订单明细'
+      },
       tron: {
         title: '波场区块交易列表'
       }

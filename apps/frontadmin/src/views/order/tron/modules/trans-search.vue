@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { currencyTyposOptions, orderStatusOptions, orderTypoOptions } from '@/constants/business';
+import { currencyTyposOptions } from '@/constants/business';
 import { useForm } from '@/hooks/common/form';
-import { translateNumberOptions, translateOptions } from '@/utils/common';
+import { translateOptions } from '@/utils/common';
 import { $t } from '@/locales';
 
 defineOptions({ name: 'TransSearch' });
@@ -97,8 +97,8 @@ const shortcuts = [
                 <ElSelect
                   v-model="model.currency"
                   clearable
-                  :empty-values="[-1, undefined]"
-                  :value-on-clear="-1"
+                  :empty-values="['', undefined]"
+                  value-on-clear=""
                   :placeholder="$t('page.order.common.currency')"
                 >
                   <ElOption

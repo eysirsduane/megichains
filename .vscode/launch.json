@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch Backend",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/apps/backend/main.go"
+        },
+        {
             "name": "Launch BackendAdmin",
             "type": "go",
             "request": "launch",
@@ -36,6 +43,7 @@
         {
             "name": "Start Both (Frontend & Backend)",
             "configurations": [
+                "Launch Backend",
                 "Launch BackendAdmin",
                 "Vue Debugger",
                 "TS Debugger"

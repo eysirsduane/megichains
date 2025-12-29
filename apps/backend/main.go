@@ -21,7 +21,7 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-var configFile = flag.String("f", "../../etc/megichains.backend.dev.yaml", "the config file")
+var configFile = flag.String("f", "../../etc/megichains.dev.yaml", "the config file")
 
 func main() {
 	flag.Parse()
@@ -37,6 +37,7 @@ func main() {
 		panic(err)
 	}
 
+	cfg.RestConf.Port = 7002
 	server := rest.MustNewServer(cfg.RestConf)
 	defer server.Stop()
 

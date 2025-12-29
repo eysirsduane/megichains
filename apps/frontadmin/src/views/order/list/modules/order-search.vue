@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { orderStatusOptions } from '@/constants/business';
+import { currencyTyposOptions, orderStatusOptions } from '@/constants/business';
 import { useForm } from '@/hooks/common/form';
-import { translateNumberOptions, translateOptions } from '@/utils/common';
+import { translateOptions } from '@/utils/common';
 import { $t } from '@/locales';
 
-defineOptions({ name: 'ExchangeSearch' });
+defineOptions({ name: 'OrderSearch' });
 
 interface Emits {
   (e: 'reset'): void;
@@ -81,26 +81,26 @@ const shortcuts = [
         <ElForm ref="formRef" :model="model" label-position="right" :label-width="80">
           <ElRow :gutter="24">
             <ElCol :lg="6" :md="8" :sm="12">
-              <ElFormItem :label="$t('page.transaction.common.order_id')" prop="id">
-                <ElInput v-model="model.id" :placeholder="$t('page.transaction.common.order_id')" />
+              <ElFormItem :label="$t('page.order.common.merch_order_id')" prop="merch_order_id">
+                <ElInput v-model="model.merch_order_id" :placeholder="$t('page.order.common.merch_order_id')" />
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
-              <ElFormItem :label="$t('page.transaction.common.transaction_id')" prop="transaction_id">
-                <ElInput v-model="model.transaction_id" :placeholder="$t('page.transaction.common.transaction_id')" />
+              <ElFormItem :label="$t('page.order.common.transaction_id')" prop="transaction_id">
+                <ElInput v-model="model.transaction_id" :placeholder="$t('page.order.common.transaction_id')" />
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
-              <ElFormItem :label="$t('page.transaction.common.typo')" prop="to_base58">
+              <ElFormItem :label="$t('page.order.common.currency')" prop="currency">
                 <ElSelect
-                  v-model="model.typo"
+                  v-model="model.currency"
                   clearable
-                  :empty-values="[-1, undefined]"
-                  :value-on-clear="-1"
-                  :placeholder="$t('page.transaction.common.typo')"
+                  :empty-values="['', undefined]"
+                  value-on-clear=""
+                  :placeholder="$t('page.order.common.currency')"
                 >
                   <ElOption
-                    v-for="(item, idx) in translateNumberOptions(orderStatusOptions)"
+                    v-for="(item, idx) in translateOptions(currencyTyposOptions)"
                     :key="idx"
                     :label="item.label"
                     :value="item.value"
@@ -109,13 +109,13 @@ const shortcuts = [
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
-              <ElFormItem :label="$t('page.transaction.common.status')" prop="status">
+              <ElFormItem :label="$t('page.order.common.status')" prop="status">
                 <ElSelect
                   v-model="model.status"
                   clearable
                   :empty-values="['']"
                   value-on-clear=""
-                  :placeholder="$t('page.transaction.common.status')"
+                  :placeholder="$t('page.order.common.status')"
                 >
                   <ElOption
                     v-for="(item, idx) in translateOptions(orderStatusOptions)"
@@ -127,13 +127,13 @@ const shortcuts = [
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
-              <ElFormItem :label="$t('page.transaction.common.from_base58')" prop="from_base58">
-                <ElInput v-model="model.from_base58" :placeholder="$t('page.transaction.common.from_base58')" />
+              <ElFormItem :label="$t('page.order.common.from_address')" prop="from_address">
+                <ElInput v-model="model.from_address" :placeholder="$t('page.order.common.from_address')" />
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
-              <ElFormItem :label="$t('page.transaction.common.to_base58')" prop="to_base58">
-                <ElInput v-model="model.to_base58" :placeholder="$t('page.transaction.common.to_base58')" />
+              <ElFormItem :label="$t('page.order.common.to_address')" prop="to_address">
+                <ElInput v-model="model.to_address" :placeholder="$t('page.order.common.to_address')" />
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
@@ -143,8 +143,8 @@ const shortcuts = [
                   type="daterange"
                   unlink-panels
                   range-separator="To"
-                  :start-placeholder="$t('page.transaction.common.start')"
-                  :end-placeholder="$t('page.transaction.common.end')"
+                  :start-placeholder="$t('common.start')"
+                  :end-placeholder="$t('common.end')"
                   :shortcuts="shortcuts"
                   value-format="x"
                 />

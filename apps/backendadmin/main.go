@@ -37,6 +37,7 @@ func main() {
 		panic(err)
 	}
 
+	cfg.RestConf.Port = 7001
 	server := rest.MustNewServer(cfg.RestConf)
 	defer server.Stop()
 
@@ -51,7 +52,7 @@ func main() {
 	httpx.SetOkHandler(biz.OkHandler)
 	httpx.SetErrorHandlerCtx(biz.ErrHandler(cfg.Name))
 
-	starting := fmt.Sprintf("Starting http server %s at %s:%d ...", cfg.Name, cfg.Host, cfg.Port)
+	starting := fmt.Sprintf("Starting http server %s at %s:%d ...", cfg.Name, cfg.Host, cfg.RestConf.Port)
 	fmt.Println(starting)
 	logx.Info(starting)
 

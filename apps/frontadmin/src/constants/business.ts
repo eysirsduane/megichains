@@ -1,4 +1,4 @@
-import { transformNumberRecordToOption, transformRecordToOption } from '@/utils/common';
+import { transformRecordToOption } from '@/utils/common';
 
 export const chainTyposRecord: Record<Api.Common.ChainTypos, App.I18n.I18nKey> = {
   '': 'common.all',
@@ -25,6 +25,6 @@ export const orderStatusRecord: Record<Api.Common.OrderStatus, App.I18n.I18nKey>
   成功: 'common.success'
 };
 
-export const orderTypoOptions = transformNumberRecordToOption(orderTyposRecord);
+export const orderTypoOptions = transformRecordToOption(orderTyposRecord);
 export const orderStatusOptions = transformRecordToOption(orderStatusRecord);
 export const currencyTyposOptions = transformRecordToOption(currencyTyposRecord);

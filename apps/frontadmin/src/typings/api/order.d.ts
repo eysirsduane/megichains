@@ -21,7 +21,15 @@ declare namespace Api {
     type OrderSearchParams = CommonType.RecordNullable<
       Pick<
         Api.Order.Order,
-        'chain' | 'transaction_id' | 'typo' | 'currency' | 'from_address' | 'to_address' | 'status' | 'id'
+        | 'merch_order_id'
+        | 'chain'
+        | 'transaction_id'
+        | 'typo'
+        | 'currency'
+        | 'from_address'
+        | 'to_address'
+        | 'status'
+        | 'id'
       > &
         Api.Common.CommonTimeSearchParams
     >;
@@ -30,13 +38,16 @@ declare namespace Api {
     type OrderList = Common.PaginatingQueryRecord<Order>;
 
     type OrderDetail = Common.CommonRecord<{
-      order_id: number;
+      log_id: number;
+      merch_order_id: string;
       transaction_id: string;
+      typo: Api.Common.OrderTypos;
       currency: string;
-      from_address: string;
-      to_address: string;
+      chain: string;
       received_amount: number;
       received_sun: number;
+      from_address: string;
+      to_address: string;
       description: string;
     }>;
   }

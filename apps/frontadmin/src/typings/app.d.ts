@@ -712,6 +712,9 @@ declare namespace App {
             contract: string;
             block_timestamp: string;
           };
+          detail: {
+            title: string;
+          };
           tron: {
             title: string;
           };

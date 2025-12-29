@@ -1,7 +1,7 @@
 Name: megichains-backend-dev
 Timeout: 3600000
 Host: 0.0.0.0
-Port: 7002
+Port: 7001
 
 Log:
   ServiceName: "megichains_service"

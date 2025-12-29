@@ -58,7 +58,8 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'alova',
       i18nKey: 'route.alova',
       icon: 'carbon:http',
-      order: 7
+      order: 7,
+      hideInMenu: true
     },
     children: [
       {
@@ -103,7 +104,8 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'function',
       i18nKey: 'route.function',
       icon: 'icon-park-outline:all-application',
-      order: 6
+      order: 6,
+      hideInMenu: true
     },
     children: [
       {
@@ -258,7 +260,8 @@ export const generatedRoutes: GeneratedRoute[] = [
       i18nKey: 'route.manage',
       icon: 'carbon:cloud-service-management',
       order: 9,
-      roles: ['R_ADMIN']
+      roles: ['R_ADMIN'],
+      hideInMenu: true
     },
     children: [
       {
@@ -320,7 +323,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'multi-menu',
       i18nKey: 'route.multi-menu',
-      order: 8
+      order: 8,
+      hideInMenu: true
     },
     children: [
       {
@@ -381,7 +385,9 @@ export const generatedRoutes: GeneratedRoute[] = [
     component: 'layout.base',
     meta: {
       title: 'order',
-      i18nKey: 'route.order'
+      i18nKey: 'route.order',
+      order: 2,
+      icon: 'cbi:scene-dynamic'
     },
     children: [
       {
@@ -390,7 +396,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.order_list',
         meta: {
           title: 'order_list',
-          i18nKey: 'route.order_list'
+          i18nKey: 'route.order_list',
+          icon: 'carbon:network-overlay'
         }
       },
       {
@@ -399,7 +406,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.order_tron',
         meta: {
           title: 'order_tron',
-          i18nKey: 'route.order_tron'
+          i18nKey: 'route.order_tron',
+          icon: 'material-symbols:route'
         }
       }
     ]
@@ -412,7 +420,8 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: '插件示例',
       i18nKey: 'route.plugin',
       order: 7,
-      icon: 'clarity:plugin-line'
+      icon: 'clarity:plugin-line',
+      hideInMenu: true
     },
     children: [
       {

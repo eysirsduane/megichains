@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	auth "megichains/apps/backendadmin/internal/handler/auth"
+	evm "megichains/apps/backendadmin/internal/handler/evm"
 	open "megichains/apps/backendadmin/internal/handler/open"
 	order "megichains/apps/backendadmin/internal/handler/order"
 	tron "megichains/apps/backendadmin/internal/handler/tron"
@@ -32,6 +33,18 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/auth/user/info",
 				Handler: auth.UserInfoGetHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/v1"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/evm/log/list",
+				Handler: evm.EvmLogListHandler(serverCtx),
 			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),

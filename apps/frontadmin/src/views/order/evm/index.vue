@@ -1,31 +1,28 @@
 <script setup lang="tsx">
-import { reactive, ref } from 'vue';
-import { ElButton } from 'element-plus';
-import { useBoolean } from '@sa/hooks';
-import { currencyTyposRecord, orderStatusRecord, orderTyposRecord } from '@/constants/business';
-import { fetchGetOrderList } from '@/service/api';
+import { reactive } from 'vue';
+import { currencyTyposRecord } from '@/constants/business';
+import { fetchGetLogList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
-import OrderDetailDrawer from './modules/order-detail-drawer.vue';
-import OrderSearch from './modules/order-search.vue';
+import TransSearch from './modules/log-search.vue';
 
-defineOptions({ name: 'OrderListView' });
+defineOptions({ name: 'TransSearch' });
 
 const searchParams = reactive(getInitSearchParams());
 
-function getInitSearchParams(): Api.Order.OrderSearchParams {
+function getInitSearchParams(): Api.Evm.LogSearchParams {
   return {
     current: 1,
     size: 20,
-    merch_order_id: '',
+    id: 0,
     chain: '',
-    status: '',
-    typo: '',
     currency: '',
-    transaction_id: '',
-    from_address: '',
-    to_address: ''
+    tx_hash: '',
+    from_hex: '',
+    to_hex: '',
+    start: 0,
+    end: 0
   };
 }
 
@@ -34,7 +31,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     currentPage: searchParams.current,
     pageSize: searchParams.size
   },
-  api: () => fetchGetOrderList(searchParams),
+  api: () => fetchGetLogList(searchParams),
   transform: response => {
     return defaultSearchform(response);
   },
@@ -43,51 +40,9 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     searchParams.size = params.pageSize;
   },
   columns: () => [
-    { prop: 'selection', type: 'selection', width: 48 },
+    // { prop: 'selection', type: 'selection', width: 48 },
     { prop: 'id', type: 'id', label: $t('common.id') },
-    { prop: 'merch_order_id', label: $t('page.order.common.merch_order_id'), width: 320 },
-    { prop: 'received_amount', label: $t('page.order.common.received_amount'), width: 160 },
     { prop: 'chain', label: $t('page.order.common.chain') },
-    {
-      prop: 'typo',
-      label: $t('page.order.common.typo'),
-      width: 100,
-      formatter: row => {
-        const tagMap: Record<Api.Common.OrderTypos, UI.ThemeColor> = {
-          '': 'info',
-          输入: 'success'
-        };
-
-        const label = $t(orderTyposRecord[row.typo]);
-
-        return (
-          <el-tag effect="dark" round type={tagMap[row.typo]}>
-            {label}
-          </el-tag>
-        );
-      }
-    },
-    {
-      prop: 'status',
-      label: $t('page.order.common.status'),
-      width: 100,
-      formatter: row => {
-        const tagMap: Record<Api.Common.OrderStatus, UI.ThemeColor> = {
-          '': 'info',
-          已创建: 'info',
-          通知失败: 'danger',
-          成功: 'success'
-        };
-
-        const label = $t(orderStatusRecord[row.status]);
-
-        return (
-          <el-tag effect="dark" round type={tagMap[row.status]}>
-            {label}
-          </el-tag>
-        );
-      }
-    },
     {
       prop: 'currency',
       label: $t('page.order.common.currency'),
@@ -108,10 +63,14 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
         );
       }
     },
-    // { prop: 'received_sun', label: $t('page.order.common.received_sun'), width: 180 },
-    { prop: 'from_address', label: $t('page.order.common.from_address'), width: 380 },
-    { prop: 'to_address', label: $t('page.order.common.to_address'), width: 380 },
-    { prop: 'transaction_id', label: $t('page.order.common.transaction_id'), width: 570 },
+    { prop: 'amount', label: $t('page.order.common.amount'), width: 160 },
+    { prop: 'sun', label: $t('page.order.common.sun'), width: 180 },
+    { prop: 'contract', label: $t('page.order.common.contract'), width: 380 },
+    { prop: 'tx_hash', label: $t('page.order.common.transaction_id'), width: 560 },
+    { prop: 'from_hex', label: $t('page.order.common.from_address'), width: 380 },
+    { prop: 'to_hex', label: $t('page.order.common.to_address'), width: 380 },
+    { prop: 'block_timestamp', label: $t('page.order.common.block_timestamp'), width: 150 },
+    { prop: 'removed', label: $t('page.order.common.removed'), width: 80 },
     {
       prop: 'updated_at',
       label: $t('common.updated_at'),
@@ -127,32 +86,26 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       formatter: row => {
         return getHumannessDateTime(row.created_at);
       }
-    },
-    {
-      prop: 'operate',
-      fixed: true,
-      label: $t('common.operate'),
-      align: 'center',
-      width: 80,
-      formatter: row => (
-        <div class="flex-center">
-          <ElButton plain type="primary" size="small" onClick={() => bill(row.id)}>
-            {$t('page.order.common.detail')}
-          </ElButton>
-        </div>
-      )
     }
+    // {
+    //   prop: 'operate',
+    //   fixed: true,
+    //   label: $t('common.operate'),
+    //   align: 'center',
+    //   width: 160,
+    //   formatter: row => (
+    //     <div class="flex-center">
+    //       <ElButton type="primary" plain size="small" onClick={() => bill(row.id)}>
+    //         {$t('page.transaction.common.bill')}
+    //       </ElButton>
+    //       <ElButton type="primary" plain size="small" onClick={() => withdraweral(row.id)}>
+    //         {$t('page.transaction.common.withdraweral')}
+    //       </ElButton>
+    //     </div>
+    //   )
+    // }
   ]
 });
-
-const { bool: drawerVisible, setTrue: openDrawer } = useBoolean();
-
-const targetId = ref(0);
-
-function bill(id: number) {
-  targetId.value = id;
-  openDrawer();
-}
 
 function resetSearchParams() {
   Object.assign(searchParams, getInitSearchParams());
@@ -161,11 +114,11 @@ function resetSearchParams() {
 
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <OrderSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
+    <TransSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <ElCard class="card-wrapper sm:flex-1-hidden" body-class="ht50">
       <template #header>
         <div class="flex items-center justify-between">
-          <p>{{ $t('page.order.common.title') }}</p>
+          <p>{{ $t('page.order.tron.title') }}</p>
           <TableHeaderOperation
             v-model:columns="columnChecks"
             :disabled-delete="true"
@@ -197,7 +150,6 @@ function resetSearchParams() {
           @size-change="mobilePagination['size-change']"
         />
       </div>
-      <OrderDetailDrawer v-model:visible="drawerVisible" :target-id="targetId" />
     </ElCard>
   </div>
 </template>

@@ -46,7 +46,8 @@ func main() {
 	userservice := service.NewUserService(db)
 	orderservice := service.NewMerchOrderService(db)
 	tronservice := service.NewTronService(db)
-	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, orderservice, tronservice)
+	evmservice := service.NewEvmService(db)
+	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, orderservice, tronservice, evmservice)
 	handler.RegisterHandlers(server, ctx)
 
 	httpx.SetOkHandler(biz.OkHandler)

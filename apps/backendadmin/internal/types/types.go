@@ -10,6 +10,41 @@ type Contacts struct {
 	Other    string `json:"other"`
 }
 
+type EvmLogItem struct {
+	Id             int64   `json:"id"`
+	Chain          string  `json:"chain"`
+	Currency       string  `json:"currency"`
+	ChainId        uint64  `json:"chain_id"`
+	TxHash         string  `json:"tx_hash"`
+	Index          uint    `json:"index"`
+	TxIndex        uint    `json:"tx_index"`
+	Amount         float64 `json:"amount"`
+	Sun            int64   `json:"sun"`
+	FromHex        string  `json:"from_hex"`
+	ToHex          string  `json:"to_hex"`
+	Contract       string  `json:"contract"`
+	BlockHash      string  `json:"block_hash"`
+	BlockNumber    uint64  `json:"block_number"`
+	BlockTimestamp uint64  `json:"block_timestamp"`
+	Removed        bool    `json:"removed"`
+}
+
+type EvmLogListReq struct {
+	Pages
+	StartEnd
+	Id       int64  `form:"id,optional"`
+	Chain    string `json:"chain,optional"`
+	Currency string `form:"currency,optional"`
+	TxHash   string `form:"tx_hash,optional"`
+	FromHex  string `form:"from_hex,optional"`
+	ToHex    string `form:"to_hex,optional"`
+}
+
+type EvmLogListResp struct {
+	Records []*EvmLogItem `json:"records"`
+	PagesBody
+}
+
 type LoginReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`

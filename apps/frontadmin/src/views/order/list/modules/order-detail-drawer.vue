@@ -79,7 +79,7 @@ watch(visible, async () => {
 </script>
 
 <template>
-  <ElDrawer v-model="visible" :title="$t('page.order.detail.title')" :size="400">
+  <ElDrawer v-model="visible" :title="$t('page.order.detail.title')" :size="500">
     <ElForm :model="model" label-position="top">
       <ElFormItem :label="$t('page.order.common.merch_order_id')" prop="transaction_id">
         <ElInput v-model="model.merch_order_id" />

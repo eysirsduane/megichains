@@ -1,11 +1,11 @@
-<script setup lang="ts">
+<script setup lang="tsx">
 import { ref, watch } from 'vue';
-import { chainTyposOptions, currencyTyposOptions, orderStatusOptions } from '@/constants/business';
+import { currencyTyposOptions } from '@/constants/business';
 import { useForm } from '@/hooks/common/form';
 import { translateOptions } from '@/utils/common';
 import { $t } from '@/locales';
 
-defineOptions({ name: 'OrderSearch' });
+defineOptions({ name: 'LogSearch' });
 
 interface Emits {
   (e: 'search'): void;
@@ -16,7 +16,7 @@ const emit = defineEmits<Emits>();
 
 const { formRef, validate, restoreValidation } = useForm();
 
-const model = defineModel<Api.Order.OrderSearchParams>('model', { required: true });
+const model = defineModel<Api.Evm.LogSearchParams>('model', { required: true });
 const initialParams = { ...model.value };
 
 async function reset() {
@@ -80,26 +80,8 @@ const shortcuts = [
         <ElForm ref="formRef" :model="model" label-position="right" :label-width="80">
           <ElRow :gutter="24">
             <ElCol :lg="6" :md="8" :sm="12">
-              <ElFormItem :label="$t('page.order.common.merch_order_id')" prop="merch_order_id">
-                <ElInput v-model="model.merch_order_id" :placeholder="$t('page.order.common.merch_order_id')" />
-              </ElFormItem>
-            </ElCol>
-            <ElCol :lg="6" :md="8" :sm="12">
-              <ElFormItem :label="$t('page.order.common.chain')" prop="chain">
-                <ElSelect
-                  v-model="model.chain"
-                  clearable
-                  :empty-values="['']"
-                  value-on-clear=""
-                  :placeholder="$t('page.order.common.chain')"
-                >
-                  <ElOption
-                    v-for="(item, idx) in translateOptions(chainTyposOptions)"
-                    :key="idx"
-                    :label="item.label"
-                    :value="item.value"
-                  ></ElOption>
-                </ElSelect>
+              <ElFormItem :label="$t('page.order.common.transaction_id')" prop="tx_hash">
+                <ElInput v-model="model.tx_hash" :placeholder="$t('page.order.common.transaction_id')" />
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
@@ -120,32 +102,16 @@ const shortcuts = [
                 </ElSelect>
               </ElFormItem>
             </ElCol>
-            <ElCol :lg="6" :md="8" :sm="12">
-              <ElFormItem :label="$t('page.order.common.status')" prop="status">
-                <ElSelect
-                  v-model="model.status"
-                  clearable
-                  :empty-values="['']"
-                  value-on-clear=""
-                  :placeholder="$t('page.order.common.status')"
-                >
-                  <ElOption
-                    v-for="(item, idx) in translateOptions(orderStatusOptions)"
-                    :key="idx"
-                    :label="item.label"
-                    :value="item.value"
-                  ></ElOption>
-                </ElSelect>
-              </ElFormItem>
-            </ElCol>
+            <ElCol :lg="6" :md="8" :sm="12"></ElCol>
+            <ElCol :lg="6" :md="8" :sm="12"></ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
               <ElFormItem :label="$t('page.order.common.from_address')" prop="from_address">
-                <ElInput v-model="model.from_address" :placeholder="$t('page.order.common.from_address')" />
+                <ElInput v-model="model.from_hex" :placeholder="$t('page.order.common.from_address')" />
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
               <ElFormItem :label="$t('page.order.common.to_address')" prop="to_address">
-                <ElInput v-model="model.to_address" :placeholder="$t('page.order.common.to_address')" />
+                <ElInput v-model="model.to_hex" :placeholder="$t('page.order.common.to_address')" />
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">

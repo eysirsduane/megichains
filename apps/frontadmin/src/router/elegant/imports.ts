@@ -39,6 +39,7 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   manage_user: () => import("@/views/manage/user/index.vue"),
   "multi-menu_first_child": () => import("@/views/multi-menu/first_child/index.vue"),
   "multi-menu_second_child_home": () => import("@/views/multi-menu/second_child_home/index.vue"),
+  order_evm: () => import("@/views/order/evm/index.vue"),
   order_list: () => import("@/views/order/list/index.vue"),
   order_tron: () => import("@/views/order/tron/index.vue"),
   plugin_barcode: () => import("@/views/plugin/barcode/index.vue"),

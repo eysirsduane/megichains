@@ -390,6 +390,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       icon: 'cbi:scene-dynamic'
     },
     children: [
+
       {
         name: 'order_list',
         path: '/order/list',
@@ -397,7 +398,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'order_list',
           i18nKey: 'route.order_list',
-          icon: 'carbon:network-overlay'
+          icon: 'material-symbols:route'
         }
       },
       {
@@ -407,7 +408,17 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'order_tron',
           i18nKey: 'route.order_tron',
-          icon: 'material-symbols:route'
+          icon: 'carbon:network-overlay'
+        }
+      },
+      {
+        name: 'order_evm',
+        path: '/order/evm',
+        component: 'view.order_evm',
+        meta: {
+          title: 'order_evm',
+          i18nKey: 'route.order_evm',
+          icon: 'carbon:network-overlay'
         }
       }
     ]

@@ -232,7 +232,7 @@ export function useTableOperate<TableData>(
   };
 }
 
-export function defaultTransform<ApiData>(
+export function defaultSearchform<ApiData>(
   response: FlatResponseData<any, Api.Common.PaginatingQueryRecord<ApiData>>
 ): PaginationData<ApiData> {
   const { data, error } = response;

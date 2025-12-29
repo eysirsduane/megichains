@@ -400,6 +400,7 @@ func (s *ChainListenService) listenEvm(chain global.ChainName, currency, moid, r
 		if err != nil {
 			logx.Errorf("EVM chain notify failed, moid:%v, txid:%v, err:%v", moid, log.TxHash, err)
 			order.Status = string(global.OrderStatusNotifyFailed)
+			order.Description = err.Error()
 		}
 
 		err = s.orderservice.Save(order)
@@ -468,6 +469,7 @@ func (s *ChainListenService) listenTron(chain global.ChainName, currency global.
 		if err != nil {
 			logx.Errorf("Tron chain notify failed, moid:%v, txid:%v, err:%v", moid, trans.TransactionId, err)
 			order.Status = string(global.OrderStatusNotifyFailed)
+			order.Description = err.Error()
 		}
 
 		err = s.orderservice.Save(order)

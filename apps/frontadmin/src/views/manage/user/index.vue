@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { ElButton, ElPopconfirm, ElTag } from 'element-plus';
 import { enableStatusRecord, userGenderRecord } from '@/constants/business';
 import { fetchGetUserList } from '@/service/api';
-import { defaultTransform, useTableOperate, useUIPaginatedTable } from '@/hooks/common/table';
+import { defaultSearchform, useTableOperate, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import UserOperateDrawer from './modules/user-operate-drawer.vue';
 import UserSearch from './modules/user-search.vue';
@@ -32,7 +32,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   },
   api: () => fetchGetUserList(searchParams.value),
   transform: response => {
-    return defaultTransform(response);
+    return defaultSearchform(response);
   },
   onPaginationParamsChange: params => {
     searchParams.value.current = params.currentPage;

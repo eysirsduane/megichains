@@ -28,3 +28,4 @@ export const orderStatusRecord: Record<Api.Common.OrderStatus, App.I18n.I18nKey>
 export const orderTypoOptions = transformRecordToOption(orderTyposRecord);
 export const orderStatusOptions = transformRecordToOption(orderStatusRecord);
 export const currencyTyposOptions = transformRecordToOption(currencyTyposRecord);
+export const chainTyposOptions = transformRecordToOption(chainTyposRecord);

@@ -4,7 +4,7 @@ import { ElButton, ElTag } from 'element-plus';
 import { utils, writeFile } from 'xlsx';
 import { enableStatusRecord, userGenderRecord } from '@/constants/business';
 import { fetchGetUserList } from '@/service/api';
-import { defaultTransform, useUIPaginatedTable } from '@/hooks/common/table';
+import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 
 defineOptions({ name: 'ExcelPage' });
@@ -22,7 +22,7 @@ const searchParams: Api.SystemManage.UserSearchParams = reactive({
 
 const { columns, data, loading } = useUIPaginatedTable({
   api: () => fetchGetUserList(searchParams),
-  transform: response => defaultTransform(response),
+  transform: response => defaultSearchform(response),
   onPaginationParamsChange: params => {
     searchParams.current = params.currentPage;
     searchParams.size = params.pageSize;

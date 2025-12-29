@@ -246,7 +246,8 @@ const local: App.I18n.Schema = {
     plugin_tables_vtable: 'VTable',
     order: '订单管理',
     order_list: '订单列表',
-    order_tron: '波场交易'
+    order_tron: '波场交易',
+    order_evm: 'EVM交易'
   },
   page: {
     login: {
@@ -511,8 +512,8 @@ const local: App.I18n.Schema = {
     order: {
       common: {
         title: '订单列表',
-        log_id: '我方交易ID',
-        merch_order_id: '商户订单ID',
+        log_id: '链外键ID',
+        merch_order_id: '商户订单',
         transaction_id: '链交易ID',
         chain: '链',
         typo: '出入类型',
@@ -527,7 +528,8 @@ const local: App.I18n.Schema = {
         detail: '明细',
         trans: '区块',
         contract: '合约地址',
-        block_timestamp: '区块交易时间'
+        block_timestamp: '区块交易时间',
+        removed: '被移除'
       },
       detail: {
         title: '订单明细'

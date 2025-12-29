@@ -711,6 +711,7 @@ declare namespace App {
             trans: string;
             contract: string;
             block_timestamp: string;
+            removed: string;
           };
           detail: {
             title: string;

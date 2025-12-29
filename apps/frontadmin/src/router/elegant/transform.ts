@@ -210,6 +210,7 @@ const routeMap: RouteMap = {
   "multi-menu_second_child": "/multi-menu/second/child",
   "multi-menu_second_child_home": "/multi-menu/second/child/home",
   "order": "/order",
+  "order_evm": "/order/evm",
   "order_list": "/order/list",
   "order_tron": "/order/tron",
   "plugin": "/plugin",

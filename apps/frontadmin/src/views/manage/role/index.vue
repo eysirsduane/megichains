@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { ElButton, ElPopconfirm, ElTag } from 'element-plus';
 import { enableStatusRecord } from '@/constants/business';
 import { fetchGetRoleList } from '@/service/api';
-import { defaultTransform, useTableOperate, useUIPaginatedTable } from '@/hooks/common/table';
+import { defaultSearchform, useTableOperate, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import RoleOperateDrawer from './modules/role-operate-drawer.vue';
 import RoleSearch from './modules/role-search.vue';
@@ -26,7 +26,7 @@ const { columns, columnChecks, data, loading, getData, getDataByPage, mobilePagi
     pageSize: searchParams.value.size
   },
   api: () => fetchGetRoleList(searchParams.value),
-  transform: response => defaultTransform(response),
+  transform: response => defaultSearchform(response),
   onPaginationParamsChange: params => {
     searchParams.value.current = params.currentPage;
     searchParams.value.size = params.pageSize;

@@ -79,13 +79,6 @@ const shortcuts = [
       <ElCollapseItem :title="$t('common.search')" name="user-search">
         <ElForm ref="formRef" :model="model" label-position="right" :label-width="80">
           <ElRow :gutter="24">
-            <!--
- <ElCol :lg="6" :md="8" :sm="12">
-              <ElFormItem :label="$t('common.id')" prop="id">
-                <ElInput v-model="model.id" :placeholder="$t('common.id')" />
-              </ElFormItem>
-            </ElCol>
--->
             <ElCol :lg="6" :md="8" :sm="12">
               <ElFormItem :label="$t('page.order.common.transaction_id')" prop="transaction_id">
                 <ElInput v-model="model.transaction_id" :placeholder="$t('page.order.common.transaction_id')" />

@@ -196,6 +196,7 @@ type EvmLogListResp {
 type AddressItem {
 	Id          int64  `json:"id"`
 	GroupId     int64  `json:"group_id"`
+	GroupName   string `json:"group_name"`
 	Chain       string `json:"chain"`
 	Typo        string `json:"typo"`
 	Status      string `json:"status"`
@@ -208,16 +209,39 @@ type AddressItem {
 type AddressListReq {
 	Pages
 	StartEnd
-	Address string `form:"address,optional"`
-	Chain   string `form:"chain,optional"`
-	Typo    string `form:typo,optional`
-	Status  string `form:"status,optional"`
-	GroupId int64  `form:"group_id,optional"`
+	Address  string `form:"address,optional"`
+	Address2 string `form:"address2,optional"`
+	Chain    string `form:"chain,optional"`
+	Typo     string `form:"typo,optional"`
+	Status   string `form:"status,optional"`
+	GroupId  int64  `form:"group_id,optional"`
 }
 
 type AddressListResp {
 	Records []*AddressItem `json:"records"`
 	PagesBody
+}
+
+type AddressGroupItem {
+	Id          int64  `json:"id"`
+	Name        string `json:"name"`
+	Status      string `json:"status"`
+	Description string `json:"description"`
+	TimeAts
+}
+
+type AddressGroupAllResp {
+	Records []*AddressGroupItem `json:"records"`
+}
+
+type AddressGroupListReq {
+	Pages
+	status string `form:"status, optional"`
+}
+
+type AddressGroupListResp {
+	PagesBody
+	Records []*AddressGroupItem `json:"records"`
 }
 
 @server (
@@ -332,5 +356,11 @@ service backendadmin {
 
 	@handler AddressEditHandler
 	post /address/edit (AddressItem)
+
+	@handler AddressGroupAllHandler
+	get /address/group/all returns (AddressGroupAllResp)
+
+	@handler AddressGroupListHandler
+	get /address/group/list (AddressGroupListReq) returns (AddressGroupListResp)
 }
 

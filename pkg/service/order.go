@@ -81,7 +81,7 @@ func (s *MerchOrderService) Find(ctx context.Context, req *converter.OrderListRe
 		return
 	}
 
-	resp = converter.ConvertToResp(orders, req.Current, req.Size, total)
+	resp = converter.ConvertToPagingResp(orders, req.Current, req.Size, total)
 
 	return
 }

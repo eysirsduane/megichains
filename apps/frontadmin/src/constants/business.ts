@@ -7,6 +7,12 @@ export const chainTyposRecord: Record<Api.Common.ChainTypos, App.I18n.I18nKey> =
   BSC: 'common.bsc'
 };
 
+export const chainBigTyposRecord: Record<Api.Common.ChainBigTypos, App.I18n.I18nKey> = {
+  '': 'common.all',
+  TRON: 'common.tron',
+  EVM: 'common.evm'
+};
+
 export const currencyTyposRecord: Record<Api.Common.CurrencyTypos, App.I18n.I18nKey> = {
   '': 'common.all',
   USDT: 'common.usdt',
@@ -32,8 +38,23 @@ export const addressTyposRecord: Record<Api.Common.AddressTypos, App.I18n.I18nKe
   COLLECT: 'common.collect'
 };
 
+export const addressStatusRecord: Record<Api.Common.AddressStatus, App.I18n.I18nKey> = {
+  '': 'common.all',
+  禁用: 'common.ban',
+  空闲: 'common.vacant',
+  占用: 'common.inuse'
+};
+export const addressGroupStatusRecord: Record<Api.Common.AddressGroupStatus, App.I18n.I18nKey> = {
+  '': 'common.all',
+  禁用: 'common.ban',
+  开放: 'common.open'
+};
+
 export const orderTypoOptions = transformRecordToOption(orderTyposRecord);
 export const orderStatusOptions = transformRecordToOption(orderStatusRecord);
 export const currencyTyposOptions = transformRecordToOption(currencyTyposRecord);
 export const chainTyposOptions = transformRecordToOption(chainTyposRecord);
+export const chainBigTyposOptions = transformRecordToOption(chainBigTyposRecord);
 export const addressTyposOptions = transformRecordToOption(addressTyposRecord);
+export const addressStatusOptions = transformRecordToOption(addressStatusRecord);
+export const addressGroupStatusOptions = transformRecordToOption(addressGroupStatusRecord);

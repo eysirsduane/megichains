@@ -51,10 +51,47 @@ func (s *AddressService) Edit(ctx context.Context, req *converter.AddressItem) (
 	return
 }
 
-func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq) (resp *converter.RespConverter[entity.Address], err error) {
-	db := gorm.G[entity.Address](s.db).Order("updated_at desc")
+func (s *AddressService) GroupAll(ctx context.Context) (resp *converter.RespConverter[entity.AddressGroup], err error) {
+	all, err := gorm.G[entity.AddressGroup](s.db).Order("id asc").Find(ctx)
+	if err != nil {
+		logx.Errorf("db address group all failed, err:%v", err)
+		err = biz.AddressGroupFindFailed
+		return
+	}
+
+	resp = converter.ConvertToResp(all, 0, 0, 0)
+
+	return
+}
+
+func (s *AddressService) GroupFind(ctx context.Context, req *converter.AddressGroupListReq) (resp *converter.RespConverter[entity.AddressGroup], err error) {
+	db := gorm.G[entity.AddressGroup](s.db).Order("id asc")
+	if req.Status != "" {
+		db = db.Where("status = ?", req.Status)
+	}
+	if err != nil {
+		logx.Errorf("db address group all failed, err:%v", err)
+		err = biz.AddressGroupFindFailed
+		return
+	}
+
+	items, err := db.Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Find(ctx)
+	if err != nil {
+		return
+	}
+
+	resp = converter.ConvertToResp(items, 0, 0, 0)
+
+	return
+}
+
+func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq) (resp *converter.RespConverter[converter.AddressWithGroup], err error) {
+	db := s.db.Model(&entity.Address{}).Order("updated_at desc")
 	if req.Address != "" {
 		db = db.Where("address = ?", req.Address)
+	}
+	if req.Address2 != "" {
+		db = db.Where("address2 = ?", req.Address2)
 	}
 	if req.Chain != "" {
 		db = db.Where("chain = ?", req.Chain)
@@ -74,21 +111,22 @@ func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq
 	if req.End > 0 {
 		db = db.Where("created_at <= ?", req.End)
 	}
-
-	items, err := db.Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Find(ctx)
+	items := make([]converter.AddressWithGroup, 0, req.Size)
+	err = db.Session(&gorm.Session{}).Select("addresses.id, addresses.group_id, addresses.chain, addresses.typo, addresses.status, addresses.address, addresses.address2, addresses.updated_at, addresses.created_at, address_groups.name as group_name").Joins("left join address_groups on addresses.group_id = address_groups.id").Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Scan(&items).Error
 	if err != nil {
 		logx.Errorf("address list find failed, err:%v", err)
 		err = biz.AddressFindFailed
 		return
 	}
-	total, err := db.Count(ctx, "id")
+	total := int64(0)
+	err = db.Session(&gorm.Session{}).Count(&total).Error
 	if err != nil {
 		logx.Errorf("address list count failed, err:%v", err)
 		err = biz.AddressCountFailed
 		return
 	}
 
-	resp = converter.ConvertToResp(items, req.Current, req.Size, total)
+	resp = converter.ConvertToPagingResp(items, req.Current, req.Size, total)
 
 	return
 }

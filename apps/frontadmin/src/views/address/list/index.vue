@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { reactive } from 'vue';
 import { ElButton } from 'element-plus';
-import { addressTyposRecord } from '@/constants/business';
+import { addressStatusRecord, addressTyposRecord } from '@/constants/business';
 import { fetchGetAddressList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
@@ -42,6 +42,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   columns: () => [
     // { prop: 'selection', type: 'selection', width: 48 },
     { prop: 'id', type: 'id', label: $t('common.id'), width: 100 },
+    { prop: 'group_name', label: $t('page.address.common.group_name'), width: 120 },
     { prop: 'chain', label: $t('page.address.common.chain'), width: 80 },
     {
       prop: 'typo',
@@ -63,7 +64,26 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
         );
       }
     },
-    { prop: 'status', label: $t('page.address.common.status'), width: 100 },
+    {
+      prop: 'status',
+      label: $t('page.address.common.status'),
+      width: 80,
+      formatter: row => {
+        const tagMap: Record<Api.Common.AddressStatus, UI.ThemeColor> = {
+          '': 'info',
+          禁用: 'danger',
+          空闲: 'success',
+          占用: 'warning'
+        };
+
+        const label = $t(addressStatusRecord[row.status]);
+        return (
+          <el-tag effect="dark" round type={tagMap[row.status]}>
+            {label}
+          </el-tag>
+        );
+      }
+    },
     { prop: 'address', label: $t('page.address.common.address'), width: 400 },
     { prop: 'address2', label: $t('page.address.common.address2'), width: 400 },
     {

@@ -10,6 +10,7 @@ declare namespace Api {
       transaction_id: string;
       typo: Api.Common.OrderTypos;
       currency: Api.Common.CurrencyTypos;
+      status: Api.Common.OrderStatus;
       chain: string;
       received_amount: number;
       received_sun: number;

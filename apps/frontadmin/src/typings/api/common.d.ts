@@ -31,6 +31,10 @@ declare namespace Api {
       records: T[];
     }
 
+    interface QueryRecord<T = any> {
+      records: T[];
+    }
+
     /** common search params of table */
     type CommonSearchParams = Pick<Common.PaginatingCommonParams, 'current' | 'size'>;
     type CommonTimeSearchParams = Pick<Common.PaginatingTimeCommonParams, 'current' | 'size' | 'start' | 'end'>;
@@ -48,15 +52,17 @@ declare namespace Api {
       /** record update time */
       updated_at: number;
       /** record status */
-      status: OrderStatus;
     } & T;
 
     type EnableStatus = '1' | '2';
     type OrderTypos = '' | '输入';
     type CurrencyTypos = '' | 'USDT' | 'USDC';
     type ChainTypos = '' | 'TRON' | 'ETH' | 'BSC';
+    type ChainBigTypos = '' | 'TRON' | 'EVM';
     type OrderStatus = '' | '已创建' | '通知失败' | '成功';
     type AddressTypos = '' | 'IN' | 'OUT' | 'COLLECT';
+    type AddressStatus = '' | '禁用' | '空闲' | '占用';
+    type AddressGroupStatus = '' | '禁用' | '开放';
     type TronContractAddresses = '' | 'TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj' | 'TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf';
   }
 }

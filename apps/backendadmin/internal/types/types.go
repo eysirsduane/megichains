@@ -3,9 +3,32 @@
 
 package types
 
+type AddressGroupAllResp struct {
+	Records []*AddressGroupItem `json:"records"`
+}
+
+type AddressGroupItem struct {
+	Id          int64  `json:"id"`
+	Name        string `json:"name"`
+	Status      string `json:"status"`
+	Description string `json:"description"`
+	TimeAts
+}
+
+type AddressGroupListReq struct {
+	Pages
+	Status string `form:"status, optional"`
+}
+
+type AddressGroupListResp struct {
+	PagesBody
+	Records []*AddressGroupItem `json:"records"`
+}
+
 type AddressItem struct {
 	Id          int64  `json:"id"`
 	GroupId     int64  `json:"group_id"`
+	GroupName   string `json:"group_name"`
 	Chain       string `json:"chain"`
 	Typo        string `json:"typo"`
 	Status      string `json:"status"`
@@ -18,11 +41,12 @@ type AddressItem struct {
 type AddressListReq struct {
 	Pages
 	StartEnd
-	Address string `form:"address,optional"`
-	Chain   string `form:"chain,optional"`
-	Typo    string `form:typo,optional`
-	Status  string `form:"status,optional"`
-	GroupId int64  `form:"group_id,optional"`
+	Address  string `form:"address,optional"`
+	Address2 string `form:"address2,optional"`
+	Chain    string `form:"chain,optional"`
+	Typo     string `form:"typo,optional"`
+	Status   string `form:"status,optional"`
+	GroupId  int64  `form:"group_id,optional"`
 }
 
 type AddressListResp struct {

@@ -21,6 +21,7 @@ type AddressGroup struct {
 	Id int64 `gorm:"type:bigserial;primaryKey;autoIncrement"`
 
 	Name        string `gorm:"size:31"`
+	Status      string `gorm:"size:15"`
 	Description string `gorm:"size:2047"`
 
 	TimeAts

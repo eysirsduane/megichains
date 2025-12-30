@@ -361,6 +361,12 @@ declare namespace App {
         in: string;
         out: string;
         collect: string;
+        evm: string;
+        inuse: string;
+        vacant: string;
+        ban: string;
+        open: string;
+        name: string;
       };
       request: {
         logout: string;
@@ -731,6 +737,7 @@ declare namespace App {
             status: string;
             typo: string;
             group_id: string;
+            group_name: string;
           };
           list: {
             title: string;

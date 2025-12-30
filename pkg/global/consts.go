@@ -15,9 +15,9 @@ const (
 type AddressStatus string
 
 const (
-	AddressTypoCreated AddressStatus = "CREATED"
-	AddressTypoInUse   AddressStatus = "INUSE"
-	AddressTypoVacant  AddressStatus = "VACANT"
+	AddressTypoCreated AddressStatus = "禁用"
+	AddressTypoInUse   AddressStatus = "空闲"
+	AddressTypoVacant  AddressStatus = "占用"
 )
 
 type OrderTypo string

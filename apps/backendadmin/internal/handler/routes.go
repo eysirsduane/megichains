@@ -27,6 +27,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodGet,
+				Path:    "/address/group/all",
+				Handler: address.AddressGroupAllHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/address/group/list",
+				Handler: address.AddressGroupListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
 				Path:    "/address/list",
 				Handler: address.AddressListHandler(serverCtx),
 			},

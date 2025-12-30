@@ -11,13 +11,23 @@ type RespConverter[T any] struct {
 	*PagesBody
 }
 
-func ConvertToResp[T any](items []T, current, size int, total int64) (resp *RespConverter[T]) {
+func ConvertToPagingResp[T any](items []T, current, size int, total int64) (resp *RespConverter[T]) {
 	resp = &RespConverter[T]{
 		PagesBody: &PagesBody{
 			Current: current,
 			Size:    size,
 			Total:   total,
 		},
+		Records: make([]T, 0, size),
+	}
+
+	copier.Copy(&resp.Records, &items)
+
+	return
+}
+
+func ConvertToResp[T any](items []T, current, size int, total int64) (resp *RespConverter[T]) {
+	resp = &RespConverter[T]{
 		Records: make([]T, 0, size),
 	}
 
@@ -172,17 +182,45 @@ type AddressItem struct {
 	TimeAts
 }
 
+type AddressWithGroup struct {
+	AddressItem
+	GroupName string `json:"group_name"`
+}
+
 type AddressListReq struct {
 	Pages
 	StartEnd
-	Address string
-	Chain   string
-	Typo    string
-	Status  string
-	GroupId int64
+	Address  string
+	Address2 string
+	Chain    string
+	Typo     string
+	Status   string
+	GroupId  int64
 }
 
 type AddressListResp struct {
 	Records []*AddressItem `json:"records"`
 	PagesBody
+}
+
+type AddressGroupListReq struct {
+	Pages
+	Status string `form:"status"`
+}
+
+type AddressGroupListResp struct {
+	PagesBody
+	Records []*AddressGroupItem `json:"records"`
+}
+
+type AddressGroupAllResp struct {
+	Records []*AddressGroupItem `json:"records"`
+}
+
+type AddressGroupItem struct {
+	Id          int64  `json:"id"`
+	Name        string `json:"name"`
+	Status      string `json:"status"`
+	Description string `json:"description"`
+	TimeAts
 }

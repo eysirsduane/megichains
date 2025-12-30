@@ -9,9 +9,15 @@ declare namespace Api {
       group_id: number;
       chain: string;
       typo: Api.Common.AddressTypos;
-      status: string;
+      status: Api.Common.AddressStatus;
       address: string;
       address2: string;
+      description: string;
+    }>;
+
+    type AddressGroup = Common.CommonRecord<{
+      name: string;
+      status: Api.Common.AddressGroupStatus;
       description: string;
     }>;
 
@@ -20,7 +26,13 @@ declare namespace Api {
         Api.Common.CommonTimeSearchParams
     >;
 
+    type AddressGroupSearchParams = CommonType.RecordNullable<
+      Pick<Api.Address.AddressGroup, 'status' | 'id'> & Api.Common.CommonTimeSearchParams
+    >;
+
     /** user list */
     type AddressList = Common.PaginatingQueryRecord<Address>;
+    type AddressGroupAll = Common.QueryRecord<AddressGroup>;
+    type AddressGroupList = Common.PaginatingQueryRecord<AddressGroup>;
   }
 }

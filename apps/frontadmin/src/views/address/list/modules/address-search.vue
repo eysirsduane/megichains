@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { chainTyposOptions, currencyTyposOptions, orderStatusOptions } from '@/constants/business';
+import { onMounted, ref, watch } from 'vue';
+import { addressStatusOptions, addressTyposOptions, chainBigTyposOptions } from '@/constants/business';
+import { fetchGetAddressGroupAll } from '@/service/api';
 import { useForm } from '@/hooks/common/form';
 import { translateOptions } from '@/utils/common';
 import { $t } from '@/locales';
@@ -32,6 +33,8 @@ async function search() {
   emit('search');
 }
 
+const addrGroupOptions = ref<Api.Address.AddressGroup[] | undefined>();
+
 watch(rtvalue, () => {
   if (rtvalue.value) {
     model.value.start = Number.parseInt(rtvalue.value[0], 10);
@@ -40,6 +43,11 @@ watch(rtvalue, () => {
     model.value.start = 0;
     model.value.end = 0;
   }
+});
+
+onMounted(async () => {
+  const all = await fetchGetAddressGroupAll();
+  addrGroupOptions.value = all.data?.records;
 });
 
 const shortcuts = [
@@ -81,7 +89,20 @@ const shortcuts = [
           <ElRow :gutter="24">
             <ElCol :lg="6" :md="8" :sm="12">
               <ElFormItem :label="$t('page.address.common.group_id')" prop="group_id">
-                <ElInput v-model="model.group_id" :placeholder="$t('page.address.common.group_id')" />
+                <ElSelect
+                  v-model="model.group_id"
+                  clearable
+                  :empty-values="[0]"
+                  :value-on-clear="0"
+                  :placeholder="$t('page.address.common.group_id')"
+                >
+                  <ElOption
+                    v-for="(item, idx) in addrGroupOptions"
+                    :key="idx"
+                    :label="item.name"
+                    :value="item.id"
+                  ></ElOption>
+                </ElSelect>
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
@@ -94,7 +115,7 @@ const shortcuts = [
                   :placeholder="$t('page.address.common.chain')"
                 >
                   <ElOption
-                    v-for="(item, idx) in translateOptions(chainTyposOptions)"
+                    v-for="(item, idx) in translateOptions(chainBigTyposOptions)"
                     :key="idx"
                     :label="item.label"
                     :value="item.value"
@@ -112,7 +133,7 @@ const shortcuts = [
                   :placeholder="$t('page.address.common.typo')"
                 >
                   <ElOption
-                    v-for="(item, idx) in translateOptions(currencyTyposOptions)"
+                    v-for="(item, idx) in translateOptions(addressTyposOptions)"
                     :key="idx"
                     :label="item.label"
                     :value="item.value"
@@ -130,7 +151,7 @@ const shortcuts = [
                   :placeholder="$t('page.order.common.status')"
                 >
                   <ElOption
-                    v-for="(item, idx) in translateOptions(orderStatusOptions)"
+                    v-for="(item, idx) in translateOptions(addressStatusOptions)"
                     :key="idx"
                     :label="item.label"
                     :value="item.value"

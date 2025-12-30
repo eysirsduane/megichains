@@ -67,7 +67,13 @@ const local: App.I18n.Schema = {
     end: '结束时间',
     in: '入',
     out: '出',
-    collect: '归集'
+    collect: '归集',
+    evm: 'EVM',
+    inuse: '占用',
+    vacant: '空闲',
+    ban: '禁用',
+    open: '开放',
+    name: '名称'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -551,7 +557,8 @@ const local: App.I18n.Schema = {
         address2: '地址2',
         status: '状态',
         typo: '类型',
-        group_id: '分组'
+        group_id: '分组',
+        group_name: '分组'
       },
       list: {
         title: '地址列表'

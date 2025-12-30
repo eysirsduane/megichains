@@ -15,3 +15,18 @@ export function postEditAddress(params?: Api.Address.Address) {
     params
   });
 }
+
+export function fetchGetAddressGroupAll() {
+  return request<Api.Address.AddressGroupAll>({
+    url: '/address/group/all',
+    method: 'get'
+  });
+}
+
+export function fetchGetAddressGroupList(params?: Api.Address.AddressGroupSearchParams) {
+  return request<Api.Address.AddressGroupList>({
+    url: '/address/group/list',
+    method: 'get',
+    params
+  });
+}

@@ -1,27 +1,22 @@
 <script setup lang="tsx">
 import { reactive } from 'vue';
-import { currencyTyposRecord } from '@/constants/business';
-import { fetchGetTransList } from '@/service/api';
+import { addressGroupStatusRecord } from '@/constants/business';
+import { fetchGetAddressGroupList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
-import TransSearch from './modules/group-search.vue';
+import TransSearch from './modules/address-group-search.vue';
 
 defineOptions({ name: 'TransSearch' });
 
 const searchParams = reactive(getInitSearchParams());
 
-function getInitSearchParams(): Api.Tron.TransSearchParams {
+function getInitSearchParams(): Api.Address.AddressGroupSearchParams {
   return {
     current: 1,
     size: 20,
     id: 0,
-    currency: '',
-    transaction_id: '',
-    from_base58: '',
-    to_base58: '',
-    start: 0,
-    end: 0
+    status: ''
   };
 }
 
@@ -30,7 +25,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     currentPage: searchParams.current,
     pageSize: searchParams.size
   },
-  api: () => fetchGetTransList(searchParams),
+  api: () => fetchGetAddressGroupList(searchParams),
   transform: response => {
     return defaultSearchform(response);
   },
@@ -40,35 +35,29 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   },
   columns: () => [
     // { prop: 'selection', type: 'selection', width: 48 },
-    { prop: 'id', type: 'id', label: $t('common.id') },
-    { prop: 'chain', label: $t('page.order.common.chain') },
+    { prop: 'id', type: 'id', label: $t('common.id'), width: 100 },
+    { prop: 'name', label: $t('common.name'), width: 160 },
     {
-      prop: 'currency',
-      label: $t('page.order.common.currency'),
+      prop: 'status',
+      label: $t('page.address.common.status'),
       width: 100,
       formatter: row => {
-        const tagMap: Record<Api.Common.CurrencyTypos, UI.ThemeColor> = {
+        const tagMap: Record<Api.Common.AddressGroupStatus, UI.ThemeColor> = {
           '': 'info',
-          USDT: 'info',
-          USDC: 'success'
+          禁用: 'danger',
+          开放: 'success'
         };
 
-        const label = $t(currencyTyposRecord[row.currency]);
+        const label = $t(addressGroupStatusRecord[row.status]);
 
         return (
-          <el-tag effect="dark" round type={tagMap[row.currency]}>
+          <el-tag effect="dark" round type={tagMap[row.status]}>
             {label}
           </el-tag>
         );
       }
     },
-    { prop: 'amount', label: $t('page.order.common.amount'), width: 160 },
-    { prop: 'sun', label: $t('page.order.common.sun'), width: 180 },
-    { prop: 'contract', label: $t('page.order.common.contract'), width: 340 },
-    { prop: 'transaction_id', label: $t('page.order.common.transaction_id'), width: 560 },
-    { prop: 'from_base58', label: $t('page.order.common.from_address'), width: 320 },
-    { prop: 'to_base58', label: $t('page.order.common.to_address'), width: 320 },
-    { prop: 'block_timestamp', label: $t('page.order.common.block_timestamp'), width: 150 },
+    { prop: 'description', label: $t('common.description'), width: 800 },
     {
       prop: 'updated_at',
       label: $t('common.updated_at'),

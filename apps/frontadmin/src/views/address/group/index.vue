@@ -1,5 +1,6 @@
 <script setup lang="tsx">
 import { reactive } from 'vue';
+import { ElButton } from 'element-plus';
 import { addressGroupStatusRecord } from '@/constants/business';
 import { fetchGetAddressGroupList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
@@ -73,29 +74,30 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       formatter: row => {
         return getHumannessDateTime(row.created_at);
       }
+    },
+    {
+      prop: 'operate',
+      fixed: true,
+      label: $t('common.operate'),
+      align: 'center',
+      width: 160,
+      formatter: row => (
+        <div class="flex-center">
+          <ElButton type="primary" plain size="small" onClick={() => edit(row.id)}>
+            {$t('common.edit')}
+          </ElButton>
+        </div>
+      )
     }
-    // {
-    //   prop: 'operate',
-    //   fixed: true,
-    //   label: $t('common.operate'),
-    //   align: 'center',
-    //   width: 160,
-    //   formatter: row => (
-    //     <div class="flex-center">
-    //       <ElButton type="primary" plain size="small" onClick={() => bill(row.id)}>
-    //         {$t('page.transaction.common.bill')}
-    //       </ElButton>
-    //       <ElButton type="primary" plain size="small" onClick={() => withdraweral(row.id)}>
-    //         {$t('page.transaction.common.withdraweral')}
-    //       </ElButton>
-    //     </div>
-    //   )
-    // }
   ]
 });
 
 function resetSearchParams() {
   Object.assign(searchParams, getInitSearchParams());
+}
+
+function edit(id: number) {
+  console.log(id);
 }
 </script>
 

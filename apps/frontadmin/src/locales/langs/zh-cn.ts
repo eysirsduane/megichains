@@ -526,7 +526,7 @@ const local: App.I18n.Schema = {
         status: '状态',
         currency: '币种',
         from_address: '来源地址',
-        to_address: '接受地址',
+        to_address: '接收地址',
         received_amount: '收到金额',
         received_sun: '收到金额(SUN)',
         amount: '收到金额',

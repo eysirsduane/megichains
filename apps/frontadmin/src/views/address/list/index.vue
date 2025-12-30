@@ -41,12 +41,12 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   },
   columns: () => [
     // { prop: 'selection', type: 'selection', width: 48 },
-    { prop: 'id', type: 'id', label: $t('common.id') },
-    { prop: 'chain', label: $t('page.address.common.chain') },
+    { prop: 'id', type: 'id', label: $t('common.id'), width: 100 },
+    { prop: 'chain', label: $t('page.address.common.chain'), width: 80 },
     {
       prop: 'typo',
       label: $t('page.address.common.typo'),
-      width: 100,
+      width: 80,
       formatter: row => {
         const tagMap: Record<Api.Common.AddressTypos, UI.ThemeColor> = {
           '': 'info',
@@ -63,9 +63,9 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
         );
       }
     },
-    { prop: 'status', label: $t('page.address.common.status'), width: 160 },
-    { prop: 'address', label: $t('page.address.common.address'), width: 180 },
-    { prop: 'address2', label: $t('page.address.common.address2'), width: 340 },
+    { prop: 'status', label: $t('page.address.common.status'), width: 100 },
+    { prop: 'address', label: $t('page.address.common.address'), width: 400 },
+    { prop: 'address2', label: $t('page.address.common.address2'), width: 400 },
     {
       prop: 'updated_at',
       label: $t('common.updated_at'),
@@ -87,7 +87,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       fixed: true,
       label: $t('common.operate'),
       align: 'center',
-      width: 160,
+      width: 80,
       formatter: row => (
         <div class="flex-center">
           <ElButton type="primary" plain size="small" onClick={() => edit(row.id)}>

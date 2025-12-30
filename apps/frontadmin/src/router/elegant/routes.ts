@@ -424,25 +424,28 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
-        name: 'order_evm',
-        path: '/order/evm',
-        component: 'view.order_evm',
-        meta: {
-          title: 'order_evm',
-          i18nKey: 'route.order_evm',
-          icon: 'carbon:network-overlay'
-        }
-      },
-      {
         name: 'order_list',
         path: '/order/list',
         component: 'view.order_list',
         meta: {
           title: 'order_list',
           i18nKey: 'route.order_list',
-          icon: 'material-symbols:route'
+          icon: 'material-symbols:route',
+          order:1
         }
       },
+      {
+        name: 'order_evm',
+        path: '/order/evm',
+        component: 'view.order_evm',
+        meta: {
+          title: 'order_evm',
+          i18nKey: 'route.order_evm',
+          icon: 'carbon:network-overlay',
+          order:2
+        }
+      },
+
       {
         name: 'order_tron',
         path: '/order/tron',
@@ -450,7 +453,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'order_tron',
           i18nKey: 'route.order_tron',
-          icon: 'carbon:network-overlay'
+          icon: 'carbon:network-overlay',
+          order:3
         }
       }
     ]

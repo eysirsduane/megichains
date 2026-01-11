@@ -42,11 +42,13 @@ Tron:
 Eth:
   ChainId: 1
   WssNetwork: wss://eth-mainnet.g.alchemy.com/v2/
+  WssNetwork2: https://eth-mainnet.public.blastapi.io 
   ApiKey: e9NHfWClRByVJCAgbZsq7
     
 BSC:
   ChainId: 56
   WssNetwork: wss://bnb-mainnet.g.alchemy.com/v2/
+  WssNetwork2: https://bsc-dataseed.binance.org/
   ApiKey: e9NHfWClRByVJCAgbZsq7 
 
 Solana:

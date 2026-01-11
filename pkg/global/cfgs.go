@@ -40,12 +40,14 @@ type EPay struct {
 type Eth struct {
 	ChainId    uint16
 	WssNetwork string
+	WssNetwork2 string
 	ApiKey     string
 }
 
 type Bsc struct {
 	ChainId    uint16
 	WssNetwork string
+	WssNetwork2 string
 	ApiKey     string
 }
 

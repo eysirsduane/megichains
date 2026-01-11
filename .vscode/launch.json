@@ -19,6 +19,13 @@
             "program": "${workspaceFolder}/apps/backendadmin/main.go"
         },
         {
+            "name": "Launch Job",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/apps/job/main.go"
+        },
+        {
             "name": "Vue Debugger",
             "type": "chrome",
             "request": "launch",
@@ -45,6 +52,7 @@
             "configurations": [
                 "Launch Backend",
                 "Launch BackendAdmin",
+                "Launch Job",
                 "Vue Debugger",
                 "TS Debugger"
             ]

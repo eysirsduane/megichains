@@ -37,11 +37,13 @@ EPay:
 Eth:
   ChainId: 1
   WssNetwork: wss://eth-sepolia.g.alchemy.com/v2/
+  WssNetwork2: https://sepolia.drpc.org
   ApiKey: e9NHfWClRByVJCAgbZsq7
     
 BSC:
   ChainId: 56
   WssNetwork: wss://bnb-testnet.g.alchemy.com/v2/
+  WssNetwork2: https://data-seed-prebsc-1-s1.binance.org:8545
   ApiKey: e9NHfWClRByVJCAgbZsq7 
 
 Solana:

@@ -47,7 +47,7 @@ func main() {
 	addrservice := service.NewAddressService(db)
 	orderservice := service.NewMerchOrderService(db)
 	tronservice := service.NewTronService(db)
-	listenservice := service.NewChainListenService(&cfg, db, addrservice, orderservice, evmservice, tronservice)
+	listenservice := service.NewListenService(&cfg, db, addrservice, orderservice, evmservice, tronservice)
 	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
 	ctx := svc.NewServiceContext(cfg, excfgservice, userservice, authservice, addrservice, listenservice)
 	handler.RegisterHandlers(server, ctx)

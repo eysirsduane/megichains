@@ -2,7 +2,6 @@ package manager
 
 import (
 	"fmt"
-	"megichains/apps/job/crons"
 
 	"github.com/robfig/cron/v3"
 )
@@ -34,40 +33,7 @@ func (m *CronManager) Register(spec string, job func()) {
 }
 
 func (m *CronManager) Start() {
-	spec0 := "*/15 * * * * *"
-	_, err := m.cron.AddFunc(spec0, crons.GetSolanaAirdrop)
-	if err != nil {
-		fmt.Printf("❌ cron task register MonitorTrxTransaction failed, [%s]: %v \n", spec0, err)
-		panic(err)
-	}
-
-	// _, err = m.cron.AddFunc(spec0, m.troner.MonitorUsdtTransaction)
-	// if err != nil {
-	// 	fmt.Printf("❌ cron task register MonitorUsdtTransaction failed, [%s]: %v \n", spec0, err)
-	// 	panic(err)
-	// }
-
-	// spec1 := "*/30 * * * * *"
-	// _, err = m.cron.AddFunc(spec1, m.troner.ReDelegatePendingOrders)
-	// if err != nil {
-	// 	fmt.Printf("❌ cron task register ReDelegatePendingOrders failed, [%s]: %v \n", spec1, err)
-	// 	panic(err)
-	// }
-	// _, err = m.cron.AddFunc(spec1, m.troner.ReExchangePendingOrders)
-	// if err != nil {
-	// 	fmt.Printf("❌ cron task register ReExchangePendingOrders failed, [%s]: %v \n", spec1, err)
-	// 	panic(err)
-	// }
-
-	// spec2 := "*/60 * * * * *"
-	// _, err = m.cron.AddFunc(spec2, m.troner.WithdrawDelegatedOrders)
-	// if err != nil {
-	// 	fmt.Printf("❌ cron task register WithdrawDelegatedOrders failed, [%s]: %v \n", spec2, err)
-	// 	panic(err)
-	// }
-
 	m.cron.Start()
-
 }
 
 func (m *CronManager) Stop() {

@@ -39,6 +39,7 @@ const (
 	ChainNameTron   ChainName = "TRON"
 	ChainNameEth    ChainName = "ETH"
 	ChainNameBsc    ChainName = "BSC"
+	ChainNameEvm ChainName = "EVM"
 	ChainNameSolana ChainName = "SOLANA"
 )
 

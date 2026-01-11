@@ -14,10 +14,10 @@ type ServiceContext struct {
 	UserService   *service.UserService
 	AuthService   *service.AuthService
 	AddrService   *service.AddressService
-	ListenService *service.ChainListenService
+	ListenService *service.ListenService
 }
 
-func NewServiceContext(c global.BackendesConfig, excfg *service.RangeConfigService, user *service.UserService, auth *service.AuthService, addrservice *service.AddressService, listen *service.ChainListenService) *ServiceContext {
+func NewServiceContext(c global.BackendesConfig, excfg *service.RangeConfigService, user *service.UserService, auth *service.AuthService, addrservice *service.AddressService, listen *service.ListenService) *ServiceContext {
 	return &ServiceContext{
 		Config:        c,
 		ExcfgService:  excfg,

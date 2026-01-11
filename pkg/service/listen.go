@@ -33,7 +33,7 @@ const (
 	BitQueryClientSingleQueryLimit = 20
 )
 
-type ChainListenService struct {
+type ListenService struct {
 	db           *gorm.DB
 	cfg          *global.BackendesConfig
 	clients      sync.Map
@@ -46,8 +46,8 @@ type ChainListenService struct {
 	tronservice  *TronService
 }
 
-func NewChainListenService(cfg *global.BackendesConfig, db *gorm.DB, addrservice *AddressService, orderservice *MerchOrderService, evmservice *EvmService, tronservice *TronService) *ChainListenService {
-	return &ChainListenService{
+func NewListenService(cfg *global.BackendesConfig, db *gorm.DB, addrservice *AddressService, orderservice *MerchOrderService, evmservice *EvmService, tronservice *TronService) *ListenService {
+	return &ListenService{
 		db:           db,
 		cfg:          cfg,
 		clients:      sync.Map{},
@@ -59,7 +59,7 @@ func NewChainListenService(cfg *global.BackendesConfig, db *gorm.DB, addrservice
 	}
 }
 
-func (s *ChainListenService) Listen(req *converter.ChainListenReq) {
+func (s *ListenService) Listen(req *converter.ChainListenReq) {
 	key := global.GetOrderAddressKey(string(req.Chain), req.Receiver, req.Currency)
 	s.Receivers.Store(key, true)
 	defer s.Receivers.Delete(key)
@@ -110,7 +110,7 @@ func (s *ChainListenService) Listen(req *converter.ChainListenReq) {
 	logx.Infof("监听事务结束, chain:%v, clen:%v, from:%v", req.Chain, s.clilen, req.Receiver)
 }
 
-func (s *ChainListenService) newEvmClient(chain global.ChainName) (client *ethclient.Client, err error) {
+func (s *ListenService) newEvmClient(chain global.ChainName) (client *ethclient.Client, err error) {
 	port := ""
 	switch chain {
 	case global.ChainNameBsc:
@@ -130,7 +130,7 @@ func (s *ChainListenService) newEvmClient(chain global.ChainName) (client *ethcl
 	return
 }
 
-func (s *ChainListenService) newSolanaClient(chain global.ChainName) (conn *websocket.Conn, err error) {
+func (s *ListenService) newSolanaClient(chain global.ChainName) (conn *websocket.Conn, err error) {
 	port := fmt.Sprintf("%v%v", s.cfg.Solana.WssNetwork, s.cfg.Solana.ApiKey)
 	conn, _, err = websocket.DefaultDialer.Dial(port, nil)
 	if err != nil {
@@ -141,7 +141,7 @@ func (s *ChainListenService) newSolanaClient(chain global.ChainName) (conn *webs
 	return
 }
 
-func (s *ChainListenService) newTronClient(chain global.ChainName) (conn *websocket.Conn, err error) {
+func (s *ListenService) newTronClient(chain global.ChainName) (conn *websocket.Conn, err error) {
 	// port := fmt.Sprintf("%v", s.cfg.Tron.HttpNetwork)
 	// conn, _, err = websocket.DefaultDialer.Dial(port, nil)
 	// if err != nil {
@@ -152,7 +152,7 @@ func (s *ChainListenService) newTronClient(chain global.ChainName) (conn *websoc
 	return
 }
 
-func (s *ChainListenService) getClientItem(chain global.ChainName) (item any, err error) {
+func (s *ListenService) getClientItem(chain global.ChainName) (item any, err error) {
 	found := false
 	s.clients.Range(func(key, val any) bool {
 		ecli, ok := val.(*clients.EvmClientItem)
@@ -263,7 +263,7 @@ func (s *ChainListenService) getClientItem(chain global.ChainName) (item any, er
 	return
 }
 
-func (s *ChainListenService) getContractAddress(currency global.CurrencyTypo, chain string) (caddr string, err error) {
+func (s *ListenService) getContractAddress(currency global.CurrencyTypo, chain string) (caddr string, err error) {
 	switch currency {
 	case global.CurrencyTypoUsdt:
 		for _, addr := range s.cfg.ContractAddresses {
@@ -285,7 +285,7 @@ func (s *ChainListenService) getContractAddress(currency global.CurrencyTypo, ch
 	return
 }
 
-func (s *ChainListenService) clearClients() {
+func (s *ListenService) clearClients() {
 	emu.Lock()
 
 	s.clients.Range(func(key, val any) bool {
@@ -316,7 +316,7 @@ func (s *ChainListenService) clearClients() {
 	emu.Unlock()
 }
 
-func (s *ChainListenService) listenEvm(chain global.ChainName, currency, moid, receiver string, seconds int64, item *clients.EvmClientItem) {
+func (s *ListenService) listenEvm(chain global.ChainName, currency, moid, receiver string, seconds int64, item *clients.EvmClientItem) {
 	contracts := make([]common.Address, 0, 1)
 	switch chain {
 	case global.ChainNameEth:
@@ -412,11 +412,11 @@ func (s *ChainListenService) listenEvm(chain global.ChainName, currency, moid, r
 	}
 }
 
-func (s *ChainListenService) listenSolana(chain global.ChainName, oid, receiver string, seconds int64, item *clients.SolanaClientItem) {
+func (s *ListenService) listenSolana(chain global.ChainName, oid, receiver string, seconds int64, item *clients.SolanaClientItem) {
 
 }
 
-func (s *ChainListenService) listenTron(chain global.ChainName, currency global.CurrencyTypo, moid, receiver string, seconds int64, item *clients.TronClientItem) {
+func (s *ListenService) listenTron(chain global.ChainName, currency global.CurrencyTypo, moid, receiver string, seconds int64, item *clients.TronClientItem) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(seconds)*time.Second)
 	defer cancel()
 
@@ -482,7 +482,7 @@ func (s *ChainListenService) listenTron(chain global.ChainName, currency global.
 	}
 }
 
-func (s *ChainListenService) ListenMany() {
+func (s *ListenService) ListenMany() {
 	cnames := []string{"BSC", "ETH", "TRON"}
 	currencys := []string{"USDT", "USDC"}
 

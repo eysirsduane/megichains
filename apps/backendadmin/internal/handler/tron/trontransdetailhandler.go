@@ -11,10 +11,10 @@ import (
 	"megichains/apps/backendadmin/internal/svc"
 )
 
-func TronTransGetHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func TronTransDetailHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		l := tron.NewTronTransGetLogic(r.Context(), svcCtx)
-		err := l.TronTransGet()
+		l := tron.NewTronTransDetailLogic(r.Context(), svcCtx)
+		err := l.TronTransDetail()
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

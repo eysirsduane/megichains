@@ -4,7 +4,7 @@ type MerchOrder struct {
 	Id            int64  `gorm:"primaryKey;autoIncrement"`
 	LogId         int64  `gorm:""`
 	MerchOrderId  string `gorm:"size:63;uniqueIndex"`
-	TransactionId string `gorm:"size255"`
+	TransactionId string `gorm:"size:255"`
 	Chain         string `gorm:"size:15;"`
 
 	Typo     string `gorm:"size:15"`

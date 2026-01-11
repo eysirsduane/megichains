@@ -43,6 +43,7 @@ declare namespace Api {
       merch_order_id: string;
       transaction_id: string;
       typo: Api.Common.OrderTypos;
+      status: Api.Common.OrderStatus;
       currency: string;
       chain: string;
       received_amount: number;

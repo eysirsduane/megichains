@@ -46,9 +46,6 @@ declare namespace Api {
       /** record creator */
       created_at: number;
       /** record create time */
-      createTime: string;
-      /** record updater */
-      updateBy: string;
       /** record update time */
       updated_at: number;
       /** record status */

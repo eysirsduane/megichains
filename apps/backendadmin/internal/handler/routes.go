@@ -21,9 +21,9 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				Method:  http.MethodPost,
-				Path:    "/address/edit",
-				Handler: address.AddressEditHandler(serverCtx),
+				Method:  http.MethodGet,
+				Path:    "/address/detail",
+				Handler: address.AddressDetailHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
@@ -32,13 +32,28 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodGet,
+				Path:    "/address/group/detail",
+				Handler: address.AddressGroupDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
 				Path:    "/address/group/list",
 				Handler: address.AddressGroupListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/address/group/save",
+				Handler: address.AddressGroupSaveHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
 				Path:    "/address/list",
 				Handler: address.AddressListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/address/save",
+				Handler: address.AddressSaveHandler(serverCtx),
 			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
@@ -99,8 +114,8 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodGet,
-				Path:    "/order/get",
-				Handler: order.OrderGetHandler(serverCtx),
+				Path:    "/order/detail",
+				Handler: order.OrderDetailHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
@@ -116,8 +131,8 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodGet,
-				Path:    "/tron/trans/get",
-				Handler: tron.TronTransGetHandler(serverCtx),
+				Path:    "/tron/trans/detail",
+				Handler: tron.TronTransDetailHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,

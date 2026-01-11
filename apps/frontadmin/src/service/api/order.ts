@@ -10,7 +10,7 @@ export function fetchGetOrderList(params?: Api.Order.OrderSearchParams) {
 
 export function fetchGetOrderDetail(id: number) {
   return request<Api.Order.OrderDetail>({
-    url: `/order/get?id=${id}`,
+    url: `/order/detail?id=${id}`,
     method: 'get'
   });
 }

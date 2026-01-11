@@ -67,8 +67,8 @@ watch(rtvalue, () => {
                 </ElSelect>
               </ElFormItem>
             </ElCol>
-             <ElCol :lg="6" :md="8" :sm="12"></ElCol>
-             <ElCol :lg="6" :md="8" :sm="12"></ElCol>
+            <ElCol :lg="6" :md="8" :sm="12"></ElCol>
+            <ElCol :lg="6" :md="8" :sm="12"></ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
               <ElSpace class="w-full justify-end" alignment="end">
                 <ElButton @click="reset">

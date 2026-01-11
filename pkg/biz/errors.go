@@ -32,11 +32,13 @@ var (
 )
 
 var (
-	AddressEditFailed      = NewSpecificError(4001, "更新地址失败")
-	AddressCreateFailed    = NewSpecificError(4002, "地址创建失败")
-	AddressFindFailed      = NewSpecificError(4003, "地址查询失败")
-	AddressCountFailed     = NewSpecificError(4004, "地址总数统计失败")
-	AddressGroupFindFailed = NewSpecificError(4005, "获取地址分组失败")
+	AddressSaveFailed        = NewSpecificError(4001, "保存地址失败")
+	AddressCreateFailed      = NewSpecificError(4002, "地址创建失败")
+	AddressFindFailed        = NewSpecificError(4003, "地址查询失败")
+	AddressCountFailed       = NewSpecificError(4004, "地址总数统计失败")
+	AddressGroupFindFailed   = NewSpecificError(4005, "获取地址分组失败")
+	AddressGroupSaveFailed   = NewSpecificError(4006, "地址分组保存失败")
+	AddressGroupFieldInvalid = NewSpecificError(4007, "地址分组字段非法")
 )
 
 var (

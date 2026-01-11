@@ -368,6 +368,7 @@ declare namespace App {
         ban: string;
         open: string;
         name: string;
+        save: string;
       };
       request: {
         logout: string;
@@ -739,8 +740,12 @@ declare namespace App {
             typo: string;
             group_id: string;
             group_name: string;
+            description: string;
           };
           list: {
+            title: string;
+          };
+          group: {
             title: string;
           };
         };

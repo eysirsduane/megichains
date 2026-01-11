@@ -3,15 +3,23 @@
 
 package types
 
+type AddressDetailReq struct {
+	Id int64 `form:"id,optional"`
+}
+
 type AddressGroupAllResp struct {
 	Records []*AddressGroupItem `json:"records"`
 }
 
+type AddressGroupDetailReq struct {
+	Id int64 `form:"id"`
+}
+
 type AddressGroupItem struct {
-	Id          int64  `json:"id"`
+	Id          int64  `json:"id,optional"`
 	Name        string `json:"name"`
 	Status      string `json:"status"`
-	Description string `json:"description"`
+	Description string `json:"description,optional"`
 	TimeAts
 }
 
@@ -189,9 +197,9 @@ type StartEnd struct {
 }
 
 type TimeAts struct {
-	UpdatedAt uint64 `json:"updated_at"`
-	DeletedAt uint64 `json:"deleted_at"`
-	CreatedAt uint64 `json:"created_at"`
+	UpdatedAt uint64 `json:"updated_at,optional"`
+	DeletedAt uint64 `json:"deleted_at,optional"`
+	CreatedAt uint64 `json:"created_at,optional"`
 }
 
 type TronAccountCreateReq struct {

@@ -8,11 +8,18 @@ export function fetchGetAddressList(params?: Api.Address.AddressSearchParams) {
   });
 }
 
-export function postEditAddress(params?: Api.Address.Address) {
-  return request<Api.Address.AddressList>({
-    url: '/address/edit',
+export function postSaveAddress(params?: Api.Address.Address) {
+  return request<Api.Address.Address>({
+    url: '/address/save',
     method: 'post',
-    params
+    data: params
+  });
+}
+
+export function fetchGetAddressDetail(id?: number) {
+  return request<Api.Address.Address>({
+    url: `/address/detail?id=${id}`,
+    method: 'get'
   });
 }
 
@@ -28,5 +35,28 @@ export function fetchGetAddressGroupList(params?: Api.Address.AddressGroupSearch
     url: '/address/group/list',
     method: 'get',
     params
+  });
+}
+
+export function fetchGetAddressGroupDetail(id: number) {
+  return request<Api.Address.AddressGroup>({
+    url: `/address/group/detail?id=${id}`,
+    method: 'get'
+  });
+}
+
+export function postSaveAddressGroup(params?: Api.Address.AddressGroup) {
+  return request<Api.Address.AddressGroup>({
+    url: `/address/group/save`,
+    method: 'post',
+    data: params
+  });
+}
+
+export function postCreateAddressGroup(params?: Api.Address.AddressGroup) {
+  return request<Api.Address.AddressGroup>({
+    url: `/address/group/create`,
+    method: 'post',
+    data: params
   });
 }

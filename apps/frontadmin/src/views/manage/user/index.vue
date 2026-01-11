@@ -17,7 +17,7 @@ function getInitSearchParams(): Api.SystemManage.UserSearchParams {
     current: 1,
     size: 30,
     status: undefined,
-    userName: undefined,
+    username: undefined,
     userGender: undefined,
     nickName: undefined,
     userPhone: undefined,

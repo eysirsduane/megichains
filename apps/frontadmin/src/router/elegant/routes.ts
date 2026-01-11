@@ -62,16 +62,6 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
-        name: 'address_list',
-        path: '/address/list',
-        component: 'view.address_list',
-        meta: {
-          title: 'address_list',
-          i18nKey: 'route.address_list',
-          icon: 'mdi:file-document-multiple-outline'
-        }
-      },
-      {
         name: 'address_group',
         path: '/address/group',
         component: 'view.address_group',
@@ -79,6 +69,16 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'address_group',
           i18nKey: 'route.address_group',
           icon: 'ep:element-plus'
+        }
+      },
+      {
+        name: 'address_list',
+        path: '/address/list',
+        component: 'view.address_list',
+        meta: {
+          title: 'address_list',
+          i18nKey: 'route.address_list',
+          icon: 'mdi:file-document-multiple-outline'
         }
       }
     ]
@@ -249,6 +249,27 @@ export const generatedRoutes: GeneratedRoute[] = [
     ]
   },
   {
+    name: 'fund',
+    path: '/fund',
+    component: 'layout.base',
+    meta: {
+      title: 'fund',
+      i18nKey: 'route.fund',
+      order: 3
+    },
+    children: [
+      {
+        name: 'fund_list',
+        path: '/fund/list',
+        component: 'view.fund_list',
+        meta: {
+          title: 'fund_list',
+          i18nKey: 'route.fund_list'
+        }
+      }
+    ]
+  },
+  {
     name: 'home',
     path: '/home',
     component: 'layout.base$view.home',
@@ -293,8 +314,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       i18nKey: 'route.manage',
       icon: 'carbon:cloud-service-management',
       order: 9,
-      roles: ['R_ADMIN'],
-      hideInMenu: true
+      roles: ['R_ADMIN']
     },
     children: [
       {
@@ -424,17 +444,6 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
-        name: 'order_list',
-        path: '/order/list',
-        component: 'view.order_list',
-        meta: {
-          title: 'order_list',
-          i18nKey: 'route.order_list',
-          icon: 'material-symbols:route',
-          order:1
-        }
-      },
-      {
         name: 'order_evm',
         path: '/order/evm',
         component: 'view.order_evm',
@@ -442,10 +451,20 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'order_evm',
           i18nKey: 'route.order_evm',
           icon: 'carbon:network-overlay',
-          order:2
+          order: 2
         }
       },
-
+      {
+        name: 'order_list',
+        path: '/order/list',
+        component: 'view.order_list',
+        meta: {
+          title: 'order_list',
+          i18nKey: 'route.order_list',
+          icon: 'material-symbols:route',
+          order: 1
+        }
+      },
       {
         name: 'order_tron',
         path: '/order/tron',
@@ -454,7 +473,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'order_tron',
           i18nKey: 'route.order_tron',
           icon: 'carbon:network-overlay',
-          order:3
+          order: 3
         }
       }
     ]

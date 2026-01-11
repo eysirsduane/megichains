@@ -1,27 +1,27 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package order
+package address
 
 import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"megichains/apps/backendadmin/internal/logic/order"
+	"megichains/apps/backendadmin/internal/logic/address"
 	"megichains/apps/backendadmin/internal/svc"
 	"megichains/apps/backendadmin/internal/types"
 )
 
-func OrderGetHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func AddressDetailHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.OrderGetReq
+		var req types.AddressDetailReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := order.NewOrderGetLogic(r.Context(), svcCtx)
-		resp, err := l.OrderGet(&req)
+		l := address.NewAddressDetailLogic(r.Context(), svcCtx)
+		resp, err := l.AddressDetail(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

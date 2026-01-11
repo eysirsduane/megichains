@@ -52,6 +52,8 @@ declare module "@elegant-router/types" {
     "function_super-page": "/function/super-page";
     "function_tab": "/function/tab";
     "function_toggle-auth": "/function/toggle-auth";
+    "fund": "/fund";
+    "fund_list": "/fund/list";
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
@@ -147,6 +149,7 @@ declare module "@elegant-router/types" {
     | "address"
     | "alova"
     | "function"
+    | "fund"
     | "home"
     | "iframe-page"
     | "login"
@@ -192,6 +195,7 @@ declare module "@elegant-router/types" {
     | "function_super-page"
     | "function_tab"
     | "function_toggle-auth"
+    | "fund_list"
     | "home"
     | "manage_menu"
     | "manage_role"

@@ -42,9 +42,9 @@ type Contacts {
 }
 
 type TimeAts {
-	UpdatedAt uint64 `json:"updated_at"`
-	DeletedAt uint64 `json:"deleted_at"`
-	CreatedAt uint64 `json:"created_at"`
+	UpdatedAt uint64 `json:"updated_at,optional"`
+	DeletedAt uint64 `json:"deleted_at,optional"`
+	CreatedAt uint64 `json:"created_at,optional"`
 }
 
 type TronAccountGetReq {}
@@ -193,6 +193,10 @@ type EvmLogListResp {
 	PagesBody
 }
 
+type AddressDetailReq {
+	Id int64 `form:"id,optional"`
+}
+
 type AddressItem {
 	Id          int64  `json:"id"`
 	GroupId     int64  `json:"group_id"`
@@ -223,10 +227,10 @@ type AddressListResp {
 }
 
 type AddressGroupItem {
-	Id          int64  `json:"id"`
+	Id          int64  `json:"id,optional"`
 	Name        string `json:"name"`
 	Status      string `json:"status"`
-	Description string `json:"description"`
+	Description string `json:"description,optional"`
 	TimeAts
 }
 
@@ -242,6 +246,10 @@ type AddressGroupListReq {
 type AddressGroupListResp {
 	PagesBody
 	Records []*AddressGroupItem `json:"records"`
+}
+
+type AddressGroupDetailReq {
+	Id int64 `form:"id"`
 }
 
 @server (
@@ -300,8 +308,8 @@ service backendadmin {
 	@handler OrderListHandler
 	get /order/list (OrderListReq) returns (OrderListResp)
 
-	@handler OrderGetHandler
-	get /order/get (OrderGetReq) returns (OrderItem)
+	@handler OrderDetailHandler
+	get /order/detail (OrderGetReq) returns (OrderItem)
 }
 
 @server (
@@ -319,8 +327,8 @@ service backendadmin {
 	@handler TronTransListHandler
 	get /tron/trans/list (TronTransListReq) returns (TronTransListResp)
 
-	@handler TronTransGetHandler
-	get /tron/trans/get
+	@handler TronTransDetailHandler
+	get /tron/trans/detail
 }
 
 @server (
@@ -354,13 +362,22 @@ service backendadmin {
 	@handler AddressListHandler
 	get /address/list (AddressListReq) returns (AddressListResp)
 
-	@handler AddressEditHandler
-	post /address/edit (AddressItem)
+	@handler AddressSaveHandler
+	post /address/save (AddressItem) returns (Response)
+
+	@handler AddressDetailHandler
+	get /address/detail (AddressDetailReq) returns (AddressItem)
 
 	@handler AddressGroupAllHandler
 	get /address/group/all returns (AddressGroupAllResp)
 
 	@handler AddressGroupListHandler
 	get /address/group/list (AddressGroupListReq) returns (AddressGroupListResp)
+
+	@handler AddressGroupDetailHandler
+	get /address/group/detail (AddressGroupDetailReq) returns (AddressGroupItem)
+
+	@handler AddressGroupSaveHandler
+	post /address/group/save (AddressGroupItem) returns (Response)
 }
 

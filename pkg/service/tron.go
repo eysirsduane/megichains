@@ -60,7 +60,7 @@ func (s *TronService) Find(ctx context.Context, req *converter.TronTransListReq)
 		return
 	}
 
-	resp = converter.ConvertToPagingResp(items, req.Current, req.Size, total)
+	resp = converter.ConvertToPagingRecordsResp(items, req.Current, req.Size, total)
 
 	return
 }

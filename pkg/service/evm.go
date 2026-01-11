@@ -67,6 +67,6 @@ func (s *EvmService) Find(ctx context.Context, req *converter.EvmLogListReq) (re
 		return
 	}
 
-	resp = converter.ConvertToPagingResp(items, req.Current, req.Size, total)
+	resp = converter.ConvertToPagingRecordsResp(items, req.Current, req.Size, total)
 	return
 }

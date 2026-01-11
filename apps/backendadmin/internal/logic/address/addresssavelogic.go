@@ -1,41 +1,41 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package order
+package address
 
 import (
 	"context"
 
 	"megichains/apps/backendadmin/internal/svc"
 	"megichains/apps/backendadmin/internal/types"
+	"megichains/pkg/converter"
 
 	"github.com/jinzhu/copier"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type OrderGetLogic struct {
+type AddressSaveLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewOrderGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *OrderGetLogic {
-	return &OrderGetLogic{
+func NewAddressSaveLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddressSaveLogic {
+	return &AddressSaveLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *OrderGetLogic) OrderGet(req *types.OrderGetReq) (resp *types.OrderItem, err error) {
-	order, err := l.svcCtx.OrderService.Get(req.Id)
+func (l *AddressSaveLogic) AddressSave(req *types.AddressItem) (resp *types.Response, err error) {
+	reqc := &converter.AddressItem{}
+	copier.Copy(reqc, req)
+
+	err = l.svcCtx.AddressService.Save(l.ctx, reqc)
 	if err != nil {
-		logx.Errorf("order get failed, oid:%v, err:%v", req.Id, err)
 		return
 	}
-
-	resp = &types.OrderItem{}
-	copier.Copy(resp, order)
 
 	return
 }

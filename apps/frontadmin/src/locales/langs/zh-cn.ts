@@ -74,7 +74,8 @@ const local: App.I18n.Schema = {
     vacant: '空闲',
     ban: '禁用',
     open: '开放',
-    name: '名称'
+    name: '名称',
+    save: '保存'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -260,7 +261,9 @@ const local: App.I18n.Schema = {
     order_evm: 'EVM交易',
     address: '地址管理',
     address_list: '地址列表',
-    address_group: '地址分组'
+    address_group: '地址分组',
+    fund: '资金管理',
+    fund_list: '地址余额'
   },
   page: {
     login: {
@@ -559,10 +562,14 @@ const local: App.I18n.Schema = {
         status: '状态',
         typo: '类型',
         group_id: '分组',
-        group_name: '分组'
+        group_name: '分组',
+        description: '描述'
       },
       list: {
         title: '地址列表'
+      },
+      group: {
+        title: '分组列表'
       }
     }
   },

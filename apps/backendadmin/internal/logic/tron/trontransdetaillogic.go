@@ -10,21 +10,22 @@ import (
 	"megichains/apps/backendadmin/internal/svc"
 )
 
-type TronTransGetLogic struct {
+type TronTransDetailLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewTronTransGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TronTransGetLogic {
-	return &TronTransGetLogic{
+func NewTronTransDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TronTransDetailLogic {
+	return &TronTransDetailLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *TronTransGetLogic) TronTransGet() error {
+func (l *TronTransDetailLogic) TronTransDetail() error {
+	// todo: add your logic here and delete this line
 
 	return nil
 }

@@ -1,12 +1,14 @@
 <script setup lang="tsx">
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 import { ElButton } from 'element-plus';
+import { useBoolean } from '@sa/hooks';
 import { addressGroupStatusRecord } from '@/constants/business';
 import { fetchGetAddressGroupList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
-import TransSearch from './modules/address-group-search.vue';
+import AddressGroupSearch from './modules/address-group-search.vue';
+import AddressGroupDetailDrawer from './modules/address-group-detail-drawer.vue';
 
 defineOptions({ name: 'TransSearch' });
 
@@ -92,27 +94,37 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   ]
 });
 
+const targetId = ref(0);
+const { bool: drawerVisible, setTrue: openDrawer } = useBoolean();
+
 function resetSearchParams() {
   Object.assign(searchParams, getInitSearchParams());
 }
 
 function edit(id: number) {
-  console.log(id);
+  targetId.value = id;
+  openDrawer();
+}
+
+function add() {
+  targetId.value = 0;
+  openDrawer();
 }
 </script>
 
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <TransSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
+    <AddressGroupSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <ElCard class="card-wrapper sm:flex-1-hidden" body-class="ht50">
       <template #header>
         <div class="flex items-center justify-between">
-          <p>{{ $t('page.order.tron.title') }}</p>
+          <p>{{ $t('page.address.group.title') }}</p>
           <TableHeaderOperation
             v-model:columns="columnChecks"
             :disabled-delete="true"
             :disabled-add="true"
             :loading="loading"
+            @add="add"
             @refresh="getData"
           />
         </div>
@@ -139,6 +151,7 @@ function edit(id: number) {
           @size-change="mobilePagination['size-change']"
         />
       </div>
+      <AddressGroupDetailDrawer v-model:visible="drawerVisible" :target-id="targetId" @saved="getDataByPage" />
     </ElCard>
   </div>
 </template>

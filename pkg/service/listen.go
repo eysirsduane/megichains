@@ -486,10 +486,11 @@ func (s *ChainListenService) ListenMany() {
 	cnames := []string{"BSC", "ETH", "TRON"}
 	currencys := []string{"USDT", "USDC"}
 
+	ctx := context.Background()
 	for i := 1; i < 500; i++ {
 		chain := ""
 		iaddr := rand.IntN(1000)
-		addr, _ := s.addrservice.GetAddress(int64(iaddr))
+		addr, _ := s.addrservice.Get(ctx, int64(iaddr))
 		switch addr.Chain {
 		case "EVM":
 			iname := rand.IntN(2)

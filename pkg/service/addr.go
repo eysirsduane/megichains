@@ -28,24 +28,37 @@ func NewAddressService(db *gorm.DB) *AddressService {
 	return &AddressService{db: db}
 }
 
-func (s *AddressService) GetAddress(id int64) (addr *entity.Address, err error) {
-	err = s.db.Where("id = ?", id).First(&addr).Error
+func (s *AddressService) Get(ctx context.Context, id int64) (resp *converter.AddressItem, err error) {
+	addr, err := gorm.G[entity.Address](s.db).Where("id = ?", id).First(ctx)
 	if err != nil {
-		logx.Errorf("db get address failed, id:%v, err:%v", id, err)
+		logx.Errorf("address detail get failed, id:%v, err:%v", id, err)
 		return
 	}
+
+	resp = &converter.AddressItem{}
+	copier.Copy(resp, addr)
 
 	return
 }
 
-func (s *AddressService) Edit(ctx context.Context, req *converter.AddressItem) (err error) {
-	addr := entity.Address{}
+func (s *AddressService) Save(ctx context.Context, req *converter.AddressItem) (err error) {
+	addr := &entity.Address{}
 	copier.Copy(&addr, req)
-	_, err = gorm.G[entity.Address](s.db).Updates(ctx, addr)
-	if err != nil {
-		logx.Errorf("db edit address failed, id:%v, err:%v", req.Id, err)
-		err = biz.AddressEditFailed
-		return
+
+	if req.Id > 0 {
+		_, err = gorm.G[entity.Address](s.db).Updates(ctx, *addr)
+		if err != nil {
+			logx.Errorf("address update failed, id:%v, err:%v", req.Id, err)
+			err = biz.AddressSaveFailed
+			return
+		}
+	} else {
+		err = gorm.G[entity.Address](s.db).Create(ctx, addr)
+		if err != nil {
+			logx.Errorf("address create failed, id:%v, err:%v", req.Id, err)
+			err = biz.AddressCreateFailed
+			return
+		}
 	}
 
 	return
@@ -59,7 +72,7 @@ func (s *AddressService) GroupAll(ctx context.Context) (resp *converter.RespConv
 		return
 	}
 
-	resp = converter.ConvertToResp(all, 0, 0, 0)
+	resp = converter.ConvertToRecordsResp(all, 0, 0, 0)
 
 	return
 }
@@ -69,24 +82,28 @@ func (s *AddressService) GroupFind(ctx context.Context, req *converter.AddressGr
 	if req.Status != "" {
 		db = db.Where("status = ?", req.Status)
 	}
+
+	items, err := db.Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Find(ctx)
 	if err != nil {
-		logx.Errorf("db address group all failed, err:%v", err)
+		logx.Errorf("address group paging failed, err:%v", err)
 		err = biz.AddressGroupFindFailed
 		return
 	}
 
-	items, err := db.Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Find(ctx)
+	total, err := db.Count(ctx, "id")
 	if err != nil {
+		logx.Errorf("address group count failed, err:%v", err)
+		err = biz.AddressCountFailed
 		return
 	}
 
-	resp = converter.ConvertToResp(items, 0, 0, 0)
+	resp = converter.ConvertToPagingRecordsResp(items, req.Current, req.Size, total)
 
 	return
 }
 
 func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq) (resp *converter.RespConverter[converter.AddressWithGroup], err error) {
-	db := s.db.Model(&entity.Address{}).Order("updated_at desc")
+	db := s.db.Model(&entity.Address{}).Order("id asc")
 	if req.Address != "" {
 		db = db.Where("address = ?", req.Address)
 	}
@@ -97,7 +114,7 @@ func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq
 		db = db.Where("chain = ?", req.Chain)
 	}
 	if req.Status != "" {
-		db = db.Where("status = ?", req.Status)
+		db = db.Where("addresses.status = ?", req.Status)
 	}
 	if req.Typo != "" {
 		db = db.Where("typo = ?", req.Typo)
@@ -126,7 +143,7 @@ func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq
 		return
 	}
 
-	resp = converter.ConvertToPagingResp(items, req.Current, req.Size, total)
+	resp = converter.ConvertToPagingRecordsResp(items, req.Current, req.Size, total)
 
 	return
 }
@@ -242,4 +259,60 @@ func checksum(payload []byte) []byte {
 	first := sha256.Sum256(payload)
 	second := sha256.Sum256(first[:])
 	return second[:4]
+}
+
+func (s *AddressService) GroupGet(ctx context.Context, id int64) (resp *converter.AddressGroupItem, err error) {
+	group, err := gorm.G[entity.AddressGroup](s.db).Where("id = ?", id).First(ctx)
+	if err != nil {
+		logx.Errorf("address group get detail failed, err:%v", err)
+		err = biz.AddressGroupFindFailed
+		return
+	}
+
+	resp = &converter.AddressGroupItem{}
+	copier.Copy(resp, group)
+
+	return
+}
+
+func (s *AddressService) GroupSave(ctx context.Context, req *converter.AddressGroupItem) (err error) {
+	group := &entity.AddressGroup{}
+	copier.Copy(group, req)
+
+	if req.Name == "" || req.Status == "" {
+		err = biz.AddressGroupFieldInvalid
+		return
+	}
+
+	if req.Id > 0 {
+		_, err = gorm.G[entity.AddressGroup](s.db).Where("id = ?", req.Id).Updates(ctx, *group)
+		if err != nil {
+			logx.Errorf("address group save failed, err:%v", err)
+			err = biz.AddressGroupSaveFailed
+			return
+		}
+	} else {
+		err = gorm.G[entity.AddressGroup](s.db).Create(ctx, group)
+		if err != nil {
+			logx.Errorf("address group create failed, err:%v", err)
+			err = biz.AddressGroupSaveFailed
+			return
+		}
+	}
+
+	return
+}
+
+func (s *AddressService) GroupCreate(ctx context.Context, req *converter.AddressGroupItem) (err error) {
+	group := &entity.AddressGroup{}
+	copier.Copy(group, req)
+
+	err = gorm.G[entity.AddressGroup](s.db).Create(ctx, group)
+	if err != nil {
+		logx.Errorf("address group save failed, err:%v", err)
+		err = biz.AddressGroupSaveFailed
+		return
+	}
+
+	return
 }

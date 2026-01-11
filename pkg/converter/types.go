@@ -11,7 +11,7 @@ type RespConverter[T any] struct {
 	*PagesBody
 }
 
-func ConvertToPagingResp[T any](items []T, current, size int, total int64) (resp *RespConverter[T]) {
+func ConvertToPagingRecordsResp[T any](items []T, current, size int, total int64) (resp *RespConverter[T]) {
 	resp = &RespConverter[T]{
 		PagesBody: &PagesBody{
 			Current: current,
@@ -26,12 +26,18 @@ func ConvertToPagingResp[T any](items []T, current, size int, total int64) (resp
 	return
 }
 
-func ConvertToResp[T any](items []T, current, size int, total int64) (resp *RespConverter[T]) {
+func ConvertToRecordsResp[T any](items []T, current, size int, total int64) (resp *RespConverter[T]) {
 	resp = &RespConverter[T]{
 		Records: make([]T, 0, size),
 	}
 
 	copier.Copy(&resp.Records, &items)
+
+	return
+}
+
+func ConvertToResp[T any](item T) (resp *T) {
+	copier.Copy(&resp, &item)
 
 	return
 }

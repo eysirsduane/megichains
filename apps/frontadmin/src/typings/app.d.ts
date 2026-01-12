@@ -749,6 +749,18 @@ declare namespace App {
             title: string;
           };
         };
+        fund: {
+          common: {
+            chain: string;
+            address: string;
+            tron_usdt: string;
+            tron_usdc: string;
+            bsc_usdt: string;
+            bsc_usdc: string;
+            eth_usdt: string;
+            eth_usdc: string;
+          };
+        };
       };
       form: {
         required: string;

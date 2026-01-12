@@ -200,6 +200,7 @@ const routeMap: RouteMap = {
   "function_toggle-auth": "/function/toggle-auth",
   "fund": "/fund",
   "fund_list": "/fund/list",
+  "fund_statistics": "/fund/statistics",
   "home": "/home",
   "iframe-page": "/iframe-page/:url",
   "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?",

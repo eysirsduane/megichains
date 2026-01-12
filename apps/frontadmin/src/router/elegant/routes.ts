@@ -266,6 +266,15 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'fund_list',
           i18nKey: 'route.fund_list'
         }
+      },
+      {
+        name: 'fund_statistics',
+        path: '/fund/statistics',
+        component: 'view.fund_statistics',
+        meta: {
+          title: 'fund_statistics',
+          i18nKey: 'route.fund_statistics'
+        }
       }
     ]
   },

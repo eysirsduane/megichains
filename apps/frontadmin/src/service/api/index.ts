@@ -5,3 +5,4 @@ export * from './order';
 export * from './tron';
 export * from './evm';
 export * from './addr';
+export * from './fund';

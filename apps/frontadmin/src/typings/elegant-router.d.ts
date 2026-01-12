@@ -54,6 +54,7 @@ declare module "@elegant-router/types" {
     "function_toggle-auth": "/function/toggle-auth";
     "fund": "/fund";
     "fund_list": "/fund/list";
+    "fund_statistics": "/fund/statistics";
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
@@ -196,6 +197,7 @@ declare module "@elegant-router/types" {
     | "function_tab"
     | "function_toggle-auth"
     | "fund_list"
+    | "fund_statistics"
     | "home"
     | "manage_menu"
     | "manage_role"

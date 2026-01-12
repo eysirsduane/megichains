@@ -1,14 +1,11 @@
 <script setup lang="tsx">
-import { reactive, ref } from 'vue';
-import { ElButton } from 'element-plus';
-import { useBoolean } from '@sa/hooks';
-import { addressStatusRecord, addressTyposRecord } from '@/constants/business';
-import { fetchGetAddressList } from '@/service/api';
+import { reactive } from 'vue';
+import { fetchGetAddressFundList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
-import AddressSearch from './modules/address-search.vue';
-import AddressDetailDrawer from './modules/address-detail-drawer.vue';
+import AddressFundSearch from './modules/address-fund-search.vue';
+// import AddressFundDetailDrawer from './modules/address-fund-detail-drawer.vue';
 
 defineOptions({ name: 'AddressList' });
 
@@ -21,10 +18,7 @@ function getInitSearchParams(): Api.Address.AddressSearchParams {
     start: 0,
     end: 0,
     address: '',
-    address2: '',
-    group_id: 0,
-    chain: '',
-    typo: ''
+    chain: ''
   };
 }
 
@@ -33,7 +27,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     currentPage: searchParams.current,
     pageSize: searchParams.size
   },
-  api: () => fetchGetAddressList(searchParams),
+  api: () => fetchGetAddressFundList(searchParams),
   transform: response => {
     return defaultSearchform(response);
   },
@@ -44,50 +38,14 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   columns: () => [
     // { prop: 'selection', type: 'selection', width: 48 },
     { prop: 'id', type: 'id', label: $t('common.id'), width: 100 },
-    { prop: 'group_name', label: $t('page.address.common.group_name'), width: 120 },
-    { prop: 'chain', label: $t('page.address.common.chain'), width: 80 },
-    {
-      prop: 'typo',
-      label: $t('page.address.common.typo'),
-      width: 80,
-      formatter: row => {
-        const tagMap: Record<Api.Common.AddressTypos, UI.ThemeColor> = {
-          '': 'info',
-          IN: 'success',
-          OUT: 'warning',
-          COLLECT: 'primary'
-        };
-
-        const label = $t(addressTyposRecord[row.typo]);
-        return (
-          <el-tag effect="dark" round type={tagMap[row.typo]}>
-            {label}
-          </el-tag>
-        );
-      }
-    },
-    {
-      prop: 'status',
-      label: $t('page.address.common.status'),
-      width: 80,
-      formatter: row => {
-        const tagMap: Record<Api.Common.AddressStatus, UI.ThemeColor> = {
-          '': 'info',
-          禁用: 'danger',
-          空闲: 'success',
-          占用: 'warning'
-        };
-
-        const label = $t(addressStatusRecord[row.status]);
-        return (
-          <el-tag effect="dark" round type={tagMap[row.status]}>
-            {label}
-          </el-tag>
-        );
-      }
-    },
-    { prop: 'address', label: $t('page.address.common.address'), width: 400 },
-    { prop: 'address2', label: $t('page.address.common.address2'), width: 400 },
+    { prop: 'chain', label: $t('page.fund.common.chain'), width: 80 },
+    { prop: 'address', label: $t('page.fund.common.address'), width: 400 },
+    { prop: 'tron_usdt', label: $t('page.fund.common.tron_usdt'), width: 200 },
+    { prop: 'tron_usdc', label: $t('page.fund.common.tron_usdc'), width: 200 },
+    { prop: 'bsc_usdt', label: $t('page.fund.common.bsc_usdt'), width: 200 },
+    { prop: 'bsc_usdc', label: $t('page.fund.common.bsc_usdc'), width: 200 },
+    { prop: 'eth_usdt', label: $t('page.fund.common.eth_usdt'), width: 200 },
+    { prop: 'eth_usdc', label: $t('page.fund.common.eth_usdc'), width: 200 },
     {
       prop: 'updated_at',
       label: $t('common.updated_at'),
@@ -103,23 +61,6 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       formatter: row => {
         return getHumannessDateTime(row.created_at);
       }
-    },
-    {
-      prop: 'operate',
-      fixed: true,
-      label: $t('common.operate'),
-      align: 'center',
-      width: 80,
-      formatter: row => (
-        <div class="flex-center">
-          <ElButton type="primary" plain size="small" onClick={() => edit(row.id)}>
-            {$t('common.edit')}
-          </ElButton>
-          {/* <ElButton type="primary" plain size="small" onClick={() => withdraweral(row.id)}>
-            {$t('page.address.common.withdraweral')}
-          </ElButton> */}
-        </div>
-      )
     }
   ]
 });
@@ -127,19 +68,11 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
 function resetSearchParams() {
   Object.assign(searchParams, getInitSearchParams());
 }
-
-const targetId = ref(0);
-const { bool: drawerVisible, setTrue: openDrawer } = useBoolean();
-
-function edit(id: number) {
-  targetId.value = id;
-  openDrawer();
-}
 </script>
 
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <AddressSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
+    <AddressFundSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <ElCard class="card-wrapper sm:flex-1-hidden" body-class="ht50">
       <template #header>
         <div class="flex items-center justify-between">
@@ -175,7 +108,7 @@ function edit(id: number) {
           @size-change="mobilePagination['size-change']"
         />
       </div>
-      <AddressDetailDrawer v-model:visible="drawerVisible" :target-id="targetId" @saved="getDataByPage" />
+      <!-- <AddressFundDetailDrawer v-model:visible="drawerVisible" :target-id="targetId" @saved="getDataByPage" /> -->
     </ElCard>
   </div>
 </template>

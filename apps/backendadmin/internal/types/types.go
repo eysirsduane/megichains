@@ -7,6 +7,42 @@ type AddressDetailReq struct {
 	Id int64 `form:"id,optional"`
 }
 
+type AddressFundItem struct {
+	Id       int64   `json:"id"`
+	Chain    string  `json:"chain"`
+	Address  string  `json:"address"`
+	TronUsdt float64 `json:"tron_usdt"`
+	TronUsdc float64 `json:"tron_usdc"`
+	BscUsdt  float64 `json:"bsc_usdt"`
+	BscUsdc  float64 `json:"bsc_usdc"`
+	EthUsdt  float64 `json:"eth_usdt"`
+	EthUsdc  float64 `json:"eth_usdc"`
+	TimeAts
+}
+
+type AddressFundListReq struct {
+	Pages
+	Chain   string `form:"chain,optional"`
+	Address string `form:"address,optional"`
+}
+
+type AddressFundListResp struct {
+	PagesBody
+	Records []*AddressFundItem `json:"records"`
+}
+
+type AddressFundStatisticsReq struct {
+}
+
+type AddressFundStatisticsResp struct {
+	TronUsdt float64 `json:"tron_usdt"`
+	TronUsdc float64 `json:"tron_usdc"`
+	BscUsdt  float64 `json:"bsc_usdt"`
+	BscUsdc  float64 `json:"bsc_usdc"`
+	EthUsdt  float64 `json:"eth_usdt"`
+	EthUsdc  float64 `json:"eth_usdc"`
+}
+
 type AddressGroupAllResp struct {
 	Records []*AddressGroupItem `json:"records"`
 }

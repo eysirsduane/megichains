@@ -263,7 +263,8 @@ const local: App.I18n.Schema = {
     address_list: '地址列表',
     address_group: '地址分组',
     fund: '资金管理',
-    fund_list: '地址余额'
+    fund_list: '地址余额',
+    fund_statistics: '余额统计'
   },
   page: {
     login: {
@@ -570,6 +571,18 @@ const local: App.I18n.Schema = {
       },
       group: {
         title: '分组列表'
+      }
+    },
+    fund: {
+      common: {
+        chain: '链',
+        address: '地址',
+        tron_usdt: '波场USDT',
+        tron_usdc: '波场USDC',
+        bsc_usdt: '币安USDT',
+        bsc_usdc: '币安USDC',
+        eth_usdt: '以太坊USDT',
+        eth_usdc: '以太坊USDC'
       }
     }
   },

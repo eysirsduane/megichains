@@ -252,6 +252,41 @@ type AddressGroupDetailReq {
 	Id int64 `form:"id"`
 }
 
+type AddressFundListReq {
+	Pages
+	Chain   string `form:"chain,optional"`
+	Address string `form:"address,optional"`
+}
+
+type AddressFundListResp {
+	PagesBody
+	Records []*AddressFundItem `json:"records"`
+}
+
+type AddressFundItem {
+	Id       int64   `json:"id"`
+	Chain    string  `json:"chain"`
+	Address  string  `json:"address"`
+	TronUsdt float64 `json:"tron_usdt"`
+	TronUsdc float64 `json:"tron_usdc"`
+	BscUsdt  float64 `json:"bsc_usdt"`
+	BscUsdc  float64 `json:"bsc_usdc"`
+	EthUsdt  float64 `json:"eth_usdt"`
+	EthUsdc  float64 `json:"eth_usdc"`
+	TimeAts
+}
+
+type AddressFundStatisticsReq {}
+
+type AddressFundStatisticsResp {
+	TronUsdt float64 `json:"tron_usdt"`
+	TronUsdc float64 `json:"tron_usdc"`
+	BscUsdt  float64 `json:"bsc_usdt"`
+	BscUsdc  float64 `json:"bsc_usdc"`
+	EthUsdt  float64 `json:"eth_usdt"`
+	EthUsdc  float64 `json:"eth_usdc"`
+}
+
 @server (
 	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
 	// goctl 生成代码时会将当前 service 代码块下的接口
@@ -379,5 +414,24 @@ service backendadmin {
 
 	@handler AddressGroupSaveHandler
 	post /address/group/save (AddressGroupItem) returns (Response)
+}
+
+@server (
+	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
+	// goctl 生成代码时会将当前 service 代码块下的接口
+	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
+	// 等信息配置的 golang 结构体名称
+	jwt: Auth
+	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
+	group: fund
+	// 定义路由前缀为 "/v1"
+	prefix: /v1
+)
+service backendadmin {
+	@handler AddressFundListHandler
+	get /fund/list (AddressFundListReq) returns (AddressFundListResp)
+
+	@handler AddressFundStatisticsHandler
+	get /fund/statistics (AddressFundStatisticsReq) returns (AddressFundStatisticsResp)
 }
 

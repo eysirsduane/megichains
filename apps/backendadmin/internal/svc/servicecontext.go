@@ -17,9 +17,10 @@ type ServiceContext struct {
 	OrderService   *service.MerchOrderService
 	TronService    *service.TronService
 	EvmService     *service.EvmService
+	FundService    *service.FundService
 }
 
-func NewServiceContext(c global.BackendesConfig, excfg *service.RangeConfigService, auth *service.AuthService, user *service.UserService, addr *service.AddressService, order *service.MerchOrderService, tron *service.TronService, evm *service.EvmService) *ServiceContext {
+func NewServiceContext(c global.BackendesConfig, excfg *service.RangeConfigService, auth *service.AuthService, user *service.UserService, addr *service.AddressService, order *service.MerchOrderService, tron *service.TronService, evm *service.EvmService, fund *service.FundService) *ServiceContext {
 	return &ServiceContext{
 		Config:         c,
 		ExcfgService:   excfg,
@@ -29,5 +30,6 @@ func NewServiceContext(c global.BackendesConfig, excfg *service.RangeConfigServi
 		OrderService:   order,
 		TronService:    tron,
 		EvmService:     evm,
+		FundService:    fund,
 	}
 }

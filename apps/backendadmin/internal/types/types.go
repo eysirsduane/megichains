@@ -122,6 +122,7 @@ type EvmLogItem struct {
 	BlockNumber    uint64  `json:"block_number"`
 	BlockTimestamp uint64  `json:"block_timestamp"`
 	Removed        bool    `json:"removed"`
+	TimeAts
 }
 
 type EvmLogListReq struct {

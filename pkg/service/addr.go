@@ -149,7 +149,7 @@ func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq
 }
 
 func (s *AddressService) UseAddress(id int64) (addr *entity.Address, err error) {
-	err = s.db.Where("status = ?", global.AddressTypoVacant).First(&addr).Error
+	err = s.db.Where("status = ?", global.AddressStatusInFree).First(&addr).Error
 	if err != nil {
 		logx.Errorf("db use address failed, id:%v, err:%v", id, err)
 		return
@@ -204,7 +204,7 @@ func (s *AddressService) createEvmAddress(chain string) {
 	addr := &entity.Address{
 		Chain:      chain,
 		Typo:       string(global.AddressTypoIn),
-		Status:     string(global.AddressTypoVacant),
+		Status:     string(global.AddressStatusInFree),
 		Address:    address,
 		PrivateKey: privateKeyHex,
 	}
@@ -242,7 +242,7 @@ func (s *AddressService) createTronAddress(chain string) {
 	addr := &entity.Address{
 		Chain:      chain,
 		Typo:       string(global.AddressTypoIn),
-		Status:     string(global.AddressTypoVacant),
+		Status:     string(global.AddressStatusInFree),
 		Address:    base58Address,
 		Address2:   fmt.Sprintf("%x", address),
 		PrivateKey: fmt.Sprintf("%x", privateKey.Serialize()),

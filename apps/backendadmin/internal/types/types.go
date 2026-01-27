@@ -7,6 +7,50 @@ type AddressDetailReq struct {
 	Id int64 `form:"id,optional"`
 }
 
+type AddressFundCollectLogItem struct {
+	Id             int64   `json:"id"`
+	Chain          string  `json:"chain"`
+	Currency       string  `json:"currency"`
+	Amount         float64 `json:"amount"`
+	Sun            int64   `json:"sun"`
+	Fee            float64 `json:"fee"`
+	FeeSun         int64   `json:"fee_sun"`
+	FromAddress    string  `json:"from_address"`
+	ToAddress      string  `json:"to_address"`
+	TxHash         string  `json:"tx_hash"`
+	Status         string  `json:"status"`
+	AddressGroupId int64   `json:"address_group_id"`
+	TimeAts
+}
+
+type AddressFundCollectLogListReq struct {
+	Pages
+	StartEnd
+	ToAddress      string `form:"to_address,optional"`
+	AddressGroupId int64  `form:"address_group_id,optional"`
+	Chain          string `form:"chain,optional"`
+	Currency       string `form:"currency,optional"`
+	Status         string `form:"status,optional"`
+}
+
+type AddressFundCollectLogListResp struct {
+	Records []*AddressFundCollectLogItem `json:"records"`
+	PagesBody
+}
+
+type AddressFundCollectReq struct {
+	AddressGroupId int64   `json:"address_group_id"`
+	Chain          string  `json:"chain"`
+	Currency       string  `json:"currency"`
+	AmountMin      float64 `json:"amount_min"`
+	FeeMax         float64 `json:"fee_max"`
+	CommandKey     string  `json:"command_key"`
+}
+
+type AddressFundCollectResp struct {
+	Success bool `json:"success"`
+}
+
 type AddressFundItem struct {
 	Id       int64   `json:"id"`
 	Chain    string  `json:"chain"`

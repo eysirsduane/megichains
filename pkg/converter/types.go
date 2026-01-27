@@ -263,3 +263,49 @@ type AddressFundStatisticsResp struct {
 	EthUsdt  float64 `json:"eth_usdt"`
 	EthUsdc  float64 `json:"eth_usdc"`
 }
+
+type AddressFundCollectReq struct {
+	Chain     string  `json:"chain"`
+	Currency  string  `json:"currency"`
+	AmountMin float64 `json:"amount_min"`
+	FeeMax    float64 `json:"fee_max"`
+	GroupId   int64   `json:"group_id"`
+	CommandKey string  `json:"command_key"`
+}
+
+type AddressFundCollectResp struct {
+	Success bool `json:"success"`
+}
+
+type AddressFundCollectLogListReq struct {
+	Pages
+	StartEnd
+	ToAddress      string `form:"to_address,optional"`
+	AddressGroupId int64  `form:"address_group_id,optional"`
+	Chain          string `form:"chain,optional"`
+	Currency       string `form:"currency,optional"`
+	Status         string `form:"status,optional"`
+}
+
+type AddressFundCollectLogItem struct {
+	Id             int64   `json:"id"`
+	AddressGroupId int64   `json:"address_group_id"`
+	Chain          string  `json:"chain"`
+	Currency       string  `json:"currency"`
+	ToAddress      string  `json:"to_address"`
+	AmountMin      float64 `json:"amount_min"`
+	FeeMax         float64 `json:"fee_max"`
+	TronUsdt       float64 `json:"tron_usdt"`
+	TronUsdc       float64 `json:"tron_usdc"`
+	BscUsdt        float64 `json:"bsc_usdt"`
+	BscUsdc        float64 `json:"bsc_usdc"`
+	EthUsdt        float64 `json:"eth_usdt"`
+	EthUsdc        float64 `json:"eth_usdc"`
+	Status         string  `json:"status"`
+	TimeAts
+}
+
+type AddressFundCollectLogListResp struct {
+	PagesBody
+	Records []*AddressFundCollectLogItem `json:"records"`
+}

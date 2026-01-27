@@ -53,6 +53,8 @@ declare module "@elegant-router/types" {
     "function_tab": "/function/tab";
     "function_toggle-auth": "/function/toggle-auth";
     "fund": "/fund";
+    "fund_collectlog": "/fund/collectlog";
+    "fund_collectlogdetail": "/fund/collectlogdetail";
     "fund_list": "/fund/list";
     "fund_statistics": "/fund/statistics";
     "home": "/home";
@@ -196,6 +198,8 @@ declare module "@elegant-router/types" {
     | "function_super-page"
     | "function_tab"
     | "function_toggle-auth"
+    | "fund_collectlog"
+    | "fund_collectlogdetail"
     | "fund_list"
     | "fund_statistics"
     | "home"

@@ -264,7 +264,9 @@ const local: App.I18n.Schema = {
     address_group: '地址分组',
     fund: '资金管理',
     fund_list: '地址余额',
-    fund_statistics: '余额统计'
+    fund_statistics: '余额统计',
+    fund_collectlog: '资金归集',
+    fund_collectlogdetail: '归集明细'
   },
   page: {
     login: {
@@ -582,7 +584,19 @@ const local: App.I18n.Schema = {
         bsc_usdt: '币安USDT',
         bsc_usdc: '币安USDC',
         eth_usdt: '以太坊USDT',
-        eth_usdc: '以太坊USDC'
+        eth_usdc: '以太坊USDC',
+        group: '分组',
+        to_address: '归集地址',
+        currency: '币种',
+        status: '状态',
+        amount_min: '最小金额',
+        fee_max: '最大手续费',
+        address_group: '分组',
+        command_key: '口令密钥'
+      },
+      collectlog: {
+        title: '资金归集列表',
+        detail: '归集明细'
       }
     }
   },

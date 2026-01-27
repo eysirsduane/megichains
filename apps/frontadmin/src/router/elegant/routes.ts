@@ -255,9 +255,28 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'fund',
       i18nKey: 'route.fund',
-      order: 3
+      order: 3,
+      icon: 'simple-icons:apacheecharts'
     },
     children: [
+      {
+        name: 'fund_collectlog',
+        path: '/fund/collectlog',
+        component: 'view.fund_collectlog',
+        meta: {
+          title: 'fund_collectlog',
+          i18nKey: 'route.fund_collectlog'
+        }
+      },
+      {
+        name: 'fund_collectlogdetail',
+        path: '/fund/collectlogdetail',
+        component: 'view.fund_collectlogdetail',
+        meta: {
+          title: 'fund_collectlogdetail',
+          i18nKey: 'route.fund_collectlogdetail'
+        }
+      },
       {
         name: 'fund_list',
         path: '/fund/list',
@@ -273,7 +292,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.fund_statistics',
         meta: {
           title: 'fund_statistics',
-          i18nKey: 'route.fund_statistics'
+          i18nKey: 'route.fund_statistics',
+          icon: 'mdi:chart-areaspline'
         }
       }
     ]

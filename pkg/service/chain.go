@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"crypto/ecdsa"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -10,6 +11,8 @@ import (
 	"fmt"
 	"io"
 	"math/big"
+	"megichains/pkg/biz"
+	"megichains/pkg/converter"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
 	"net/http"
@@ -20,6 +23,8 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/gorm"
@@ -76,10 +81,10 @@ func (s *ChainService) ScanAddressesFunds() {
 	for _, addr := range addrs {
 		switch global.ChainName(addr.Chain) {
 		case global.ChainNameEvm:
-			s.evmFunds(addr.Address, global.ChainNameBsc)
-			s.evmFunds(addr.Address, global.ChainNameEth)
+			s.EvmFunds(addr.Address, global.ChainNameBsc)
+			s.EvmFunds(addr.Address, global.ChainNameEth)
 		case global.ChainNameTron:
-			s.tronFunds(addr.Address)
+			s.TronFunds(addr.Address)
 		default:
 			logx.Errorf("scan addresses funds found unknown chain, chain:%v", addr.Chain)
 		}
@@ -88,7 +93,7 @@ func (s *ChainService) ScanAddressesFunds() {
 	}
 }
 
-func (s *ChainService) evmFunds(addr string, chain global.ChainName) {
+func (s *ChainService) EvmFunds(addr string, chain global.ChainName) {
 	address := common.HexToAddress(addr)
 
 	taddr, err := s.getContractAddress(global.CurrencyTypoUsdt, string(chain))
@@ -119,7 +124,7 @@ func (s *ChainService) evmFunds(addr string, chain global.ChainName) {
 	s.updateDB(addr, chain, usdt, usdc)
 }
 
-func (s *ChainService) tronFunds(addr string) {
+func (s *ChainService) TronFunds(addr string) {
 	taddr, err := s.getContractAddress(global.CurrencyTypoUsdt, string(global.ChainNameTron))
 	if err != nil {
 		logx.Errorf("tron fund get usdc contract address failed, err:%v", err)
@@ -327,4 +332,154 @@ func (s *ChainService) ERC20Balance(chain global.ChainName, token common.Address
 	}
 
 	return outputs[0].(*big.Int), nil
+}
+
+func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.AddressFundCollectReq) (resp *converter.AddressFundCollectResp, err error) {
+	log := &entity.AddressFundCollectLog{
+		UserId:         uid,
+		AddressGroupId: req.GroupId,
+		Chain:          req.Chain,
+		Currency:       req.Currency,
+		AmountMin:      req.AmountMin,
+		FeeMax:         req.FeeMax,
+	}
+
+	err = gorm.G[entity.AddressFundCollectLog](s.db).Create(ctx, log)
+	if err != nil {
+		logx.Errorf("address fund collect log create failed, err:%v", err)
+		err = biz.AddressFundCollectLogCreateFailed
+		return
+	}
+
+	chain := global.ChainName(req.Chain)
+	currency := global.CurrencyTypo(req.Currency)
+	switch chain {
+	case global.ChainNameBsc, global.ChainNameEth:
+		err = s.EvmCollect(ctx, log, chain, currency, req.AmountMin, req.FeeMax, req.GroupId)
+	case global.ChainNameTron:
+		err = s.TronCollect(currency, req.AmountMin, req.FeeMax, req.GroupId)
+	default:
+		logx.Errorf("collect found unknown chain, chain:%v", chain)
+		err = biz.AddressFundCollectUnknownChain
+	}
+
+	return
+}
+
+func (s *ChainService) EvmCollect(ctx context.Context, log *entity.AddressFundCollectLog, chain global.ChainName, currency global.CurrencyTypo, amin, fmax float64, gid int64) (err error) {
+	var cli *ethclient.Client
+	switch chain {
+	case global.ChainNameBsc:
+		cli, _ = s.newEvmClient(global.ChainNameBsc)
+	case global.ChainNameEth:
+		cli, _ = s.newEvmClient(global.ChainNameEth)
+	}
+	defer cli.Close()
+
+	receiver, err := gorm.G[entity.Address](s.db).Where("chain = ? and typo = ?", global.ChainNameEvm, global.AddressTypoCollect).First(ctx)
+	if err != nil {
+		logx.Errorf("evm collect get receiver address failed, chain:%v, err:%v", chain, err)
+		return
+	}
+
+	from, err := gorm.G[entity.Address](s.db).Where("chain = ? and typo = ?", global.ChainNameEvm, global.AddressTypoIn).First(ctx)
+	if err != nil {
+		logx.Errorf("evm collect get from address failed, chain:%v, err:%v", chain, err)
+		return
+	}
+
+	privateKey, err := crypto.HexToECDSA(from.PrivateKey)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	publicKey := privateKey.Public()
+	publicKeyECDSA := publicKey.(*ecdsa.PublicKey)
+	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
+
+	// 3. 获取 nonce
+	nonce, err := cli.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// 4. USDC 合约地址
+	usdcAddress := common.HexToAddress("0x64544969ed7EBf5f083679233325356EbE738930")
+
+	// 5. 接收地址
+	toAddress := common.HexToAddress(receiver.Address)
+
+	camount := 0.1
+	// 6. 转账金额（10 USDC）
+	sun := global.Sun(camount, global.AmountTypoBsc)
+	amount := new(big.Int)
+	amount.SetString(fmt.Sprintf("%v", sun), 10) // 10 * 1e18
+
+	// 7. ABI 编码 transfer 方法
+	erc20ABI := `[{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],
+	"name":"transfer","outputs":[{"name":"","type":"bool"}],"type":"function"}]`
+
+	parsedABI, err := abi.JSON(strings.NewReader(erc20ABI))
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	data, err := parsedABI.Pack("transfer", toAddress, amount)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// 8. Gas 设置
+	gasLimit := uint64(60000)
+	gasPrice, err := cli.SuggestGasPrice(context.Background())
+	if err != nil {
+		fmt.Println(err)
+	}
+	tx := types.NewTransaction(
+		nonce,
+		usdcAddress, // to = 合约地址
+		big.NewInt(0),
+		gasLimit,
+		gasPrice,
+		data,
+	)
+
+	chainID := big.NewInt(97)
+	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainID), privateKey)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	err = cli.SendTransaction(ctx, signedTx)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	switch chain {
+	case global.ChainNameBsc:
+		switch currency {
+		case global.CurrencyTypoUsdt:
+			log.BscUsdt += camount
+		case global.CurrencyTypoUsdc:
+			log.BscUsdc += camount
+		}
+	case global.ChainNameEth:
+		switch currency {
+		case global.CurrencyTypoUsdt:
+			log.BscUsdt += camount
+		case global.CurrencyTypoUsdc:
+			log.BscUsdc += camount
+		}
+	}
+
+	_, err = gorm.G[entity.AddressFundCollectLog](s.db).Updates(ctx, *log)
+	if err != nil {
+		logx.Errorf("address fund collect log updates failed, err:%v", err)
+	}
+
+	return
+}
+
+func (s *ChainService) TronCollect(currency global.CurrencyTypo, amin, fmax float64, gid int64) (err error) {
+	return
 }

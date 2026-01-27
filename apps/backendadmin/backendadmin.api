@@ -288,6 +288,50 @@ type AddressFundStatisticsResp {
 	EthUsdc  float64 `json:"eth_usdc"`
 }
 
+type AddressFundCollectReq {
+	AddressGroupId int64   `json:"address_group_id"`
+	Chain          string  `json:"chain"`
+	Currency       string  `json:"currency"`
+	AmountMin      float64 `json:"amount_min"`
+	FeeMax         float64 `json:"fee_max"`
+	CommandKey     string  `json:"command_key"`
+}
+
+type AddressFundCollectResp {
+	Success bool `json:"success"`
+}
+
+type AddressFundCollectLogListReq {
+	Pages
+	StartEnd
+	ToAddress      string `form:"to_address,optional"`
+	AddressGroupId int64  `form:"address_group_id,optional"`
+	Chain          string `form:"chain,optional"`
+	Currency       string `form:"currency,optional"`
+	Status         string `form:"status,optional"`
+}
+
+type AddressFundCollectLogListResp {
+	Records []*AddressFundCollectLogItem `json:"records"`
+	PagesBody
+}
+
+type AddressFundCollectLogItem {
+	Id             int64   `json:"id"`
+	Chain          string  `json:"chain"`
+	Currency       string  `json:"currency"`
+	Amount         float64 `json:"amount"`
+	Sun            int64   `json:"sun"`
+	Fee            float64 `json:"fee"`
+	FeeSun         int64   `json:"fee_sun"`
+	FromAddress    string  `json:"from_address"`
+	ToAddress      string  `json:"to_address"`
+	TxHash         string  `json:"tx_hash"`
+	Status         string  `json:"status"`
+	AddressGroupId int64   `json:"address_group_id"`
+	TimeAts
+}
+
 @server (
 	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
 	// goctl 生成代码时会将当前 service 代码块下的接口
@@ -434,5 +478,11 @@ service backendadmin {
 
 	@handler AddressFundStatisticsHandler
 	get /fund/statistics (AddressFundStatisticsReq) returns (AddressFundStatisticsResp)
+
+	@handler AddressFundCollectLogListHandler
+	get /fund/collect/log/list (AddressFundCollectLogListReq) returns (AddressFundCollectLogListResp)
+
+	@handler AddressFundCollectHandler
+	post /fund/collect (AddressFundCollectReq) returns (AddressFundCollectResp)
 }
 

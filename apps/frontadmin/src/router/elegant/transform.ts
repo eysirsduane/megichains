@@ -199,6 +199,8 @@ const routeMap: RouteMap = {
   "function_tab": "/function/tab",
   "function_toggle-auth": "/function/toggle-auth",
   "fund": "/fund",
+  "fund_collectlog": "/fund/collectlog",
+  "fund_collectlogdetail": "/fund/collectlogdetail",
   "fund_list": "/fund/list",
   "fund_statistics": "/fund/statistics",
   "home": "/home",

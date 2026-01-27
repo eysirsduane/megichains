@@ -14,3 +14,19 @@ export function fetchGetAddressFundStatistics() {
     method: 'get'
   });
 }
+
+export function fetchGetAddressFundLogList(params?: Api.Fund.AddressFundCollectLogSearchParams) {
+  return request<Api.Fund.AddressFundCollectLogList>({
+    url: '/fund/collect/log/list',
+    method: 'get',
+    params
+  });
+}
+
+export function postCollectAddressFund(params?: Api.Fund.AddressFundCollect) {
+  return request<Api.Fund.AddressFundCollectLogList>({
+    url: '/fund/collect',
+    method: 'post',
+    params
+  });
+}

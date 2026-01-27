@@ -51,6 +51,11 @@ declare namespace Api {
       /** record status */
     } & T;
 
+    type CommonPureRecord<T = any> = {
+      /** record id */
+      id: number;
+    } & T;
+
     type EnableStatus = '1' | '2';
     type OrderTypos = '' | '输入';
     type CurrencyTypos = '' | 'USDT' | 'USDC';

@@ -21,6 +21,6 @@ type TronAccountResource struct {
 }
 
 type UserInfo struct {
-	Id       int64
+	Id       string
 	Username string
 }

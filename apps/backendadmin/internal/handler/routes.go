@@ -98,6 +98,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				Method:  http.MethodPost,
+				Path:    "/fund/collect",
+				Handler: fund.AddressFundCollectHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/fund/collect/log/list",
+				Handler: fund.AddressFundCollectLogListHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodGet,
 				Path:    "/fund/list",
 				Handler: fund.AddressFundListHandler(serverCtx),

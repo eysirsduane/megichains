@@ -759,6 +759,18 @@ declare namespace App {
             bsc_usdc: string;
             eth_usdt: string;
             eth_usdc: string;
+            to_address: string;
+            group: string;
+            status: string;
+            currency: string;
+            address_group: string;
+            amount_min: string;
+            fee_max: string;
+            command_key: string;
+          };
+          collectlog: {
+            title: string;
+            detail: string;
           };
         };
       };

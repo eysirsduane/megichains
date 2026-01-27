@@ -42,11 +42,12 @@ type ListenService struct {
 	Receivers    sync.Map
 	addrservice  *AddressService
 	orderservice *MerchOrderService
+	chainservie  *ChainService
 	evmservice   *EvmService
 	tronservice  *TronService
 }
 
-func NewListenService(cfg *global.BackendesConfig, db *gorm.DB, addrservice *AddressService, orderservice *MerchOrderService, evmservice *EvmService, tronservice *TronService) *ListenService {
+func NewListenService(cfg *global.BackendesConfig, db *gorm.DB, addrservice *AddressService, orderservice *MerchOrderService, chainservie *ChainService, evmservice *EvmService, tronservice *TronService) *ListenService {
 	return &ListenService{
 		db:           db,
 		cfg:          cfg,
@@ -54,6 +55,7 @@ func NewListenService(cfg *global.BackendesConfig, db *gorm.DB, addrservice *Add
 		Receivers:    sync.Map{},
 		addrservice:  addrservice,
 		orderservice: orderservice,
+		chainservie:  chainservie,
 		evmservice:   evmservice,
 		tronservice:  tronservice,
 	}
@@ -409,6 +411,8 @@ func (s *ListenService) listenEvm(chain global.ChainName, currency, moid, receiv
 			err = biz.EvmOrderSaveFailed
 			return
 		}
+
+		s.chainservie.EvmFunds(receiver, chain)
 	}
 }
 
@@ -479,6 +483,8 @@ func (s *ListenService) listenTron(chain global.ChainName, currency global.Curre
 			err = biz.TronOrderSaveFailed
 			return
 		}
+
+		s.chainservie.TronFunds(receiver)
 	}
 }
 

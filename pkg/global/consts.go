@@ -15,9 +15,9 @@ const (
 type AddressStatus string
 
 const (
-	AddressTypoCreated AddressStatus = "禁用"
-	AddressTypoInUse   AddressStatus = "空闲"
-	AddressTypoVacant  AddressStatus = "占用"
+	AddressStatusBaned  AddressStatus = "禁用"
+	AddressStatusInUse  AddressStatus = "占用"
+	AddressStatusInFree AddressStatus = "空闲"
 )
 
 type OrderTypo string
@@ -39,7 +39,7 @@ const (
 	ChainNameTron   ChainName = "TRON"
 	ChainNameEth    ChainName = "ETH"
 	ChainNameBsc    ChainName = "BSC"
-	ChainNameEvm ChainName = "EVM"
+	ChainNameEvm    ChainName = "EVM"
 	ChainNameSolana ChainName = "SOLANA"
 )
 

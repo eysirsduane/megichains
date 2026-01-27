@@ -65,3 +65,10 @@ var (
 	TronTransactionFindFailed  = NewSpecificError(8004, "Tron订单通知失败")
 	TronTransactionCountFailed = NewSpecificError(8005, "Tron订单总数统计失败")
 )
+
+var (
+	AddressFundCollectUnknownChain   = NewSpecificError(901, "地址资金归集未知的链")
+	AddressFundCollectLogFindFailed  = NewSpecificError(902, "地址资金归集日志查询失败")
+	AddressFundCollectLogCountFailed = NewSpecificError(903, "地址资金归集日志统计失败")
+	AddressFundCollectLogCreateFailed = NewSpecificError(904, "地址资金归集日志创建失败")
+)

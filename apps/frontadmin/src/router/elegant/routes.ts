@@ -301,7 +301,6 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'fund_statistics',
           i18nKey: 'route.fund_statistics',
           icon: 'mdi:chart-areaspline',
-          keepAlive: true
         }
       }
     ]

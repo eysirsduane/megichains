@@ -58,7 +58,8 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'address',
       i18nKey: 'route.address',
       icon: 'ant-design:exception-outlined',
-      order: 3
+      order: 3,
+      keepAlive: true
     },
     children: [
       {
@@ -68,7 +69,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'address_group',
           i18nKey: 'route.address_group',
-          icon: 'ep:element-plus'
+          icon: 'ep:element-plus',
+          keepAlive: true
         }
       },
       {
@@ -78,7 +80,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'address_list',
           i18nKey: 'route.address_list',
-          icon: 'mdi:file-document-multiple-outline'
+          icon: 'mdi:file-document-multiple-outline',
+          keepAlive: true
         }
       }
     ]
@@ -256,7 +259,8 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'fund',
       i18nKey: 'route.fund',
       order: 3,
-      icon: 'simple-icons:apacheecharts'
+      icon: 'simple-icons:apacheecharts',
+      keepAlive: true
     },
     children: [
       {
@@ -265,7 +269,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.fund_collectlog',
         meta: {
           title: 'fund_collectlog',
-          i18nKey: 'route.fund_collectlog'
+          i18nKey: 'route.fund_collectlog',
+          keepAlive: true
         }
       },
       {
@@ -274,7 +279,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.fund_collectlogdetail',
         meta: {
           title: 'fund_collectlogdetail',
-          i18nKey: 'route.fund_collectlogdetail'
+          i18nKey: 'route.fund_collectlogdetail',
+          keepAlive: true
         }
       },
       {
@@ -283,7 +289,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.fund_list',
         meta: {
           title: 'fund_list',
-          i18nKey: 'route.fund_list'
+          i18nKey: 'route.fund_list',
+          keepAlive: true
         }
       },
       {
@@ -293,7 +300,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'fund_statistics',
           i18nKey: 'route.fund_statistics',
-          icon: 'mdi:chart-areaspline'
+          icon: 'mdi:chart-areaspline',
+          keepAlive: true
         }
       }
     ]
@@ -480,7 +488,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'order_evm',
           i18nKey: 'route.order_evm',
           icon: 'carbon:network-overlay',
-          order: 2
+          order: 2,
+          keepAlive: true
         }
       },
       {
@@ -491,7 +500,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'order_list',
           i18nKey: 'route.order_list',
           icon: 'material-symbols:route',
-          order: 1
+          order: 1,
+          keepAlive: true
         }
       },
       {
@@ -502,7 +512,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'order_tron',
           i18nKey: 'route.order_tron',
           icon: 'carbon:network-overlay',
-          order: 3
+          order: 3,
+          keepAlive: true
         }
       }
     ]

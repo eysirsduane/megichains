@@ -12,16 +12,16 @@ import (
 	"megichains/apps/backendadmin/internal/types"
 )
 
-func AddressFundCollectLogListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func AddressFundCollectListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.AddressFundCollectLogListReq
+		var req types.AddressFundCollectListReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := fund.NewAddressFundCollectLogListLogic(r.Context(), svcCtx)
-		resp, err := l.AddressFundCollectLogList(&req)
+		l := fund.NewAddressFundCollectListLogic(r.Context(), svcCtx)
+		resp, err := l.AddressFundCollectList(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

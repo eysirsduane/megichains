@@ -15,18 +15,18 @@ export function fetchGetAddressFundStatistics() {
   });
 }
 
-export function fetchGetAddressFundLogList(params?: Api.Fund.AddressFundCollectLogSearchParams) {
-  return request<Api.Fund.AddressFundCollectLogList>({
-    url: '/fund/collect/log/list',
+export function fetchGetAddressFundLogList(params?: Api.Fund.AddressFundCollectListSearchParams) {
+  return request<Api.Fund.AddressFundCollectList>({
+    url: '/fund/collect/list',
     method: 'get',
     params
   });
 }
 
-export function postCollectAddressFund(params?: Api.Fund.AddressFundCollect) {
-  return request<Api.Fund.AddressFundCollectLogList>({
+export function postCollectAddressFund(params?: Api.Fund.AddressFundCollectCreating) {
+  return request<Api.Fund.AddressFundCollectList>({
     url: '/fund/collect',
     method: 'post',
-    params
+    data: params
   });
 }

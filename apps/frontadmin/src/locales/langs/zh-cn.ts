@@ -263,10 +263,9 @@ const local: App.I18n.Schema = {
     address_list: '地址列表',
     address_group: '地址分组',
     fund: '资金管理',
-    fund_list: '地址余额',
     fund_statistics: '余额统计',
-    fund_collectlog: '资金归集',
-    fund_collectlogdetail: '归集明细'
+    fund_collect: '资金归集',
+    fund_collectdetail: '归集明细'
   },
   page: {
     login: {
@@ -592,9 +591,14 @@ const local: App.I18n.Schema = {
         amount_min: '最小金额',
         fee_max: '最大手续费',
         address_group: '分组',
-        command_key: '口令密钥'
+        command_key: '口令密钥',
+        success_amount: '成功金额',
+        total_count: '总数',
+        success_count: '成功数',
+        description: '描述',
+        collect_amount_min: '归集最小金额'
       },
-      collectlog: {
+      collect: {
         title: '资金归集列表',
         detail: '归集明细'
       }

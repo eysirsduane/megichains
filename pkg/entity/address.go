@@ -12,6 +12,13 @@ type Address struct {
 	PrivateKey string `gorm:"size:2047"`
 	PublicKey  string `gorm:"size:2047"`
 
+	TronUsdt float64 `gorm:""`
+	TronUsdc float64 `gorm:""`
+	BscUsdt  float64 `gorm:""`
+	BscUsdc  float64 `gorm:""`
+	EthUsdt  float64 `gorm:""`
+	EthUsdc  float64 `gorm:""`
+
 	Description string `gorm:"size:2047"`
 
 	TimeAts

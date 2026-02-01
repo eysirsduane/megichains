@@ -264,33 +264,23 @@ export const generatedRoutes: GeneratedRoute[] = [
     },
     children: [
       {
-        name: 'fund_collectlog',
-        path: '/fund/collectlog',
-        component: 'view.fund_collectlog',
+        name: 'fund_collect',
+        path: '/fund/collect',
+        component: 'view.fund_collect',
         meta: {
-          title: 'fund_collectlog',
-          i18nKey: 'route.fund_collectlog',
-          keepAlive: true
+          title: 'fund_collect',
+          i18nKey: 'route.fund_collect',
+          order: 2,
         }
       },
       {
-        name: 'fund_collectlogdetail',
-        path: '/fund/collectlogdetail',
-        component: 'view.fund_collectlogdetail',
+        name: 'fund_collectdetail',
+        path: '/fund/collectdetail',
+        component: 'view.fund_collectdetail',
         meta: {
-          title: 'fund_collectlogdetail',
-          i18nKey: 'route.fund_collectlogdetail',
-          keepAlive: true
-        }
-      },
-      {
-        name: 'fund_list',
-        path: '/fund/list',
-        component: 'view.fund_list',
-        meta: {
-          title: 'fund_list',
-          i18nKey: 'route.fund_list',
-          keepAlive: true
+          title: 'fund_collectdetail',
+          i18nKey: 'route.fund_collectdetail',
+          order: 3,
         }
       },
       {
@@ -301,6 +291,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'fund_statistics',
           i18nKey: 'route.fund_statistics',
           icon: 'mdi:chart-areaspline',
+          order: 1
         }
       }
     ]

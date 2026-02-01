@@ -87,6 +87,12 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       }
     },
     { prop: 'address', label: $t('page.address.common.address'), width: 400 },
+    { prop: 'tron_usdt', label: $t('page.fund.common.tron_usdt'), width: 200 },
+    { prop: 'tron_usdc', label: $t('page.fund.common.tron_usdc'), width: 200 },
+    { prop: 'bsc_usdt', label: $t('page.fund.common.bsc_usdt'), width: 200 },
+    { prop: 'bsc_usdc', label: $t('page.fund.common.bsc_usdc'), width: 200 },
+    { prop: 'eth_usdt', label: $t('page.fund.common.eth_usdt'), width: 200 },
+    { prop: 'eth_usdc', label: $t('page.fund.common.eth_usdc'), width: 200 },
     { prop: 'address2', label: $t('page.address.common.address2'), width: 400 },
     {
       prop: 'updated_at',

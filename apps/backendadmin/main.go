@@ -4,8 +4,10 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"net/http"
 
 	"megichains/pkg/biz"
 	"megichains/pkg/entity"
@@ -38,7 +40,18 @@ func main() {
 	}
 
 	cfg.RestConf.Port = 7001
-	server := rest.MustNewServer(cfg.RestConf)
+	server := rest.MustNewServer(cfg.RestConf, rest.WithUnauthorizedCallback(func(w http.ResponseWriter, r *http.Request, err error) {
+		resp := biz.Response{
+			Code: 401,
+			Msg:  "登录状态失效，请重新登录",
+			Data: nil,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+
+		_ = json.NewEncoder(w).Encode(resp)
+	}))
 	defer server.Stop()
 
 	excfgservice := service.NewRangeConfigService(db)

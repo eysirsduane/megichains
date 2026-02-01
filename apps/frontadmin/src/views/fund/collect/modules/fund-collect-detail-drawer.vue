@@ -14,7 +14,7 @@ const targetId = defineModel<number>('targetId', {
 });
 
 type Model = Pick<
-  Api.Fund.AddressFundCollect,
+  Api.Fund.AddressFundCollectCreating,
   'id' | 'address_group_id' | 'chain' | 'currency' | 'status' | 'amount_min' | 'fee_max' | 'secret_key' | 'description'
 >;
 
@@ -27,8 +27,8 @@ function createDefaultModel(): Model {
     chain: '',
     currency: '',
     status: '',
-    amount_min: 0,
-    fee_max: 0,
+    amount_min: 0.0,
+    fee_max: 0.0,
     secret_key: '',
     description: ''
   };
@@ -100,7 +100,7 @@ watch(visible, async () => {
 </script>
 
 <template>
-  <ElDrawer v-model="visible" :title="$t('page.fund.collectlog.detail')" :size="500">
+  <ElDrawer v-model="visible" :title="$t('page.fund.collect.detail')" :size="500">
     <ElForm :model="model" label-position="top">
       <ElFormItem :label="$t('common.id')" prop="id">
         <ElInput v-model="model.id" disabled />
@@ -120,11 +120,11 @@ watch(visible, async () => {
           <ElOption v-for="item in currencys" :key="item.value" :label="item.label" :value="item.value"></ElOption>
         </ElSelect>
       </ElFormItem>
-      <ElFormItem :label="$t('page.fund.common.amount_min')" prop="amount_min">
-        <ElInput v-model.number="model.amount_min" />
+      <ElFormItem :label="$t('page.fund.common.collect_amount_min')" prop="amount_min">
+        <ElInputNumber v-model.number="model.amount_min" />
       </ElFormItem>
       <ElFormItem :label="$t('page.fund.common.fee_max')" prop="fee_max">
-        <ElInput v-model.number="model.fee_max" />
+        <ElInputNumber v-model.number="model.fee_max" />
       </ElFormItem>
       <ElFormItem :label="$t('page.fund.common.command_key')" prop="secret_key">
         <ElInput v-model="model.secret_key" />

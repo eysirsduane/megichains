@@ -104,8 +104,8 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodGet,
-				Path:    "/fund/collect/log/list",
-				Handler: fund.AddressFundCollectLogListHandler(serverCtx),
+				Path:    "/fund/collect/list",
+				Handler: fund.AddressFundCollectListHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,

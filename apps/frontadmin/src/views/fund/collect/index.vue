@@ -1,24 +1,28 @@
 <script setup lang="tsx">
-import { reactive } from 'vue';
-import { fetchGetAddressFundList } from '@/service/api';
+import { reactive, ref } from 'vue';
+import { useBoolean } from '@sa/hooks';
+import { fetchGetAddressFundLogList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
-import AddressFundSearch from './modules/address-fund-search.vue';
-// import AddressFundDetailDrawer from './modules/address-fund-detail-drawer.vue';
+import AddressFundSearch from './modules/fund-collect-search.vue';
+import AddressFundCollectDetailDrawer from './modules/fund-collect-detail-drawer.vue';
 
-defineOptions({ name: 'AddressList' });
+defineOptions({ name: 'AddressFundCollectLogList' });
 
 const searchParams = reactive(getInitSearchParams());
 
-function getInitSearchParams(): Api.Address.AddressSearchParams {
+function getInitSearchParams(): Api.Fund.AddressFundCollectListSearchParams {
   return {
     current: 1,
     size: 20,
     start: 0,
     end: 0,
-    address: '',
-    chain: ''
+    to_address: '',
+    chain: '',
+    status: '',
+    currency: '',
+    address_group_id: 0
   };
 }
 
@@ -27,7 +31,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     currentPage: searchParams.current,
     pageSize: searchParams.size
   },
-  api: () => fetchGetAddressFundList(searchParams),
+  api: () => fetchGetAddressFundLogList(searchParams),
   transform: response => {
     return defaultSearchform(response);
   },
@@ -39,13 +43,16 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     // { prop: 'selection', type: 'selection', width: 48 },
     { prop: 'id', type: 'id', label: $t('common.id'), width: 100 },
     { prop: 'chain', label: $t('page.fund.common.chain'), width: 80 },
-    { prop: 'address', label: $t('page.fund.common.address'), width: 400 },
-    { prop: 'tron_usdt', label: $t('page.fund.common.tron_usdt'), width: 200 },
-    { prop: 'tron_usdc', label: $t('page.fund.common.tron_usdc'), width: 200 },
-    { prop: 'bsc_usdt', label: $t('page.fund.common.bsc_usdt'), width: 200 },
-    { prop: 'bsc_usdc', label: $t('page.fund.common.bsc_usdc'), width: 200 },
-    { prop: 'eth_usdt', label: $t('page.fund.common.eth_usdt'), width: 200 },
-    { prop: 'eth_usdc', label: $t('page.fund.common.eth_usdc'), width: 200 },
+    { prop: 'address_group_name', label: $t('page.fund.common.group'), width: 80 },
+    { prop: 'currency', label: $t('page.fund.common.currency'), width: 80 },
+    { prop: 'status', label: $t('page.fund.common.status'), width: 80 },
+    { prop: 'receiver_address', label: $t('page.fund.common.to_address'), width: 400 },
+    { prop: 'success_amount', label: $t('page.fund.common.success_amount'), width: 200 },
+    { prop: 'total_count', label: $t('page.fund.common.total_count'), width: 200 },
+    { prop: 'success_count', label: $t('page.fund.common.success_count'), width: 200 },
+    { prop: 'amount_min', label: $t('page.fund.common.collect_amount_min'), width: 200 },
+    { prop: 'fee_max', label: $t('page.fund.common.fee_max'), width: 200 },
+    { prop: 'description', label: $t('page.fund.common.description'), width: 200 },
     {
       prop: 'updated_at',
       label: $t('common.updated_at'),
@@ -68,6 +75,15 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
 function resetSearchParams() {
   Object.assign(searchParams, getInitSearchParams());
 }
+
+const targetId = ref(0);
+
+const { bool: drawerVisible, setTrue: openDrawer } = useBoolean();
+
+function add() {
+  targetId.value = 0;
+  openDrawer();
+}
 </script>
 
 <template>
@@ -76,12 +92,13 @@ function resetSearchParams() {
     <ElCard class="card-wrapper sm:flex-1-hidden" body-class="ht50">
       <template #header>
         <div class="flex items-center justify-between">
-          <p>{{ $t('page.address.list.title') }}</p>
+          <p>{{ $t('page.fund.collect.title') }}</p>
           <TableHeaderOperation
             v-model:columns="columnChecks"
             :disabled-delete="true"
             :disabled-add="true"
             :loading="loading"
+            @add="add"
             @refresh="getData"
           />
         </div>
@@ -108,7 +125,7 @@ function resetSearchParams() {
           @size-change="mobilePagination['size-change']"
         />
       </div>
-      <!-- <AddressFundDetailDrawer v-model:visible="drawerVisible" :target-id="targetId" @saved="getDataByPage" /> -->
+      <AddressFundCollectDetailDrawer v-model:visible="drawerVisible" :target-id="targetId" @saved="getDataByPage" />
     </ElCard>
   </div>
 </template>

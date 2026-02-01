@@ -25,7 +25,7 @@ declare namespace Api {
       eth_usdc: number;
     }>;
 
-    type AddressFundCollectLog = Common.CommonRecord<{
+    type AddressFundCollect = Common.CommonRecord<{
       address_group_id: number;
       chain: string;
       currency: string;
@@ -42,7 +42,7 @@ declare namespace Api {
       description: string;
     }>;
 
-    type AddressFundCollect = Common.CommonPureRecord<{
+    type AddressFundCollectCreating = Common.CommonPureRecord<{
       address_group_id: number;
       chain: string;
       currency: string;
@@ -57,13 +57,13 @@ declare namespace Api {
     type AddressFundSearchParams = CommonType.RecordNullable<
       Pick<Api.Fund.AddressFund, 'address' | 'chain' | 'id'> & Api.Common.CommonTimeSearchParams
     >;
-    type AddressFundCollectLogSearchParams = CommonType.RecordNullable<
-      Pick<Api.Fund.AddressFundCollectLog, 'to_address' | 'address_group_id' | 'chain' | 'currency' | 'status'> &
+    type AddressFundCollectListSearchParams = CommonType.RecordNullable<
+      Pick<Api.Fund.AddressFundCollect, 'to_address' | 'address_group_id' | 'chain' | 'currency' | 'status'> &
         Api.Common.CommonTimeSearchParams
     >;
 
     /** user list */
     type AddressFundList = Common.PaginatingQueryRecord<AddressFund>;
-    type AddressFundCollectLogList = Common.PaginatingQueryRecord<AddressFundCollectLog>;
+    type AddressFundCollectList = Common.PaginatingQueryRecord<AddressFundCollect>;
   }
 }

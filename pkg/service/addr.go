@@ -103,7 +103,7 @@ func (s *AddressService) GroupFind(ctx context.Context, req *converter.AddressGr
 }
 
 func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq) (resp *converter.RespConverter[converter.AddressWithGroup], err error) {
-	db := s.db.Model(&entity.Address{}).Order("id asc")
+	db := s.db.Model(&entity.Address{})
 	if req.Address != "" {
 		db = db.Where("address = ?", req.Address)
 	}
@@ -129,7 +129,7 @@ func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq
 		db = db.Where("created_at <= ?", req.End)
 	}
 	items := make([]converter.AddressWithGroup, 0, req.Size)
-	err = db.Session(&gorm.Session{}).Select("addresses.id, addresses.group_id, addresses.chain, addresses.typo, addresses.status, addresses.address, addresses.address2, addresses.updated_at, addresses.created_at, address_groups.name as group_name").Joins("left join address_groups on addresses.group_id = address_groups.id").Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Scan(&items).Error
+	err = db.Session(&gorm.Session{}).Debug().Joins("left join address_groups on addresses.group_id = address_groups.id").Order("addresses.tron_usdt desc NULLS LAST, addresses.bsc_usdt desc NULLS LAST, addresses.eth_usdt desc NULLS LAST").Select("addresses.id, addresses.group_id, addresses.chain, addresses.typo, addresses.status, addresses.address, addresses.address2, addresses.updated_at, addresses.created_at, address_groups.name as group_name, addresses.tron_usdt, addresses.tron_usdc, addresses.bsc_usdt, addresses.bsc_usdc, addresses.eth_usdt, addresses.eth_usdc").Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Scan(&items).Error
 	if err != nil {
 		logx.Errorf("address list find failed, err:%v", err)
 		err = biz.AddressFindFailed

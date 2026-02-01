@@ -184,6 +184,12 @@ type AddressItem struct {
 	Status      string
 	Address     string
 	Address2    string
+	TronUsdt    float64
+	TronUsdc    float64
+	BscUsdt     float64
+	BscUsdc     float64
+	EthUsdt     float64
+	EthUsdc     float64
 	Description string
 	TimeAts
 }
@@ -265,19 +271,19 @@ type AddressFundStatisticsResp struct {
 }
 
 type AddressFundCollectReq struct {
-	Chain     string  `json:"chain"`
-	Currency  string  `json:"currency"`
-	AmountMin float64 `json:"amount_min"`
-	FeeMax    float64 `json:"fee_max"`
-	GroupId   int64   `json:"group_id"`
-	CommandKey string  `json:"command_key"`
+	Chain          string  `json:"chain"`
+	Currency       string  `json:"currency"`
+	AmountMin      float64 `json:"amount_min"`
+	FeeMax         float64 `json:"fee_max"`
+	AddressGroupId int64   `json:"address_group_id"`
+	SecretKey      string  `json:"secret_key"`
 }
 
 type AddressFundCollectResp struct {
 	Success bool `json:"success"`
 }
 
-type AddressFundCollectLogListReq struct {
+type AddressFundCollectListReq struct {
 	Pages
 	StartEnd
 	ToAddress      string `form:"to_address,optional"`
@@ -287,7 +293,7 @@ type AddressFundCollectLogListReq struct {
 	Status         string `form:"status,optional"`
 }
 
-type AddressFundCollectLogItem struct {
+type AddressFundCollectItem struct {
 	Id             int64   `json:"id"`
 	AddressGroupId int64   `json:"address_group_id"`
 	Chain          string  `json:"chain"`
@@ -305,7 +311,13 @@ type AddressFundCollectLogItem struct {
 	TimeAts
 }
 
-type AddressFundCollectLogListResp struct {
+type AddressFundCollectListResp struct {
 	PagesBody
-	Records []*AddressFundCollectLogItem `json:"records"`
+	Records []*AddressFundCollectItem `json:"records"`
+}
+
+type FromAddress struct {
+	Address    string
+	PrivateKey string
+	Balance    float64
 }

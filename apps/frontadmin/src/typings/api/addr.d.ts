@@ -11,6 +11,12 @@ declare namespace Api {
       typo: Api.Common.AddressTypos;
       status: Api.Common.AddressStatus;
       address: string;
+      tron_usdt: number;
+      tron_usdc: number;
+      bsc_usdt: number;
+      bsc_usdc: number;
+      eth_usdt: number;
+      eth_usdc: number;
       address2: string;
       description: string;
     }>;

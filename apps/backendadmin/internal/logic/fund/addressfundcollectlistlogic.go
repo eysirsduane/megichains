@@ -14,22 +14,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type AddressFundCollectLogListLogic struct {
+type AddressFundCollectListLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewAddressFundCollectLogListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddressFundCollectLogListLogic {
-	return &AddressFundCollectLogListLogic{
+func NewAddressFundCollectListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddressFundCollectListLogic {
+	return &AddressFundCollectListLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *AddressFundCollectLogListLogic) AddressFundCollectLogList(req *types.AddressFundCollectLogListReq) (resp *types.AddressFundCollectLogListResp, err error) {
-	reqc := &converter.AddressFundCollectLogListReq{}
+func (l *AddressFundCollectListLogic) AddressFundCollectList(req *types.AddressFundCollectListReq) (resp *types.AddressFundCollectListResp, err error) {
+	reqc := &converter.AddressFundCollectListReq{}
 	copier.Copy(reqc, req)
 
 	res, err := l.svcCtx.FundService.FindCollectLogList(l.ctx, reqc)
@@ -38,7 +38,7 @@ func (l *AddressFundCollectLogListLogic) AddressFundCollectLogList(req *types.Ad
 		return
 	}
 
-	resp = &types.AddressFundCollectLogListResp{}
+	resp = &types.AddressFundCollectListResp{}
 	copier.Copy(resp, res)
 
 	return

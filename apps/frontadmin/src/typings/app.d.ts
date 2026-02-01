@@ -767,8 +767,13 @@ declare namespace App {
             amount_min: string;
             fee_max: string;
             command_key: string;
+            success_amount: string;
+            total_count: string;
+            success_count: string;
+            description: string;
+            collect_amount_min: string;
           };
-          collectlog: {
+          collect: {
             title: string;
             detail: string;
           };

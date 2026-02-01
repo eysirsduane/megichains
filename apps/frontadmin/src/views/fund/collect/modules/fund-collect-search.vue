@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
-import { chainBigTyposOptions } from '@/constants/business';
+import { chainBigTyposOptions, chainTyposOptions } from '@/constants/business';
 import { fetchGetAddressGroupAll } from '@/service/api';
 import { useForm } from '@/hooks/common/form';
 import { translateOptions } from '@/utils/common';
@@ -17,7 +17,7 @@ const emit = defineEmits<Emits>();
 
 const { formRef, validate, restoreValidation } = useForm();
 
-const model = defineModel<Api.Fund.AddressFundCollectLogSearchParams>('model', { required: true });
+const model = defineModel<Api.Fund.AddressFundCollectListSearchParams>('model', { required: true });
 const initialParams = { ...model.value };
 
 async function reset() {
@@ -67,7 +67,7 @@ onMounted(async () => {
                   :placeholder="$t('page.fund.common.chain')"
                 >
                   <ElOption
-                    v-for="(item, idx) in translateOptions(chainBigTyposOptions)"
+                    v-for="(item, idx) in translateOptions(chainTyposOptions)"
                     :key="idx"
                     :label="item.label"
                     :value="item.value"
@@ -134,6 +134,8 @@ onMounted(async () => {
                 <ElInput v-model="model.to_address" :placeholder="$t('page.fund.common.to_address')" />
               </ElFormItem>
             </ElCol>
+            <ElCol :lg="6" :md="8" :sm="12"></ElCol>
+            <ElCol :lg="6" :md="8" :sm="12"></ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
               <ElSpace class="w-full justify-end" alignment="end">
                 <ElButton @click="reset">

@@ -2,6 +2,7 @@ package global
 
 import (
 	"fmt"
+	"math/big"
 	"strconv"
 	"time"
 
@@ -77,4 +78,22 @@ func GetFloat64String(f float64) (s string) {
 func GetOrderAddressKey(chain, receiver, currency string) (key string) {
 	key = fmt.Sprintf("%v-%v-%v", chain, receiver, currency)
 	return
+}
+
+func EthToWei(eth float64) *big.Int {
+	wei := new(big.Float).Mul(big.NewFloat(eth), big.NewFloat(1e18))
+	weiInt := new(big.Int)
+	wei.Int(weiInt)
+	return weiInt
+}
+
+func GweiToWei(gwei *big.Int) *big.Int {
+	return new(big.Int).Mul(gwei, big.NewInt(1e9))
+}
+
+func UsdcToBase(usdc float64) *big.Int {
+	f := new(big.Float).Mul(big.NewFloat(usdc), big.NewFloat(1e6))
+	n := new(big.Int)
+	f.Int(n)
+	return n
 }

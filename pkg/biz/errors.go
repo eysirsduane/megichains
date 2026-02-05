@@ -90,4 +90,7 @@ var (
 	AddressFundCollectSuggestGasTipCapFailed   = NewSpecificError(921, "地址资金归集获取建议Gas小费失败")
 	AddressFundCollectGetHeaderFailed          = NewSpecificError(922, "地址资金归集获取区块头失败")
 	AddressFundCollectGetChainIdFailed         = NewSpecificError(923, "地址资金归集获取链ID失败")
+	AddressFundCollectPrivateKeyDecryptFailed  = NewSpecificError(924, "地址资金归集私钥解密失败")
+	AddressFundCollectEstimateGasFailed        = NewSpecificError(925, "地址资金归集估算Gas失败")
+	AddressFundCollectInvalidGasTipCap         = NewSpecificError(926, "地址资金归集无效的Gas小费")
 )

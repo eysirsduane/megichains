@@ -22,8 +22,6 @@ import (
 	"time"
 
 	"github.com/btcsuite/btcutil/base58"
-	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -69,6 +67,26 @@ func (s *ChainService) newEvmClient(chain global.ChainName) (client *ethclient.C
 	return
 }
 
+func (s *ChainService) EncryptEthPrivateKey() {
+	ctx := context.Background()
+	addrs, err := gorm.G[entity.Address](s.db).Where("chain = ?", global.ChainNameEvm).Order("id asc").Find(ctx)
+	if err != nil {
+		logx.Errorf("encrypt private key address find failed, err:%v", err)
+		return
+	}
+	for _, addr := range addrs {
+		encrypted, err := global.EncryptEthPrivateKey(addr.PrivateKey, global.SecretKey)
+		if err != nil {
+			logx.Errorf("encrypt private key encrypted failed, addr:%v, err:%v", addr.Address, err)
+			continue
+		}
+		addr.PrivateKey = encrypted
+		if err := s.db.Save(&addr).Error; err != nil {
+			logx.Errorf("encrypt private key save encrypted key failed, addr:%v, err:%v", addr.Address, err)
+		}
+	}
+}
+
 func (s *ChainService) ScanAddressesFunds() {
 	if s.running {
 		return
@@ -88,6 +106,7 @@ func (s *ChainService) ScanAddressesFunds() {
 	for _, addr := range addrs {
 		switch global.ChainName(addr.Chain) {
 		case global.ChainNameEvm:
+
 			s.EvmFunds(addr.Address, global.ChainNameBsc)
 			s.EvmFunds(addr.Address, global.ChainNameEth)
 		case global.ChainNameTron:
@@ -274,7 +293,7 @@ func (s *ChainService) getContractAddress(currency global.CurrencyTypo, chain st
 	return
 }
 
-func (s *ChainService) ERC20Balance(chain global.ChainName, token common.Address, owner common.Address) (*big.Int, error) {
+func (s *ChainService) ERC20Balance(chain global.ChainName, uaddr common.Address, owner common.Address) (*big.Int, error) {
 	var cli *ethclient.Client
 	switch chain {
 	case global.ChainNameBsc:
@@ -284,43 +303,25 @@ func (s *ChainService) ERC20Balance(chain global.ChainName, token common.Address
 	}
 	defer cli.Close()
 
-	erc20ABI := `[{
-        "constant":true,
-        "inputs":[{"name":"_owner","type":"address"}],
-        "name":"balanceOf",
-        "outputs":[{"name":"","type":"uint256"}],
-        "type":"function"
-    }]`
-
-	parsedABI, err := abi.JSON(strings.NewReader(erc20ABI))
+	erc20c, err := erc20.NewErc20(uaddr, cli)
 	if err != nil {
+		logx.Errorf("evm collect new erc20 instance failed, uaddr:%v, err:%v", uaddr.Hex(), err)
+		err = biz.AddressFundCollectNewErc20InstanceFailed
 		return nil, err
 	}
 
-	data, err := parsedABI.Pack("balanceOf", owner)
+	balance, err := erc20c.BalanceOf(&bind.CallOpts{}, owner)
 	if err != nil {
+		logx.Errorf("evm collect get erc20 balance failed, uaddr:%v, err:%v", uaddr.Hex(), err)
+		err = biz.AddressFundCollectErc20TransferFailed
 		return nil, err
 	}
 
-	msg := ethereum.CallMsg{
-		To:   &token,
-		Data: data,
-	}
-
-	result, err := cli.CallContract(context.Background(), msg, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	outputs, err := parsedABI.Unpack("balanceOf", result)
-	if err != nil {
-		return nil, err
-	}
-
-	return outputs[0].(*big.Int), nil
+	return balance, nil
 }
 
 func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.AddressFundCollectReq) (resp *converter.AddressFundCollectResp, err error) {
+
 	collect := &entity.AddressFundCollect{
 		UserId:         uid,
 		AddressGroupId: req.AddressGroupId,
@@ -404,12 +405,19 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 	for _, from := range froms {
 		wg.Go(func() {
 			ctx := context.Background()
-			privateKey, err := crypto.HexToECDSA(from.PrivateKey)
+			decrypted, err := global.DecryptEthPrivateKey(from.PrivateKey, global.SecretKey)
+			if err != nil {
+				logx.Errorf("evm collect from private key decrypt failed, from:%v, err:%v", from.Address, err)
+				err = biz.AddressFundCollectPrivateKeyDecryptFailed
+				return
+			}
+			privateKey, err := crypto.HexToECDSA(decrypted)
 			if err != nil {
 				logx.Errorf("evm collect from private key hex to ECDSA failed, from:%v, err:%v", from.Address, err)
 				err = biz.AddressFundCollectPrivateKeyInvalid
 				return
 			}
+
 			publicKeyECDSA := privateKey.Public().(*ecdsa.PublicKey)
 			fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
 
@@ -468,11 +476,32 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 				err = biz.AddressFundCollectPrivateKeyInvalid
 				return
 			}
+
+			gasLimit := uint64(200000)
+			weiPerEth := new(big.Float).SetInt64(1e18)
+			maxFeeWei := new(big.Float).Mul(new(big.Float).SetFloat64(fmax), weiPerEth)
+			gasFeeCapWei := new(big.Float).Quo(maxFeeWei, new(big.Float).SetUint64(gasLimit))
+
+			gasFeeCap := new(big.Int)
+			_, acc := gasFeeCapWei.Int(gasFeeCap)
+			if acc != big.Exact {
+				logx.Errorf("evm collect gas calculation precision loss, feecap:%v", gasFeeCapWei)
+				err = biz.AddressFundCollectEstimateGasFailed
+				return
+			}
+
+			gasTipCap := new(big.Int).Div(gasFeeCap, big.NewInt(2))
+			if gasTipCap.Sign() <= 0 {
+				logx.Errorf("evm collect invalid gas tip cap, feecap:%v, tipcap:%v", gasFeeCap, gasTipCap)
+				err = biz.AddressFundCollectInvalidGasTipCap
+				return
+			}
+
 			auth.Nonce = big.NewInt(int64(nonce))
 			auth.Value = big.NewInt(0)
-			auth.GasTipCap = tipCap
-			auth.GasFeeCap = feeCap
-			auth.GasLimit = uint64(fmax)
+			auth.GasTipCap = gasTipCap
+			auth.GasFeeCap = gasFeeCap
+			auth.GasLimit = gasLimit
 
 			erc20c, err := erc20.NewErc20(uaddr, cli)
 			if err != nil {
@@ -491,7 +520,7 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 			defer cancel()
 			receipt, err := bind.WaitMined(ctx, cli, tx)
 			if err != nil {
-				logx.Errorf("evm collect wait mined failed, addr:%v, err:%v", from.Address, err)
+				logx.Errorf("evm collect wait mined failed, from:%v, err:%v", from.Address, err)
 				err = biz.AddressFundCollectWaitMinedFailed
 				return
 			}
@@ -507,9 +536,10 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 			}
 
 			//更新链上真实余额
-			switch global.ChainName(from.Chain) {
-			case global.ChainNameEvm:
+			switch chain {
+			case global.ChainNameBsc:
 				s.EvmFunds(from.Address, global.ChainNameBsc)
+			case global.ChainNameEth:
 				s.EvmFunds(from.Address, global.ChainNameEth)
 			case global.ChainNameTron:
 				s.TronFunds(from.Address)

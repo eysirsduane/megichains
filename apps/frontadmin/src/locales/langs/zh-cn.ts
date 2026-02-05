@@ -75,7 +75,10 @@ const local: App.I18n.Schema = {
     ban: '禁用',
     open: '开放',
     name: '名称',
-    save: '保存'
+    save: '保存',
+    username: '用户名',
+    partial_success: '部分成功',
+    failed: '失败'
   },
   request: {
     logout: '请求失败后登出用户',

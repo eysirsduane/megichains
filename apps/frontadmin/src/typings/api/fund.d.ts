@@ -27,6 +27,7 @@ declare namespace Api {
 
     type AddressFundCollect = Common.CommonRecord<{
       address_group_id: number;
+      address_group_name: string;
       chain: string;
       currency: string;
       status: string;

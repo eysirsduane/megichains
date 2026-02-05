@@ -1,7 +1,8 @@
 <script setup lang="tsx">
 import { reactive, ref } from 'vue';
 import { useBoolean } from '@sa/hooks';
-import { fetchGetAddressFundLogList } from '@/service/api';
+import { collectStatusRecord, currencyTyposRecord } from '@/constants/business';
+import { fetchGetAddressFundCollectList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
@@ -31,7 +32,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     currentPage: searchParams.current,
     pageSize: searchParams.size
   },
-  api: () => fetchGetAddressFundLogList(searchParams),
+  api: () => fetchGetAddressFundCollectList(searchParams),
   transform: response => {
     return defaultSearchform(response);
   },
@@ -42,10 +43,49 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   columns: () => [
     // { prop: 'selection', type: 'selection', width: 48 },
     { prop: 'id', type: 'id', label: $t('common.id'), width: 100 },
+    { prop: 'address_group_name', label: $t('page.fund.common.group'), width: 160 },
     { prop: 'chain', label: $t('page.fund.common.chain'), width: 80 },
-    { prop: 'address_group_name', label: $t('page.fund.common.group'), width: 80 },
-    { prop: 'currency', label: $t('page.fund.common.currency'), width: 80 },
-    { prop: 'status', label: $t('page.fund.common.status'), width: 80 },
+    {
+      prop: 'currency',
+      label: $t('page.fund.common.currency'),
+      width: 100,
+      formatter: row => {
+        const tagMap: Record<Api.Common.CurrencyTypos, UI.ThemeColor> = {
+          '': 'info',
+          USDT: 'info',
+          USDC: 'success'
+        };
+
+        const label = $t(currencyTyposRecord[row.currency]);
+        return (
+          <el-tag effect="dark" round type={tagMap[row.currency]}>
+            {label}
+          </el-tag>
+        );
+      }
+    },
+    {
+      prop: 'status',
+      label: $t('page.fund.common.status'),
+      width: 120,
+      formatter: row => {
+        const tagMap: Record<Api.Common.CollectStatus, UI.ThemeColor> = {
+          '': 'info',
+          已创建: 'info',
+          成功: 'success',
+          失败: 'danger',
+          部分成功: 'warning'
+        };
+
+        const label = $t(collectStatusRecord[row.status]);
+        return (
+          <el-tag effect="dark" round type={tagMap[row.status]}>
+            {label}
+          </el-tag>
+        );
+      }
+    },
+    { prop: 'username', label: $t('common.username'), width: 160 },
     { prop: 'receiver_address', label: $t('page.fund.common.to_address'), width: 400 },
     { prop: 'success_amount', label: $t('page.fund.common.success_amount'), width: 200 },
     { prop: 'total_count', label: $t('page.fund.common.total_count'), width: 200 },

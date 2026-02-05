@@ -270,7 +270,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'fund_collect',
           i18nKey: 'route.fund_collect',
-          order: 2,
+          order: 2
         }
       },
       {
@@ -280,7 +280,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'fund_collectdetail',
           i18nKey: 'route.fund_collectdetail',
-          order: 3,
+          order: 3
         }
       },
       {

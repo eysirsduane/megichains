@@ -15,7 +15,7 @@ export function fetchGetAddressFundStatistics() {
   });
 }
 
-export function fetchGetAddressFundLogList(params?: Api.Fund.AddressFundCollectListSearchParams) {
+export function fetchGetAddressFundCollectList(params?: Api.Fund.AddressFundCollectListSearchParams) {
   return request<Api.Fund.AddressFundCollectList>({
     url: '/fund/collect/list',
     method: 'get',

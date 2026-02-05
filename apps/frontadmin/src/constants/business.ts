@@ -31,6 +31,14 @@ export const orderStatusRecord: Record<Api.Common.OrderStatus, App.I18n.I18nKey>
   成功: 'common.success'
 };
 
+export const collectStatusRecord: Record<Api.Common.CollectStatus, App.I18n.I18nKey> = {
+  '': 'common.all',
+  已创建: 'common.created',
+  部分成功: 'common.partial_success',
+  成功: 'common.success',
+  失败: 'common.failed'
+};
+
 export const addressTyposRecord: Record<Api.Common.AddressTypos, App.I18n.I18nKey> = {
   '': 'common.all',
   IN: 'common.in',

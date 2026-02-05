@@ -369,6 +369,9 @@ declare namespace App {
         open: string;
         name: string;
         save: string;
+        username: string;
+        partial_success: string;
+        failed: string;
       };
       request: {
         logout: string;

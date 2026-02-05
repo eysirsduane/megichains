@@ -54,10 +54,10 @@ func (s *FundService) Statistics(ctx context.Context) (resp *converter.AddressFu
 	return
 }
 
-func (s *FundService) FindCollectLogList(ctx context.Context, req *converter.AddressFundCollectListReq) (resp *converter.RespConverter[*entity.AddressFundCollect], err error) {
+func (s *FundService) FindCollectLogList(ctx context.Context, req *converter.AddressFundCollectListReq) (resp *converter.RespConverter[*converter.AddressFundCollectItem], err error) {
 	db := s.db.Model(entity.AddressFundCollect{}).Order("id desc")
-	if req.ToAddress != "" {
-		db = db.Where("to_address = ?", req.ToAddress)
+	if req.ReceiverAddress != "" {
+		db = db.Where("receiver_address = ?", req.ReceiverAddress)
 	}
 	if req.AddressGroupId != 0 {
 		db = db.Where("address_group_id = ?", req.AddressGroupId)
@@ -72,8 +72,8 @@ func (s *FundService) FindCollectLogList(ctx context.Context, req *converter.Add
 		db = db.Where("status = ?", req.Status)
 	}
 
-	items := make([]*entity.AddressFundCollect, 0)
-	err = db.Session(&gorm.Session{}).Joins("left join address_groups on address_fund_collects.address_group_id = address_groups.id").Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Find(&items).Error
+	items := make([]*converter.AddressFundCollectItem, 0)
+	err = db.Session(&gorm.Session{}).Select("address_fund_collects.*, address_groups.name as address_group_name, users.username as username").Joins("left join address_groups on address_fund_collects.address_group_id = address_groups.id").Joins("left join users on address_fund_collects.user_id = users.id").Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Scan(&items).Error
 	if err != nil {
 		logx.Errorf("address fund collect log paging failed, err:%v", err)
 		err = biz.AddressFundCollectLogFindFailed

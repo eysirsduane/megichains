@@ -10,6 +10,7 @@ type AddressDetailReq struct {
 type AddressFundCollectItem struct {
 	Id               int64   `json:"id"`
 	UserId           string  `json:"user_id"`
+	Username         string  `json:"username"`
 	AddressGroupId   int64   `json:"address_group_id"`
 	AddressGroupName string  `json:"address_group_name"`
 	Chain            string  `json:"chain"`
@@ -28,11 +29,11 @@ type AddressFundCollectItem struct {
 type AddressFundCollectListReq struct {
 	Pages
 	StartEnd
-	ToAddress      string `form:"to_address,optional"`
-	AddressGroupId int64  `form:"address_group_id,optional"`
-	Chain          string `form:"chain,optional"`
-	Currency       string `form:"currency,optional"`
-	Status         string `form:"status,optional"`
+	ReceiverAddress string `form:"receiver_address,optional"`
+	AddressGroupId  int64  `form:"address_group_id,optional"`
+	Chain           string `form:"chain,optional"`
+	Currency        string `form:"currency,optional"`
+	Status          string `form:"status,optional"`
 }
 
 type AddressFundCollectListResp struct {

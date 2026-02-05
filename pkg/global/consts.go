@@ -80,3 +80,13 @@ const (
 	OrderStatusNotifyFailed OrderStatus = "通知失败"
 	OrderStatusSuccess      OrderStatus = "成功"
 )
+
+type CollectStatus string
+
+const (
+	CollectStatusCreated    CollectStatus = "已创建"
+	CollectStatusProcessing CollectStatus = "处理中"
+	CollectStatusPartially  CollectStatus = "部分成功"
+	CollectStatusSuccess    CollectStatus = "成功"
+	CollectStatusFailed     CollectStatus = "失败"
+)

@@ -5,10 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"megichains/apps/job/manager"
-	"megichains/pkg/entity"
 	"megichains/pkg/global"
-	"megichains/pkg/service"
 	"net/http"
 	"os"
 	"os/signal"
@@ -28,17 +25,17 @@ func main() {
 	logx.MustSetup(cfg.Log)
 	defer logx.Close()
 
-	db, err := entity.NewGormDB(&cfg)
-	if err != nil {
-		logx.Errorf("init gorm db failed, err:%v", err)
-		panic(err)
-	}
+	// db, err := entity.NewGormDB(&cfg)
+	// if err != nil {
+	// 	logx.Errorf("init gorm db failed, err:%v", err)
+	// 	panic(err)
+	// }
 
-	chain := service.NewChainService(&cfg, db)
-	mgr := manager.NewCronManager()
-	mgr.Register("*/10 * * * * *", chain.ScanAddressesFunds)
-	mgr.Start()
-	defer mgr.Stop()
+	// chain := service.NewChainService(&cfg, db)
+	// mgr := manager.NewCronManager()
+	// mgr.Register("*/10 * * * * *", chain.ScanAddressesFunds)
+	// mgr.Start()
+	// defer mgr.Stop()
 
 	starting := "Starting job..."
 	fmt.Println(starting)

@@ -9,6 +9,7 @@ import (
 	"megichains/pkg/converter"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
+	"strings"
 
 	"github.com/btcsuite/btcd/btcec/v2"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -187,6 +188,7 @@ func (s *AddressService) createEvmAddress(chain string) {
 	// 2. 私钥转字节 / hex
 	privateKeyBytes := crypto.FromECDSA(privateKey)
 	privateKeyHex := hexutil.Encode(privateKeyBytes)
+	privateKeyHex = strings.TrimPrefix(privateKeyHex, "0x")
 
 	// 3. 生成公钥
 	publicKey := privateKey.Public()

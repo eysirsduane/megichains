@@ -310,11 +310,11 @@ type AddressFundCollectResp {
 type AddressFundCollectListReq {
 	Pages
 	StartEnd
-	ToAddress      string `form:"to_address,optional"`
-	AddressGroupId int64  `form:"address_group_id,optional"`
-	Chain          string `form:"chain,optional"`
-	Currency       string `form:"currency,optional"`
-	Status         string `form:"status,optional"`
+	ReceiverAddress string `form:"receiver_address,optional"`
+	AddressGroupId  int64  `form:"address_group_id,optional"`
+	Chain           string `form:"chain,optional"`
+	Currency        string `form:"currency,optional"`
+	Status          string `form:"status,optional"`
 }
 
 type AddressFundCollectListResp {
@@ -325,6 +325,7 @@ type AddressFundCollectListResp {
 type AddressFundCollectItem {
 	Id               int64   `json:"id"`
 	UserId           string  `json:"user_id"`
+	Username         string  `json:"username"`
 	AddressGroupId   int64   `json:"address_group_id"`
 	AddressGroupName string  `json:"address_group_name"`
 	Chain            string  `json:"chain"`

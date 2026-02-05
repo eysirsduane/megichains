@@ -12,6 +12,7 @@ import (
 	"io"
 	"math/big"
 	"megichains/pkg/biz"
+	erc20 "megichains/pkg/contract"
 	"megichains/pkg/converter"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
@@ -23,6 +24,7 @@ import (
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -32,8 +34,7 @@ import (
 )
 
 var mu sync.RWMutex
-var erc20ABI = `[{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],
-	"name":"transfer","outputs":[{"name":"","type":"bool"}],"type":"function"}]`
+var erc20ABI = `[{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"type":"function"}]`
 
 type ChainService struct {
 	cfg     *global.BackendesConfig
@@ -51,6 +52,7 @@ func (s *ChainService) newEvmClient(chain global.ChainName) (client *ethclient.C
 	case global.ChainNameBsc:
 		port = s.cfg.Bsc.WssNetwork2
 	case global.ChainNameEth:
+		// port = fmt.Sprintf("%v%v", s.cfg.Eth.WssNetwork, s.cfg.Eth.ApiKey)
 		port = s.cfg.Eth.WssNetwork2
 	// case global.ChainNameTron:
 	// 	port = s.cfg.Tron.WssNetwork
@@ -326,6 +328,7 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 		Currency:       req.Currency,
 		AmountMin:      req.AmountMin,
 		FeeMax:         req.FeeMax,
+		Status:         string(global.CollectStatusCreated),
 	}
 
 	err = gorm.G[entity.AddressFundCollect](s.db).Create(ctx, collect)
@@ -339,7 +342,7 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 	currency := global.CurrencyTypo(req.Currency)
 	switch chain {
 	case global.ChainNameBsc, global.ChainNameEth:
-		err = s.EvmCollect(ctx, collect, chain, currency, req.AmountMin, req.FeeMax, req.AddressGroupId)
+		err = s.EvmCollect(ctx, collect, req.AddressGroupId, chain, currency, req.AmountMin, req.FeeMax)
 	case global.ChainNameTron:
 		err = s.TronCollect(currency, req.AmountMin, req.FeeMax, req.AddressGroupId)
 	default:
@@ -350,7 +353,7 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 	return
 }
 
-func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFundCollect, chain global.ChainName, currency global.CurrencyTypo, amin, fmax float64, gid int64) (err error) {
+func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFundCollect, gid int64, chain global.ChainName, currency global.CurrencyTypo, amin, fmax float64) (err error) {
 	var cli *ethclient.Client
 	switch chain {
 	case global.ChainNameBsc:
@@ -369,33 +372,28 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 
 	collect.ReceiverAddress = receiver.Address
 
-	jquery := "chain = ? and typo = ?"
-	jselect := "address, private_key"
+	jquery := `"group_id" = ? and "chain" = ? and typo = ? `
 	switch chain {
 	case global.ChainNameBsc:
 		switch currency {
 		case global.CurrencyTypoUsdt:
-			jquery += " and bsc_usdt > ?"
-			jselect += ", bsc_usdt as balance"
+			jquery += " and bsc_usdt >= ?"
 		case global.CurrencyTypoUsdc:
-			jquery += " and bsc_usdc > ?"
-			jselect += ", bsc_usdc as balance"
+			jquery += " and bsc_usdc >= ?"
 		}
 	case global.ChainNameEth:
 		switch currency {
 		case global.CurrencyTypoUsdt:
-			jquery += " and eth_usdt > ?"
-			jselect += ", eth_usdt as balance"
+			jquery += " and eth_usdt >= ?"
 		case global.CurrencyTypoUsdc:
-			jquery += " and eth_usdc > ?"
-			jselect += ", eth_usdc as balance"
+			jquery += " and eth_usdc >= ?"
 		}
 	}
 
-	froms := make([]*converter.FromAddress, 0)
-	err = s.db.Model(entity.Address{}).Where(jquery, global.ChainNameEvm, global.AddressTypoIn, amin).Select(jselect).Find(&froms).Error
+	froms := make([]*entity.Address, 0)
+	err = s.db.Model(entity.Address{}).Where(jquery, gid, global.ChainNameEvm, global.AddressTypoIn, amin).Find(&froms).Error
 	if err != nil {
-		logx.Errorf("evm collect get from address failed, chain:%v, err:%v", chain, err)
+		logx.Errorf("evm collect get from address failed, group:%v, chain:%v, err:%v", gid, chain, err)
 		err = biz.AddressFundCollectFromAddressNotFound
 		return
 	}
@@ -405,22 +403,15 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 	var wg sync.WaitGroup
 	for _, from := range froms {
 		wg.Go(func() {
+			ctx := context.Background()
 			privateKey, err := crypto.HexToECDSA(from.PrivateKey)
 			if err != nil {
-				logx.Errorf("evm collect private key hex to ECDSA failed, addr:%v, err:%v", from.Address, err)
+				logx.Errorf("evm collect from private key hex to ECDSA failed, from:%v, err:%v", from.Address, err)
 				err = biz.AddressFundCollectPrivateKeyInvalid
 				return
 			}
-			publicKey := privateKey.Public()
-			publicKeyECDSA := publicKey.(*ecdsa.PublicKey)
+			publicKeyECDSA := privateKey.Public().(*ecdsa.PublicKey)
 			fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
-
-			nonce, err := cli.PendingNonceAt(context.Background(), fromAddress)
-			if err != nil {
-				logx.Errorf("evm collect pending nonce failed, err:%v", err)
-				err = biz.AddressFundCollectGetNonceFailed
-				return
-			}
 
 			caddr, err := s.getContractAddress(currency, string(chain))
 			if err != nil {
@@ -428,66 +419,114 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 				err = biz.AddressFundCollectGetContractAddressFailed
 				return
 			}
-
 			uaddr := common.HexToAddress(caddr)
 			toAddress := common.HexToAddress(receiver.Address)
 
-			camount := 0.01
-			sun := global.Sun(camount, global.AmountTypoBsc)
-			amount := new(big.Int)
-			amount.SetString(fmt.Sprintf("%v", sun), 10) // 10 * 1e18
+			camount := 0.000001
 
-			parsedABI, err := abi.JSON(strings.NewReader(erc20ABI))
-			if err != nil {
-				logx.Errorf("evm collect parse abi failed, err:%v", err)
-				err = biz.AddressFundCollectParseABIFailed
-				return
-			}
-
-			data, err := parsedABI.Pack("transfer", toAddress, amount)
-			if err != nil {
-				logx.Errorf("evm collect pack transfer failed, err:%v", err)
-				err = biz.AddressFundCollectPackTransferFailed
-				return
-			}
-
-			gasLimit := uint64(fmax)
-			gasPrice, err := cli.SuggestGasPrice(context.Background())
-			if err != nil {
-				logx.Errorf("evm collect suggest gas price failed, err:%v", err)
-				err = biz.AddressFundCollectSuggestGasPriceFailed
-				return
-			}
-			tx := types.NewTransaction(nonce, uaddr, big.NewInt(0), gasLimit, gasPrice, data)
-
-			cid := int64(0)
+			sun := int64(0)
 			switch chain {
 			case global.ChainNameBsc:
-				cid = int64(s.cfg.Bsc.ChainId)
+				sun = global.Sun(camount, global.AmountTypoBsc)
 			case global.ChainNameEth:
-				cid = int64(s.cfg.Eth.ChainId)
+				sun = global.Sun(camount, global.AmountTypoEth)
 			}
-			signedTx, err := types.SignTx(tx, types.NewEIP155Signer(big.NewInt(cid)), privateKey)
+
+			nonce, err := cli.PendingNonceAt(ctx, fromAddress)
 			if err != nil {
-				logx.Errorf("evm collect sign tx failed, err:%v", err)
-				err = biz.AddressFundCollectSignTxFailed
+				logx.Errorf("evm collect get pending nonce failed, from:%v, err:%v", from.Address, err)
+				err = biz.AddressFundCollectGetNonceFailed
+				return
+			}
+			tipCap, err := cli.SuggestGasTipCap(ctx) // priority fee
+			if err != nil {
+				logx.Errorf("evm collect suggest gas tip cap failed, err:%v", err)
+				err = biz.AddressFundCollectSuggestGasTipCapFailed
 				return
 			}
 
-			err = cli.SendTransaction(ctx, signedTx)
+			header, err := cli.HeaderByNumber(ctx, nil)
 			if err != nil {
-				logx.Errorf("evm collect send tx failed, err:%v", err)
-				err = biz.AddressFundCollectSendTxFailed
+				logx.Errorf("evm collect get header failed, err:%v", err)
+				err = biz.AddressFundCollectGetHeaderFailed
+				return
+			}
+			baseFee := header.BaseFee
+
+			feeCap := new(big.Int).Mul(baseFee, big.NewInt(2))
+			feeCap.Add(feeCap, tipCap)
+
+			cid, err := cli.ChainID(ctx)
+			if err != nil {
+				logx.Errorf("evm collect get chain id failed, from:%v, err:%v", from.Address, err)
+				err = biz.AddressFundCollectGetChainIdFailed
+				return
+			}
+			auth, err := bind.NewKeyedTransactorWithChainID(privateKey, cid)
+			if err != nil {
+				logx.Errorf("evm collect keyed transaction failed, from:%v, err:%v", from.Address, err)
+				err = biz.AddressFundCollectPrivateKeyInvalid
+				return
+			}
+			auth.Nonce = big.NewInt(int64(nonce))
+			auth.Value = big.NewInt(0)
+			auth.GasTipCap = tipCap
+			auth.GasFeeCap = feeCap
+			auth.GasLimit = uint64(fmax)
+
+			erc20c, err := erc20.NewErc20(uaddr, cli)
+			if err != nil {
+				logx.Errorf("evm collect new erc20 instance failed, uaddr:%v, err:%v", uaddr.Hex(), err)
+				err = biz.AddressFundCollectNewErc20InstanceFailed
+				return
+			}
+			tx, err := erc20c.Transfer(auth, toAddress, big.NewInt(sun))
+			if err != nil {
+				logx.Errorf("evm collect erc20 transfer failed, from:%v, to:%v, err:%v", from.Address, toAddress.Hex(), err)
+				err = biz.AddressFundCollectErc20TransferFailed
 				return
 			}
 
-			mu.Lock()
-			collect.SuccessAmount += camount
-			collect.SuccessCount++
-			mu.Unlock()
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+			defer cancel()
+			receipt, err := bind.WaitMined(ctx, cli, tx)
+			if err != nil {
+				logx.Errorf("evm collect wait mined failed, addr:%v, err:%v", from.Address, err)
+				err = biz.AddressFundCollectWaitMinedFailed
+				return
+			}
+
+			if receipt.Status == types.ReceiptStatusSuccessful {
+				logx.Infof("🎉 evm collect transfer success, from:%v, to:%v, contract:%v, amount:%v, txid:%v", fromAddress.Hex(), toAddress.Hex(), uaddr.Hex(), camount, tx.Hash().Hex())
+				mu.Lock()
+				collect.SuccessAmount += camount
+				collect.SuccessCount++
+				mu.Unlock()
+			} else {
+				logx.Errorf("evm collect transfer failed, from:%v, to:%v, contract:%v, amount:%v, txid:%v, status:%d", fromAddress.Hex(), toAddress.Hex(), uaddr.Hex(), camount, tx.Hash().Hex(), receipt.Status)
+			}
+
+			//更新链上真实余额
+			switch global.ChainName(from.Chain) {
+			case global.ChainNameEvm:
+				s.EvmFunds(from.Address, global.ChainNameBsc)
+				s.EvmFunds(from.Address, global.ChainNameEth)
+			case global.ChainNameTron:
+				s.TronFunds(from.Address)
+			default:
+				logx.Errorf("evm collect scan address fund found unknown chain, chain:%v, from:%v", from.Chain, from.Address)
+			}
 		})
 	}
 	wg.Wait()
+
+	if collect.TotalCount == collect.SuccessCount {
+		collect.Status = string(global.CollectStatusSuccess)
+	} else if collect.SuccessCount > 0 {
+		collect.Status = string(global.CollectStatusPartially)
+	} else {
+		collect.Status = string(global.CollectStatusFailed)
+	}
 
 	err = s.db.Save(collect).Error
 	if err != nil {

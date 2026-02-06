@@ -54,7 +54,7 @@ func (s *FundService) Statistics(ctx context.Context) (resp *converter.AddressFu
 	return
 }
 
-func (s *FundService) FindCollectLogList(ctx context.Context, req *converter.AddressFundCollectListReq) (resp *converter.RespConverter[*converter.AddressFundCollectItem], err error) {
+func (s *FundService) FindCollectList(ctx context.Context, req *converter.AddressFundCollectListReq) (resp *converter.RespConverter[*converter.AddressFundCollectItem], err error) {
 	db := s.db.Model(entity.AddressFundCollect{}).Order("id desc")
 	if req.ReceiverAddress != "" {
 		db = db.Where("receiver_address = ?", req.ReceiverAddress)
@@ -89,4 +89,55 @@ func (s *FundService) FindCollectLogList(ctx context.Context, req *converter.Add
 
 	resp = converter.ConvertToPagingRecordsResp(items, req.Current, req.Size, total)
 	return
+}
+
+func (s *FundService) ScanFundCollectsStatus() {
+	collects := make([]*entity.AddressFundCollect, 0)
+	err := s.db.Model(&entity.AddressFundCollect{}).Where("status = ?", global.CollectStatusProcessing).Find(&collects).Error
+	if err != nil {
+		logx.Errorf("job scan fund collect status failed, err:%v", err)
+		return
+	}
+
+	for _, coll := range collects {
+		created := int64(0)
+		err = s.db.Model(&entity.AddressFundCollectLog{}).Where("collect_id = ? and status = ?", coll.Id, global.CollectLogStatusCreated).Count(&created).Error
+		if err != nil {
+			logx.Errorf("job scan fund collect status count successful failed, err:%v", err)
+			continue
+		}
+		if created > 0 {
+			continue
+		}
+
+		calc := &global.CollectCalc{}
+		err = s.db.Model(&entity.AddressFundCollectLog{}).Where("collect_id = ? and status = ?", coll.Id, global.CollectLogStatusSuccess).Select("count(id) as success_count, sum(amount) as success_amount").Scan(calc).Error
+		if err != nil {
+			logx.Errorf("job scan fund collect status count successful failed, err:%v", err)
+			continue
+		}
+		if coll.TotalCount == calc.SuccessCount {
+			coll.Status = string(global.CollectLogStatusSuccess)
+		} else {
+			faileds := int64(0)
+			err = s.db.Model(&entity.AddressFundCollectLog{}).Where("collect_id = ? and status = ?", coll.Id, global.CollectLogStatusFailed).Count(&faileds).Error
+			if err != nil {
+				logx.Errorf("job scan fund collect status count successful failed, err:%v", err)
+				continue
+			}
+			if coll.TotalCount == faileds {
+				coll.Status = string(global.CollectStatusFailed)
+			} else {
+				coll.Status = string(global.CollectStatusPartially)
+			}
+		}
+
+		coll.SuccessCount = calc.SuccessCount
+		coll.SuccessAmount = calc.SuccessAmount
+		err = s.db.Save(coll).Error
+		if err != nil {
+			logx.Errorf("job scan fund collect status save collect failed, err:%v", err)
+			continue
+		}
+	}
 }

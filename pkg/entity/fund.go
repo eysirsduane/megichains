@@ -21,17 +21,19 @@ type AddressFundCollect struct {
 	TimeAts
 }
 
-type AddressFundCollectDetail struct {
-	Id    int64 `gorm:"primaryKey;autoIncrement"`
-	LogId int64 `gorm:""`
+type AddressFundCollectLog struct {
+	Id        int64 `gorm:"primaryKey;autoIncrement"`
+	CollectId int64 `gorm:""`
 
-	Chain       string `gorm:"size:31"`
-	Currency    string `gorm:"size:31"`
-	FromAddress string `gorm:"size:255"`
-	ToAddress   string `gorm:"size:255"`
+	Chain           string `gorm:"size:31"`
+	Currency        string `gorm:"size:31"`
+	FromAddress     string `gorm:"size:255"`
+	ReceiverAddress string `gorm:"size:255"`
 
 	Amount float64 `gorm:""`
 	Status string  `gorm:"size:31"`
+
+	Description string `gorm:"size:1023"`
 
 	TimeAts
 }

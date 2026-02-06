@@ -372,6 +372,7 @@ declare namespace App {
         username: string;
         partial_success: string;
         failed: string;
+        processing: string;
       };
       request: {
         logout: string;

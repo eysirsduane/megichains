@@ -62,7 +62,7 @@ declare namespace Api {
     type ChainTypos = '' | 'TRON' | 'ETH' | 'BSC';
     type ChainBigTypos = '' | 'TRON' | 'EVM';
     type OrderStatus = '' | '已创建' | '通知失败' | '成功';
-    type CollectStatus = '' | '已创建'  | '部分成功' | '成功' | '失败';
+    type CollectStatus = '' | '已创建' | '处理中' | '部分成功' | '成功' | '失败';
     type AddressTypos = '' | 'IN' | 'OUT' | 'COLLECT';
     type AddressStatus = '' | '禁用' | '空闲' | '占用';
     type AddressGroupStatus = '' | '禁用' | '开放';

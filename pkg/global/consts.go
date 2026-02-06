@@ -84,9 +84,20 @@ const (
 type CollectStatus string
 
 const (
-	CollectStatusCreated    CollectStatus = "已创建"
-	CollectStatusProcessing CollectStatus = "处理中"
-	CollectStatusPartially  CollectStatus = "部分成功"
-	CollectStatusSuccess    CollectStatus = "成功"
-	CollectStatusFailed     CollectStatus = "失败"
+	CollectStatusCreated     CollectStatus = "已创建"
+	CollectStatusProcessing  CollectStatus = "处理中"
+	CollectStatusPartially   CollectStatus = "部分成功"
+	CollectStatusSuccess     CollectStatus = "成功"
+	CollectStatusFailed      CollectStatus = "失败"
+	CollectLogStatusFinished CollectStatus = "结束"
+)
+
+type CollectLogStatus string
+
+const (
+	CollectLogStatusCreated    CollectLogStatus = "已创建"
+	CollectLogStatusProcessing CollectLogStatus = "处理中"
+	CollectLogStatusSuccess    CollectLogStatus = "成功"
+	CollectLogStatusTimeout    CollectLogStatus = "超时"
+	CollectLogStatusFailed     CollectLogStatus = "失败"
 )

@@ -72,9 +72,10 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
         const tagMap: Record<Api.Common.CollectStatus, UI.ThemeColor> = {
           '': 'info',
           已创建: 'info',
+          处理中: 'info',
+          部分成功: 'warning',
           成功: 'success',
-          失败: 'danger',
-          部分成功: 'warning'
+          失败: 'danger'
         };
 
         const label = $t(collectStatusRecord[row.status]);

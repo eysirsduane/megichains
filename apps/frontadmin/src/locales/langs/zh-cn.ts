@@ -78,7 +78,8 @@ const local: App.I18n.Schema = {
     save: '保存',
     username: '用户名',
     partial_success: '部分成功',
-    failed: '失败'
+    failed: '失败',
+    processing: '处理中'
   },
   request: {
     logout: '请求失败后登出用户',

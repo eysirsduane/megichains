@@ -3,6 +3,7 @@ package erc20
 import (
 	"context"
 	"math/big"
+	"megichains/pkg/global"
 	"strings"
 
 	ethereum "github.com/ethereum/go-ethereum"
@@ -20,7 +21,7 @@ func PackTransfer(to common.Address, value *big.Int) ([]byte, error) {
 	return contractABI.Pack("transfer", to, value)
 }
 
-func EstimateTransactionFee(ctx context.Context, cli *ethclient.Client, uaddr, fromAddress, toAddress common.Address, sun int64) (efee *big.Int, tcap *big.Int, fcap *big.Int, glimit uint64, err error) {
+func EstimateTransactionFee(ctx context.Context, cli *ethclient.Client, chain global.ChainName, uaddr, fromAddress, toAddress common.Address, sun int64) (efee *big.Int, tcap *big.Int, fcap *big.Int, glimit uint64, err error) {
 	txlimit, err := PackTransfer(toAddress, big.NewInt(sun))
 	if err != nil {
 		return
@@ -37,27 +38,37 @@ func EstimateTransactionFee(ctx context.Context, cli *ethclient.Client, uaddr, f
 	}
 	glimit = uint64(float64(glimit) * 1.25)
 
-	tcap, err = cli.SuggestGasTipCap(ctx)
-	if err != nil {
-		return
-	}
-	header, err := cli.HeaderByNumber(ctx, nil)
-	if err != nil {
-		return
-	}
+	switch chain {
+	case global.ChainNameBsc:
+		fcap, err := cli.SuggestGasPrice(ctx)
+		if err != nil {
+			break
+		}
 
-	fcap = new(big.Int).Add(header.BaseFee, tcap)
+		efee = new(big.Int).Mul(fcap, big.NewInt(int64(glimit)))
+	case global.ChainNameEth:
+		tcap, err = cli.SuggestGasTipCap(ctx)
+		if err != nil {
+			break
+		}
+		header, err := cli.HeaderByNumber(ctx, nil)
+		if err != nil {
+			break
+		}
 
-	mtip := big.NewInt(40_000_000)
-	mfcap := big.NewInt(400_000_000)
-	if tcap.Cmp(mtip) < 0 {
-		tcap = mtip
-	}
-	if fcap.Cmp(mfcap) < 0 {
-		fcap = mfcap
-	}
+		fcap = new(big.Int).Add(header.BaseFee, tcap)
 
-	efee = new(big.Int).Mul(fcap, big.NewInt(int64(glimit)))
+		mtip := big.NewInt(40_000_000)
+		mfcap := big.NewInt(400_000_000)
+		if tcap.Cmp(mtip) < 0 {
+			tcap = mtip
+		}
+		if fcap.Cmp(mfcap) < 0 {
+			fcap = mfcap
+		}
+
+		efee = new(big.Int).Mul(fcap, big.NewInt(int64(glimit)))
+	}
 
 	return
 }

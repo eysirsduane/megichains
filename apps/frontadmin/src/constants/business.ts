@@ -34,6 +34,7 @@ export const orderStatusRecord: Record<Api.Common.OrderStatus, App.I18n.I18nKey>
 export const collectStatusRecord: Record<Api.Common.CollectStatus, App.I18n.I18nKey> = {
   '': 'common.all',
   已创建: 'common.created',
+  处理中: 'common.processing',
   部分成功: 'common.partial_success',
   成功: 'common.success',
   失败: 'common.failed'

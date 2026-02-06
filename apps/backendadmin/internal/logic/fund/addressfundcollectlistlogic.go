@@ -32,7 +32,7 @@ func (l *AddressFundCollectListLogic) AddressFundCollectList(req *types.AddressF
 	reqc := &converter.AddressFundCollectListReq{}
 	copier.Copy(reqc, req)
 
-	res, err := l.svcCtx.FundService.FindCollectLogList(l.ctx, reqc)
+	res, err := l.svcCtx.FundService.FindCollectList(l.ctx, reqc)
 	if err != nil {
 		logx.Errorf("find address list failed, err:%v", err)
 		return

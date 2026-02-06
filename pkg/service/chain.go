@@ -12,9 +12,9 @@ import (
 	"io"
 	"math/big"
 	"megichains/pkg/biz"
-	erc20 "megichains/pkg/contract"
 	"megichains/pkg/converter"
 	"megichains/pkg/entity"
+	"megichains/pkg/erc20"
 	"megichains/pkg/global"
 	"net/http"
 	"strings"
@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/btcsuite/btcutil/base58"
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -50,8 +51,8 @@ func (s *ChainService) newEvmClient(chain global.ChainName) (client *ethclient.C
 	case global.ChainNameBsc:
 		port = s.cfg.Bsc.WssNetwork2
 	case global.ChainNameEth:
-		// port = fmt.Sprintf("%v%v", s.cfg.Eth.WssNetwork, s.cfg.Eth.ApiKey)
-		port = s.cfg.Eth.WssNetwork2
+		port = fmt.Sprintf("%v%v", s.cfg.Eth.WssNetwork, s.cfg.Eth.ApiKey)
+		// port = s.cfg.Eth.WssNetwork2
 	// case global.ChainNameTron:
 	// 	port = s.cfg.Tron.WssNetwork
 	default:
@@ -430,7 +431,7 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 			uaddr := common.HexToAddress(caddr)
 			toAddress := common.HexToAddress(receiver.Address)
 
-			camount := 0.000001
+			camount := 0.00012
 
 			sun := int64(0)
 			switch chain {
@@ -440,29 +441,24 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 				sun = global.Sun(camount, global.AmountTypoEth)
 			}
 
-			nonce, err := cli.PendingNonceAt(ctx, fromAddress)
+			efee, tcap, fcap, glimit, err := global.EstimateTransactionFee(ctx, cli, uaddr, fromAddress, toAddress, sun)
 			if err != nil {
-				logx.Errorf("evm collect get pending nonce failed, from:%v, err:%v", from.Address, err)
-				err = biz.AddressFundCollectGetNonceFailed
-				return
-			}
-			tipCap, err := cli.SuggestGasTipCap(ctx) // priority fee
-			if err != nil {
-				logx.Errorf("evm collect suggest gas tip cap failed, err:%v", err)
-				err = biz.AddressFundCollectSuggestGasTipCapFailed
+				logx.Errorf("evm collect estimate fee failed, err:%v", err)
+				err = biz.AddressFundCollectEstimateGasFailed
 				return
 			}
 
-			header, err := cli.HeaderByNumber(ctx, nil)
+			overed, err := global.CheckFeeOverLimit(efee, fmax)
 			if err != nil {
-				logx.Errorf("evm collect get header failed, err:%v", err)
-				err = biz.AddressFundCollectGetHeaderFailed
+				logx.Errorf("evm collect check fee over limit failed, err:%v", err)
+				err = biz.AddressFundCollectInvalidGasTipCap
 				return
 			}
-			baseFee := header.BaseFee
-
-			feeCap := new(big.Int).Mul(baseFee, big.NewInt(2))
-			feeCap.Add(feeCap, tipCap)
+			if overed {
+				logx.Errorf("evm collect fee over limit, from:%v, fee:%v, max:%v", from.Address, fcap.String(), fmax)
+				err = biz.AddressFundCollectFeeOverLimit
+				return
+			}
 
 			cid, err := cli.ChainID(ctx)
 			if err != nil {
@@ -470,6 +466,9 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 				err = biz.AddressFundCollectGetChainIdFailed
 				return
 			}
+
+			// clearPendingTransaction(ctx, cli, cid, fromAddress, privateKey)
+
 			auth, err := bind.NewKeyedTransactorWithChainID(privateKey, cid)
 			if err != nil {
 				logx.Errorf("evm collect keyed transaction failed, from:%v, err:%v", from.Address, err)
@@ -477,31 +476,18 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 				return
 			}
 
-			gasLimit := uint64(200000)
-			weiPerEth := new(big.Float).SetInt64(1e18)
-			maxFeeWei := new(big.Float).Mul(new(big.Float).SetFloat64(fmax), weiPerEth)
-			gasFeeCapWei := new(big.Float).Quo(maxFeeWei, new(big.Float).SetUint64(gasLimit))
-
-			gasFeeCap := new(big.Int)
-			_, acc := gasFeeCapWei.Int(gasFeeCap)
-			if acc != big.Exact {
-				logx.Errorf("evm collect gas calculation precision loss, feecap:%v", gasFeeCapWei)
-				err = biz.AddressFundCollectEstimateGasFailed
-				return
-			}
-
-			gasTipCap := new(big.Int).Div(gasFeeCap, big.NewInt(2))
-			if gasTipCap.Sign() <= 0 {
-				logx.Errorf("evm collect invalid gas tip cap, feecap:%v, tipcap:%v", gasFeeCap, gasTipCap)
-				err = biz.AddressFundCollectInvalidGasTipCap
+			nonce, err := cli.PendingNonceAt(ctx, fromAddress)
+			if err != nil {
+				logx.Errorf("evm collect get pending nonce failed, from:%v, err:%v", from.Address, err)
+				err = biz.AddressFundCollectGetNonceFailed
 				return
 			}
 
 			auth.Nonce = big.NewInt(int64(nonce))
 			auth.Value = big.NewInt(0)
-			auth.GasTipCap = gasTipCap
-			auth.GasFeeCap = gasFeeCap
-			auth.GasLimit = gasLimit
+			auth.GasTipCap = tcap
+			auth.GasFeeCap = fcap
+			auth.GasLimit = glimit
 
 			erc20c, err := erc20.NewErc20(uaddr, cli)
 			if err != nil {
@@ -527,6 +513,7 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 
 			if receipt.Status == types.ReceiptStatusSuccessful {
 				logx.Infof("🎉 evm collect transfer success, from:%v, to:%v, contract:%v, amount:%v, txid:%v", fromAddress.Hex(), toAddress.Hex(), uaddr.Hex(), camount, tx.Hash().Hex())
+
 				mu.Lock()
 				collect.SuccessAmount += camount
 				collect.SuccessCount++
@@ -566,6 +553,69 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 	}
 
 	return
+}
+
+func estimateGasLimit(ctx context.Context, cli ethclient.Client, toAddress, fromAddress, uaddr common.Address, sun int64) (glimit uint64, err error) {
+	txlimit, err := erc20.PackTransfer(toAddress, big.NewInt(sun))
+	if err != nil {
+		logx.Errorf("evm collect pack transfer for estimate gas limit failed, err:%v", err)
+		err = biz.AddressFundCollectPackTransferFailed
+		return
+	}
+	msg := ethereum.CallMsg{
+		From:  fromAddress,   // 付款账户
+		To:    &uaddr,        // 目标合约地址
+		Data:  txlimit,       // 合约调用数据
+		Value: big.NewInt(0), // ERC20转账不转账ETH，值为0
+	}
+	glimit, err = cli.EstimateGas(ctx, msg)
+	if err != nil {
+		logx.Errorf("=== evm collect estimate gas limit failed ===, err:%v", err)
+		glimit = 120000
+	}
+	glimit = uint64(float64(glimit) * 1.25)
+
+	return
+}
+
+func clearPendingTransaction(ctx context.Context, cli *ethclient.Client, cid *big.Int, addr common.Address, prikey *ecdsa.PrivateKey) {
+	confirmedNonce, err := cli.NonceAt(ctx, addr, nil)
+	if err != nil {
+		logx.Errorf("获取确认Nonce失败: %v, cnonce:%v", err, confirmedNonce)
+		return
+	}
+
+	gasTipCap := big.NewInt(100_000_000_000) // 100 Gwei 矿工小费
+	gasFeeCap := big.NewInt(300_000_000_000) // 300 Gwei 总费用上限
+	gasLimit := uint64(21000)                // 原生转账标准GasLimit
+
+	// 4. 构造覆盖交易：相同阻塞Nonce + 0ETH转给自己
+	tx := types.NewTx(&types.DynamicFeeTx{
+		ChainID:   cid,
+		Nonce:     confirmedNonce, // 关键：使用阻塞的Nonce
+		To:        &addr,          // 收款方=自己，无资产转移
+		Value:     big.NewInt(0),
+		Gas:       gasLimit,
+		GasTipCap: gasTipCap,
+		GasFeeCap: gasFeeCap,
+	})
+
+	// 5. 签名交易
+	signer := types.LatestSignerForChainID(cid)
+	signedTx, err := types.SignTx(tx, signer, prikey)
+	if err != nil {
+		logx.Errorf("交易签名失败: %v", err)
+		return
+	}
+
+	// 6. 发送覆盖交易
+	err = cli.SendTransaction(ctx, signedTx)
+	if err != nil {
+		logx.Errorf("发送覆盖交易失败: %v", err)
+		return
+	}
+
+	logx.Infof("clean txid:%v", signedTx.Hash().Hex())
 }
 
 func (s *ChainService) TronCollect(currency global.CurrencyTypo, amin, fmax float64, gid int64) (err error) {

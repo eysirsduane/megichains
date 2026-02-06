@@ -93,4 +93,5 @@ var (
 	AddressFundCollectPrivateKeyDecryptFailed  = NewSpecificError(924, "地址资金归集私钥解密失败")
 	AddressFundCollectEstimateGasFailed        = NewSpecificError(925, "地址资金归集估算Gas失败")
 	AddressFundCollectInvalidGasTipCap         = NewSpecificError(926, "地址资金归集无效的Gas小费")
+	AddressFundCollectFeeOverLimit             = NewSpecificError(927, "地址资金归集手续费超过上限")
 )

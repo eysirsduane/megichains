@@ -441,14 +441,14 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 				sun = global.Sun(camount, global.AmountTypoEth)
 			}
 
-			efee, tcap, fcap, glimit, err := global.EstimateTransactionFee(ctx, cli, uaddr, fromAddress, toAddress, sun)
+			efee, tcap, fcap, glimit, err := erc20.EstimateTransactionFee(ctx, cli, uaddr, fromAddress, toAddress, sun)
 			if err != nil {
 				logx.Errorf("evm collect estimate fee failed, err:%v", err)
 				err = biz.AddressFundCollectEstimateGasFailed
 				return
 			}
 
-			overed, err := global.CheckFeeOverLimit(efee, fmax)
+			overed, err := erc20.CheckFeeOverLimit(efee, fmax)
 			if err != nil {
 				logx.Errorf("evm collect check fee over limit failed, err:%v", err)
 				err = biz.AddressFundCollectInvalidGasTipCap

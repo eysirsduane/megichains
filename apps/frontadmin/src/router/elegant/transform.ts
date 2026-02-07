@@ -200,7 +200,7 @@ const routeMap: RouteMap = {
   "function_toggle-auth": "/function/toggle-auth",
   "fund": "/fund",
   "fund_collect": "/fund/collect",
-  "fund_collectdetail": "/fund/collectdetail",
+  "fund_collectlog": "/fund/collectlog",
   "fund_statistics": "/fund/statistics",
   "home": "/home",
   "iframe-page": "/iframe-page/:url",

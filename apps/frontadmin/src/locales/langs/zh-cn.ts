@@ -79,7 +79,14 @@ const local: App.I18n.Schema = {
     username: '用户名',
     partial_success: '部分成功',
     failed: '失败',
-    processing: '处理中'
+    processing: '处理中',
+    amount: '金额',
+    from_address: '发送方',
+    receiver_address: '接收方',
+    status: '状态',
+    currency: '币种',
+    chain: '链',
+    transaction_id: '交易ID'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -269,7 +276,7 @@ const local: App.I18n.Schema = {
     fund: '资金管理',
     fund_statistics: '余额统计',
     fund_collect: '资金归集',
-    fund_collectdetail: '归集明细'
+    fund_collectlog: '归集明细'
   },
   page: {
     login: {
@@ -600,11 +607,15 @@ const local: App.I18n.Schema = {
         total_count: '总数',
         success_count: '成功数',
         description: '描述',
-        collect_amount_min: '归集最小金额'
+        collect_amount_min: '归集最小金额',
+        collect_id: '归集ID'
       },
       collect: {
         title: '资金归集列表',
         detail: '归集明细'
+      },
+      collectlog: {
+        title: '归集日志列表'
       }
     }
   },

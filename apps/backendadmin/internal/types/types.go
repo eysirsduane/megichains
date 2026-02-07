@@ -41,6 +41,36 @@ type AddressFundCollectListResp struct {
 	PagesBody
 }
 
+type AddressFundCollectLogItem struct {
+	Id              int64   `json:"id"`
+	CollectId       int64   `json:"collect_id"`
+	Chain           string  `json:"chain"`
+	Currency        string  `json:"currency"`
+	FromAddress     string  `json:"from_address"`
+	ReceiverAddress string  `json:"receiver_address"`
+	Amount          float64 `json:"amount"`
+	Status          string  `json:"status"`
+	TransactionId   string  `json:"transaction_id"`
+	Description     string  `json:"description"`
+	TimeAts
+}
+
+type AddressFundCollectLogListReq struct {
+	Pages
+	StartEnd
+	CollectId       int64  `form:"collect_id,optional"`
+	FromAddress     string `form:"from_address,optional"`
+	ReceiverAddress string `form:"receiver_address,optional"`
+	Chain           string `form:"chain,optional"`
+	Currency        string `form:"currency,optional"`
+	Status          string `form:"status,optional"`
+}
+
+type AddressFundCollectLogListResp struct {
+	Records []*AddressFundCollectLogItem `json:"records"`
+	PagesBody
+}
+
 type AddressFundCollectReq struct {
 	AddressGroupId int64   `json:"address_group_id"`
 	Chain          string  `json:"chain"`

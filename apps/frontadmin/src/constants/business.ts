@@ -40,6 +40,13 @@ export const collectStatusRecord: Record<Api.Common.CollectStatus, App.I18n.I18n
   失败: 'common.failed'
 };
 
+export const collectLogStatusRecord: Record<Api.Common.CollectLogStatus, App.I18n.I18nKey> = {
+  '': 'common.all',
+  已创建: 'common.created',
+  成功: 'common.success',
+  失败: 'common.failed'
+};
+
 export const addressTyposRecord: Record<Api.Common.AddressTypos, App.I18n.I18nKey> = {
   '': 'common.all',
   IN: 'common.in',
@@ -67,3 +74,4 @@ export const chainBigTyposOptions = transformRecordToOption(chainBigTyposRecord)
 export const addressTyposOptions = transformRecordToOption(addressTyposRecord);
 export const addressStatusOptions = transformRecordToOption(addressStatusRecord);
 export const addressGroupStatusOptions = transformRecordToOption(addressGroupStatusRecord);
+export const collectLogStatusOptions = transformRecordToOption(collectLogStatusRecord);

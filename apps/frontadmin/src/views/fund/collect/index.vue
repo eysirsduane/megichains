@@ -67,7 +67,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     {
       prop: 'status',
       label: $t('page.fund.common.status'),
-      width: 120,
+      width: 110,
       formatter: row => {
         const tagMap: Record<Api.Common.CollectStatus, UI.ThemeColor> = {
           '': 'info',
@@ -89,10 +89,10 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     { prop: 'username', label: $t('common.username'), width: 160 },
     { prop: 'receiver_address', label: $t('page.fund.common.to_address'), width: 400 },
     { prop: 'success_amount', label: $t('page.fund.common.success_amount'), width: 200 },
-    { prop: 'total_count', label: $t('page.fund.common.total_count'), width: 200 },
-    { prop: 'success_count', label: $t('page.fund.common.success_count'), width: 200 },
-    { prop: 'amount_min', label: $t('page.fund.common.collect_amount_min'), width: 200 },
-    { prop: 'fee_max', label: $t('page.fund.common.fee_max'), width: 200 },
+    { prop: 'total_count', label: $t('page.fund.common.total_count'), width: 100 },
+    { prop: 'success_count', label: $t('page.fund.common.success_count'), width: 100 },
+    { prop: 'amount_min', label: $t('page.fund.common.collect_amount_min'), width: 120 },
+    { prop: 'fee_max', label: $t('page.fund.common.fee_max'), width: 120 },
     { prop: 'description', label: $t('page.fund.common.description'), width: 200 },
     {
       prop: 'updated_at',

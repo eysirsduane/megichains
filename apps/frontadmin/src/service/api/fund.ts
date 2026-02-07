@@ -30,3 +30,11 @@ export function postCollectAddressFund(params?: Api.Fund.AddressFundCollectCreat
     data: params
   });
 }
+
+export function fetchGetAddressFundLogList(params?: Api.Fund.AddressFundCollectLogListSearchParams) {
+  return request<Api.Fund.AddressFundCollectLogList>({
+    url: '/fund/collect/log/list',
+    method: 'get',
+    params
+  });
+}

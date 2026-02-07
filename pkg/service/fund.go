@@ -75,15 +75,15 @@ func (s *FundService) FindCollectList(ctx context.Context, req *converter.Addres
 	items := make([]*converter.AddressFundCollectItem, 0)
 	err = db.Session(&gorm.Session{}).Select("address_fund_collects.*, address_groups.name as address_group_name, users.username as username").Joins("left join address_groups on address_fund_collects.address_group_id = address_groups.id").Joins("left join users on address_fund_collects.user_id = users.id").Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Scan(&items).Error
 	if err != nil {
-		logx.Errorf("address fund collect log paging failed, err:%v", err)
-		err = biz.AddressFundCollectLogFindFailed
+		logx.Errorf("address fund collect list paging failed, err:%v", err)
+		err = biz.AddressFundCollectFindFailed
 		return
 	}
 	total := int64(0)
 	err = db.Session(&gorm.Session{}).Count(&total).Error
 	if err != nil {
-		logx.Errorf("address fund collect log count failed, err:%v", err)
-		err = biz.AddressFundCollectLogCountFailed
+		logx.Errorf("address fund collect list count failed, err:%v", err)
+		err = biz.AddressFundCollectCountFailed
 		return
 	}
 
@@ -140,4 +140,45 @@ func (s *FundService) ScanFundCollectsStatus() {
 			continue
 		}
 	}
+}
+
+func (s *FundService) FindCollectLogList(ctx context.Context, req *converter.AddressFundCollectLogListReq) (resp *converter.RespConverter[*converter.AddressFundCollectLogItem], err error) {
+	db := s.db.Model(entity.AddressFundCollectLog{}).Order("id desc")
+	if req.CollectId > 0 {
+		db = db.Where("collect_id = ?", req.CollectId)
+	}
+	if req.Chain != "" {
+		db = db.Where("chain = ?", req.Chain)
+	}
+	if req.Currency != "" {
+		db = db.Where("currency = ?", req.Currency)
+	}
+	if req.Status != "" {
+		db = db.Where("status = ?", req.Status)
+	}
+	if req.FromAddress != "" {
+		db = db.Where("from_address = ?", req.FromAddress)
+	}
+	if req.ReceiverAddress != "" {
+		db = db.Where("receiver_address = ?", req.ReceiverAddress)
+	}
+
+	items := make([]*converter.AddressFundCollectLogItem, 0)
+	err = db.Session(&gorm.Session{}).Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Scan(&items).Error
+	if err != nil {
+		logx.Errorf("address fund collect log paging failed, err:%v", err)
+		err = biz.AddressFundCollectLogFindFailed
+		return
+	}
+	total := int64(0)
+	err = db.Session(&gorm.Session{}).Count(&total).Error
+	if err != nil {
+		logx.Errorf("address fund collect log count failed, err:%v", err)
+		err = biz.AddressFundCollectLogCountFailed
+		return
+	}
+
+	resp = converter.ConvertToPagingRecordsResp(items, req.Current, req.Size, total)
+
+	return
 }

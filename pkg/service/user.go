@@ -2,6 +2,7 @@ package service
 
 import (
 	"megichains/pkg/biz"
+	"megichains/pkg/converter"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
 	"strings"
@@ -41,7 +42,7 @@ func (s *UserService) Create(username, password string) (success bool, err error
 	return
 }
 
-func (s *UserService) Get(username string) (userinfo *UserInfo, err error) {
+func (s *UserService) Get(username string) (userinfo *converter.UserInfo, err error) {
 	user := &entity.User{}
 	err = s.db.Model(&entity.User{}).Where("username = ?", username).First(user).Error
 	if err != nil {
@@ -50,7 +51,7 @@ func (s *UserService) Get(username string) (userinfo *UserInfo, err error) {
 		return
 	}
 
-	userinfo = &UserInfo{}
+	userinfo = &converter.UserInfo{}
 	copier.Copy(userinfo, user)
 
 	return

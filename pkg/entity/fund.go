@@ -30,8 +30,9 @@ type AddressFundCollectLog struct {
 	FromAddress     string `gorm:"size:255"`
 	ReceiverAddress string `gorm:"size:255"`
 
-	Amount float64 `gorm:""`
-	Status string  `gorm:"size:31"`
+	Amount        float64 `gorm:""`
+	Status        string  `gorm:"size:31"`
+	TransactionId string  `gorm:"size:255"`
 
 	Description string `gorm:"size:1023"`
 

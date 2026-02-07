@@ -373,6 +373,13 @@ declare namespace App {
         partial_success: string;
         failed: string;
         processing: string;
+        amount: string;
+        from_address: string;
+        receiver_address: string;
+        status: string;
+        currency: string;
+        chain: string;
+        transaction_id: string;
       };
       request: {
         logout: string;
@@ -776,10 +783,14 @@ declare namespace App {
             success_count: string;
             description: string;
             collect_amount_min: string;
+            collect_id: string;
           };
           collect: {
             title: string;
             detail: string;
+          };
+          collectlog: {
+            title: string;
           };
         };
       };

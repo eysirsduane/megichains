@@ -20,7 +20,4 @@ type TronAccountResource struct {
 	StorageLimit         int64 `json:"storageLimit"`
 }
 
-type UserInfo struct {
-	Id       string
-	Username string
-}
+

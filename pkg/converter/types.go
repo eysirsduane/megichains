@@ -322,3 +322,38 @@ type FromAddress struct {
 	PrivateKey string
 	Balance    float64
 }
+
+type AddressFundCollectLogListReq struct {
+	Pages
+	StartEnd
+	CollectId       int64
+	FromAddress     string `form:"from_address,optional"`
+	ReceiverAddress string `form:"receiver_address,optional"`
+	Chain           string `form:"chain,optional"`
+	Currency        string `form:"currency,optional"`
+	Status          string `form:"status,optional"`
+}
+
+type AddressFundCollectLogListResp struct {
+	PagesBody
+	Records []*AddressFundCollectLogItem `json:"records"`
+}
+
+type AddressFundCollectLogItem struct {
+	Id              int64
+	CollectId       int64
+	Chain           string
+	Currency        string
+	FromAddress     string
+	ReceiverAddress string
+	Amount          float64
+	Status          string
+	TransactionId   string `json:"transaction_id"`
+	Description     string
+	TimeAts
+}
+
+type UserInfo struct {
+	Id       string
+	Username string
+}

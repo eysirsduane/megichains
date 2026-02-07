@@ -436,6 +436,8 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 				return
 			}
 
+			log.TransactionId = tx.Hash().Hex()
+
 			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 			defer cancel()
 			receipt, err := bind.WaitMined(ctx, cli, tx)

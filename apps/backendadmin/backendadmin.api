@@ -341,6 +341,36 @@ type AddressFundCollectItem {
 	TimeAts
 }
 
+type AddressFundCollectLogListReq {
+	Pages
+	StartEnd
+	CollectId       int64  `form:"collect_id,optional"`
+	FromAddress     string `form:"from_address,optional"`
+	ReceiverAddress string `form:"receiver_address,optional"`
+	Chain           string `form:"chain,optional"`
+	Currency        string `form:"currency,optional"`
+	Status          string `form:"status,optional"`
+}
+
+type AddressFundCollectLogListResp {
+	Records []*AddressFundCollectLogItem `json:"records"`
+	PagesBody
+}
+
+type AddressFundCollectLogItem {
+	Id              int64   `json:"id"`
+	CollectId       int64   `json:"collect_id"`
+	Chain           string  `json:"chain"`
+	Currency        string  `json:"currency"`
+	FromAddress     string  `json:"from_address"`
+	ReceiverAddress string  `json:"receiver_address"`
+	Amount          float64 `json:"amount"`
+	Status          string  `json:"status"`
+	TransactionId   string  `json:"transaction_id"`
+	Description     string  `json:"description"`
+	TimeAts
+}
+
 @server (
 	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
 	// goctl 生成代码时会将当前 service 代码块下的接口
@@ -488,10 +518,13 @@ service backendadmin {
 	@handler AddressFundStatisticsHandler
 	get /fund/statistics (AddressFundStatisticsReq) returns (AddressFundStatisticsResp)
 
+	@handler AddressFundCollectHandler
+	post /fund/collect (AddressFundCollectReq) returns (AddressFundCollectResp)
+
 	@handler AddressFundCollectListHandler
 	get /fund/collect/list (AddressFundCollectListReq) returns (AddressFundCollectListResp)
 
-	@handler AddressFundCollectHandler
-	post /fund/collect (AddressFundCollectReq) returns (AddressFundCollectResp)
+	@handler AddressFundCollectLogListHandler
+	get /fund/collect/log/list (AddressFundCollectLogListReq) returns (AddressFundCollectLogListResp)
 }
 

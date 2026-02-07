@@ -189,14 +189,14 @@ func (s *ChainService) updateDB(addr string, chain global.ChainName, usdt, usdc 
 	} else {
 		switch chain {
 		case global.ChainNameBsc:
-			address.BscUsdt = global.Amount(usdt.Int64(), global.AmountTypoBsc)
-			address.BscUsdc = global.Amount(usdc.Int64(), global.AmountTypoBsc)
+			address.BscUsdt = global.Amount(usdt.Int64(), global.AmountTypo18e)
+			address.BscUsdc = global.Amount(usdc.Int64(), global.AmountTypo18e)
 		case global.ChainNameEth:
-			address.EthUsdt = global.Amount(usdt.Int64(), global.AmountTypoEth)
-			address.EthUsdc = global.Amount(usdc.Int64(), global.AmountTypoEth)
+			address.EthUsdt = global.Amount(usdt.Int64(), global.AmountTypo6e)
+			address.EthUsdc = global.Amount(usdc.Int64(), global.AmountTypo6e)
 		case global.ChainNameTron:
-			address.TronUsdt = global.Amount(usdt.Int64(), global.AmountTypoTron)
-			address.TronUsdc = global.Amount(usdc.Int64(), global.AmountTypoTron)
+			address.TronUsdt = global.Amount(usdt.Int64(), global.AmountTypo6e)
+			address.TronUsdc = global.Amount(usdc.Int64(), global.AmountTypo6e)
 		}
 
 		_, err = db.Updates(ctx, address)
@@ -454,9 +454,21 @@ func (s *ChainService) EvmCollect(ctx context.Context, collect *entity.AddressFu
 
 			if receipt.Status == types.ReceiptStatusSuccessful {
 				logx.Infof("🎉 evm collect transfer success, chain:%v, currency:%v, from:%v, to:%v,  txid:%v", chain, currency, from.Address, receiver.Address, tx.Hash().Hex())
+
 				log.Status = string(global.CollectLogStatusSuccess)
+				log.GasUsed = receipt.GasUsed
+				log.EffectiveGasPrice = receipt.EffectiveGasPrice.Int64()
+				log.GasPrice = tx.GasPrice().Int64()
+
+				switch chain {
+				case global.ChainNameBsc:
+					log.TotalGasFee = int64(log.GasUsed) * log.GasPrice
+				case global.ChainNameEth:
+					log.TotalGasFee = int64(log.GasUsed) * log.EffectiveGasPrice
+				}
 			} else {
 				logx.Errorf("evm collect transfer failed, chain:%v, currency:%v, from:%v, to:%v,  txid:%v, status:%d", chain, currency, from.Address, receiver.Address, tx.Hash().Hex(), receipt.Status)
+
 				log.Status = string(global.CollectLogStatusFailed)
 				log.Description = fmt.Sprintf("evm collect log transfer failed, receipt status:%v", receipt.Status)
 			}
@@ -512,9 +524,9 @@ func (s *ChainService) sendEvmTransaction(ctx context.Context, cli *ethclient.Cl
 	sun := int64(0)
 	switch chain {
 	case global.ChainNameBsc:
-		sun = global.Sun(amount, global.AmountTypoBsc)
+		sun = global.Sun(amount, global.AmountTypo18e)
 	case global.ChainNameEth:
-		sun = global.Sun(amount, global.AmountTypoEth)
+		sun = global.Sun(amount, global.AmountTypo6e)
 	}
 
 	efee, tcap, fcap, glimit, err := erc20.EstimateTransactionFee(ctx, cli, chain, uaddr, fromAddress, toAddress, sun)
@@ -522,12 +534,12 @@ func (s *ChainService) sendEvmTransaction(ctx context.Context, cli *ethclient.Cl
 		return
 	}
 
-	overed, err := erc20.CheckFeeOverLimit(efee, fmax)
-	if err != nil {
-		return
-	}
-	if overed {
-		err = fmt.Errorf("evm collect fee limit overflow, efee:%v", efee)
+	mwei := new(big.Float).Mul(new(big.Float).SetFloat64(fmax), new(big.Float).SetInt64(1e18))
+	mfee := new(big.Int)
+	mwei.Int(mfee)
+
+	if efee.Cmp(mfee) > 0 {
+		err = fmt.Errorf("evm collect fee limit overflow, need:%v, actual:%v, fmax:%v", efee, mfee, fmax)
 		return
 	}
 
@@ -536,7 +548,8 @@ func (s *ChainService) sendEvmTransaction(ctx context.Context, cli *ethclient.Cl
 		return
 	}
 
-	// clearPendingTransaction(ctx, cli, cid, fromAddress, privateKey)
+	// tx = clearPendingTransaction(ctx, cli, cid, fromAddress, privateKey)
+	// return
 
 	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, cid)
 	if err != nil {
@@ -595,16 +608,16 @@ func estimateGasLimit(ctx context.Context, cli ethclient.Client, toAddress, from
 	return
 }
 
-func clearPendingTransaction(ctx context.Context, cli *ethclient.Client, cid *big.Int, addr common.Address, prikey *ecdsa.PrivateKey) {
+func clearPendingTransaction(ctx context.Context, cli *ethclient.Client, cid *big.Int, addr common.Address, prikey *ecdsa.PrivateKey) (stx *types.Transaction) {
 	confirmedNonce, err := cli.NonceAt(ctx, addr, nil)
 	if err != nil {
 		logx.Errorf("获取确认Nonce失败: %v, cnonce:%v", err, confirmedNonce)
 		return
 	}
 
-	gasTipCap := big.NewInt(100_000_000_000) // 100 Gwei 矿工小费
-	gasFeeCap := big.NewInt(300_000_000_000) // 300 Gwei 总费用上限
-	gasLimit := uint64(21000)                // 原生转账标准GasLimit
+	gasTipCap := big.NewInt(10_000_000_000) // 10 Gwei 矿工小费
+	gasFeeCap := big.NewInt(30_000_000_000) // 30 Gwei 总费用上限
+	gasLimit := uint64(21000)               // 原生转账标准GasLimit
 
 	// 4. 构造覆盖交易：相同阻塞Nonce + 0ETH转给自己
 	tx := types.NewTx(&types.DynamicFeeTx{
@@ -619,20 +632,22 @@ func clearPendingTransaction(ctx context.Context, cli *ethclient.Client, cid *bi
 
 	// 5. 签名交易
 	signer := types.LatestSignerForChainID(cid)
-	signedTx, err := types.SignTx(tx, signer, prikey)
+	stx, err = types.SignTx(tx, signer, prikey)
 	if err != nil {
 		logx.Errorf("交易签名失败: %v", err)
 		return
 	}
 
 	// 6. 发送覆盖交易
-	err = cli.SendTransaction(ctx, signedTx)
+	err = cli.SendTransaction(ctx, stx)
 	if err != nil {
 		logx.Errorf("发送覆盖交易失败: %v", err)
 		return
 	}
 
-	logx.Infof("clean txid:%v", signedTx.Hash().Hex())
+	logx.Infof("clean pending transaction, addr:%v, txid:%v", addr.Hex(), stx.Hash().Hex())
+
+	return
 }
 
 func (s *ChainService) TronCollect(currency global.CurrencyTypo, amin, fmax float64, gid int64) (err error) {

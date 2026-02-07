@@ -294,21 +294,23 @@ type AddressFundCollectListReq struct {
 }
 
 type AddressFundCollectItem struct {
-	Id               int64   `json:"id"`
-	UserId           string  `json:"user_id"`
-	Username         string  `json:"username"`
-	AddressGroupId   int64   `json:"address_group_id"`
-	AddressGroupName string  `json:"address_group_name"`
-	Chain            string  `json:"chain"`
-	Currency         string  `json:"currency"`
-	Status           string  `json:"status"`
-	ReceiverAddress  string  `json:"receiver_address"`
-	AmountMin        float64 `json:"amount_min"`
-	FeeMax           float64 `json:"fee_max"`
-	SuccessAmount    float64 `json:"success_amount"`
-	TotalCount       int64   `json:"total_count"`
-	SuccessCount     int64   `json:"success_count"`
-	Description      string  `json:"description"`
+	Id                  int64   `json:"id"`
+	UserId              string  `json:"user_id"`
+	Username            string  `json:"username"`
+	AddressGroupId      int64   `json:"address_group_id"`
+	AddressGroupName    string  `json:"address_group_name"`
+	Chain               string  `json:"chain"`
+	Currency            string  `json:"currency"`
+	Status              string  `json:"status"`
+	ReceiverAddress     string  `json:"receiver_address"`
+	AmountMin           float64 `json:"amount_min"`
+	FeeMax              float64 `json:"fee_max"`
+	SuccessAmount       float64 `json:"success_amount"`
+	TotalCount          int64   `json:"total_count"`
+	SuccessCount        int64   `json:"success_count"`
+	TotalGasFee         int64   `json:"total_gas_fee"`
+	TotalGasFeeCurrency float64 `json:"total_gas_fee_currency"`
+	Description         string  `json:"description"`
 	TimeAts
 }
 
@@ -340,16 +342,20 @@ type AddressFundCollectLogListResp struct {
 }
 
 type AddressFundCollectLogItem struct {
-	Id              int64
-	CollectId       int64
-	Chain           string
-	Currency        string
-	FromAddress     string
-	ReceiverAddress string
-	Amount          float64
-	Status          string
-	TransactionId   string `json:"transaction_id"`
-	Description     string
+	Id                int64
+	CollectId         int64
+	Chain             string
+	Currency          string
+	FromAddress       string
+	ReceiverAddress   string
+	Amount            float64
+	Status            string
+	TransactionId     string `json:"transaction_id"`
+	GasUsed           uint64 `json:"gas_used"`
+	GasPrice          int64  `json:"gas_price"`
+	EffectiveGasPrice int64  `json:"effective_gas_price"`
+	TotalGasFee       int64  `json:"total_gas_fee"`
+	Description       string
 	TimeAts
 }
 

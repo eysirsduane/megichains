@@ -11,10 +11,8 @@ import (
 type AmountTypo int64
 
 const (
-	AmountTypoEth  AmountTypo = 1_000_000
-	AmountTypoBsc  AmountTypo = 1_000_000_000_000_000_000
-	AmountTypoSun  AmountTypo = 1_000_000
-	AmountTypoTron AmountTypo = 1_000_000
+	AmountTypo6e  AmountTypo = 1_000_000
+	AmountTypo18e AmountTypo = 1_000_000_000_000_000_000
 )
 
 func Amount(sun int64, typo AmountTypo) (amount float64) {

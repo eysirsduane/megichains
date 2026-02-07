@@ -87,6 +87,10 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     { prop: 'amount', label: $t('common.amount'), width: 200 },
     { prop: 'from_address', label: $t('common.from_address'), width: 400 },
     { prop: 'receiver_address', label: $t('common.receiver_address'), width: 400 },
+    { prop: 'gas_used', label: $t('common.gas_used'), width: 200 },
+    { prop: 'gas_price', label: $t('common.gas_price'), width: 200 },
+    { prop: 'effective_gas_price', label: $t('common.effective_gas_price'), width: 200 },
+    { prop: 'total_gas_fee', label: $t('common.total_gas_fee'), width: 200 },
     { prop: 'transaction_id', label: $t('common.transaction_id'), width: 600 },
     { prop: 'description', label: $t('common.description'), width: 300 },
     {

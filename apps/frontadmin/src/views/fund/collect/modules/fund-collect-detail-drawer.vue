@@ -13,6 +13,8 @@ const targetId = defineModel<number>('targetId', {
   default: 0
 });
 
+const formRef = ref();
+
 type Model = Pick<
   Api.Fund.AddressFundCollectCreating,
   'id' | 'address_group_id' | 'chain' | 'currency' | 'status' | 'amount_min' | 'fee_max' | 'secret_key' | 'description'
@@ -68,16 +70,22 @@ interface Emits {
 }
 const emit = defineEmits<Emits>();
 
-async function save() {
-  const { data, error } = await postCollectAddressFund(model.value);
-  if (!error) {
-    window.$message?.success($t('common.updateSuccess'));
-    closeDrawer();
-    emit('saved');
-    return data;
-  }
+function save() {
+  formRef.value.validate(async (valid: boolean) => {
+    if (valid) {
+      const { data, error } = await postCollectAddressFund(model.value);
+      if (!error) {
+        window.$message?.success($t('common.saveSuccess'));
+        closeDrawer();
+        emit('saved');
+        return data;
+      }
+    } else {
+      window.$message?.error($t('common.paramsInvalid'));
+    }
 
-  return data;
+    return null;
+  });
 }
 
 const groups = ref<Api.Address.AddressGroup[]>([]);
@@ -97,15 +105,24 @@ watch(visible, async () => {
     }
   }
 });
+
+const rules = {
+  address_group_id: [{ required: true, message: '请选择分组', trigger: 'blur' }],
+  chain: [{ required: true, message: '请选择链', trigger: 'blur' }],
+  currency: [{ required: true, message: '请选择币种', trigger: 'blur' }],
+  amount_min: [{ required: true, message: '请输入最小归集金额', trigger: 'blur' }],
+  fee_max: [{ required: true, message: '请输入最大转账费用', trigger: 'blur' }],
+  secret_key: [{ required: true, message: '请输入口令密钥', trigger: 'blur' }]
+};
 </script>
 
 <template>
   <ElDrawer v-model="visible" :title="$t('page.fund.collect.detail')" :size="500">
-    <ElForm :model="model" label-position="top">
+    <ElForm ref="formRef" :rules="rules" :model="model" label-position="top">
       <ElFormItem :label="$t('common.id')" prop="id">
         <ElInput v-model="model.id" disabled />
       </ElFormItem>
-      <ElFormItem :label="$t('page.fund.common.address_group')" prop="group_id">
+      <ElFormItem :label="$t('page.fund.common.address_group')" prop="address_group_id">
         <ElSelect v-model="model.address_group_id" :empty-values="[0]" value-on-clear="">
           <ElOption v-for="item in groups" :key="item.id" :label="item.name" :value="item.id"></ElOption>
         </ElSelect>

@@ -74,7 +74,7 @@ func (m *TronClientItem) Listen(ctx context.Context, chain global.ChainName, ich
 									continue
 								}
 
-								amount := global.Amount(sun, global.AmountTypoTron)
+								amount := global.Amount(sun, global.AmountTypo6e)
 
 								trans := &entity.TronTransaction{}
 								trans.Currency = tx.TokenInfo.Symbol

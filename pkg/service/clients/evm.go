@@ -103,9 +103,9 @@ func (m *EvmClientItem) Listen(ctx context.Context, chain global.ChainName, icha
 				amount := float64(0)
 				switch chain {
 				case global.ChainNameEth:
-					amount = global.Amount(sun.Int64(), global.AmountTypoEth)
+					amount = global.Amount(sun.Int64(), global.AmountTypo6e)
 				case global.ChainNameBsc:
-					amount = global.Amount(sun.Int64(), global.AmountTypoBsc)
+					amount = global.Amount(sun.Int64(), global.AmountTypo18e)
 				default:
 					logx.Errorf("EVM chain 未知链SUN/AMOUNT比值, chain:%v", chain)
 					return

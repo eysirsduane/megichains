@@ -111,11 +111,13 @@ func (s *FundService) ScanFundCollectsStatus() {
 		}
 
 		calc := &global.CollectCalc{}
-		err = s.db.Model(&entity.AddressFundCollectLog{}).Where("collect_id = ? and status = ?", coll.Id, global.CollectLogStatusSuccess).Select("count(id) as success_count, sum(amount) as success_amount").Scan(calc).Error
+		err = s.db.Model(&entity.AddressFundCollectLog{}).Where("collect_id = ? and status = ?", coll.Id, global.CollectLogStatusSuccess).Select("count(id) as success_count, sum(amount) as success_amount, sum(total_gas_fee) as total_gas_fee").Scan(calc).Error
 		if err != nil {
 			logx.Errorf("job scan fund collect status count successful failed, err:%v", err)
 			continue
 		}
+		coll.TotalGasFee = calc.TotalGasFee
+		coll.TotalGasFeeCurrency = global.Amount(calc.TotalGasFee, global.AmountTypo18e)
 		if coll.TotalCount == calc.SuccessCount {
 			coll.Status = string(global.CollectLogStatusSuccess)
 		} else {
@@ -139,6 +141,8 @@ func (s *FundService) ScanFundCollectsStatus() {
 			logx.Errorf("job scan fund collect status save collect failed, err:%v", err)
 			continue
 		}
+
+		logx.Infof("job scan fund collect handle successful, collect:%v", coll.Id)
 	}
 }
 

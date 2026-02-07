@@ -45,6 +45,9 @@ const local: App.I18n.Schema = {
     trigger: '触发',
     update: '更新',
     updateSuccess: '更新成功',
+    saveSuccess: '保存成功',
+    saveFailed: '保存失败',
+    paramsInvalid: '参数不合法',
     userCenter: '个人中心',
     yesOrNo: {
       yes: '是',
@@ -86,7 +89,11 @@ const local: App.I18n.Schema = {
     status: '状态',
     currency: '币种',
     chain: '链',
-    transaction_id: '交易ID'
+    transaction_id: '交易ID',
+    gas_used: '消耗燃料总数',
+    gas_price: '燃料单价(BSC)',
+    effective_gas_price: '燃料单价(ETH)',
+    total_gas_fee: '总费用'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -276,7 +283,7 @@ const local: App.I18n.Schema = {
     fund: '资金管理',
     fund_statistics: '余额统计',
     fund_collect: '资金归集',
-    fund_collectlog: '归集明细'
+    fund_collectlog: '归集日志'
   },
   page: {
     login: {
@@ -327,7 +334,7 @@ const local: App.I18n.Schema = {
     },
     about: {
       title: '关于',
-      introduction: `SoybeanAdmin 是一个优雅且功能强大的后台管理模板，基于最新的前端技术栈，包括 Vue3, Vite5, TypeScript, Pinia 和 UnoCSS。它内置了丰富的主题配置和组件，代码规范严谨，实现了自动化的文件路由系统。此外，它还采用了基于 ApiFox 的在线Mock数据方案。SoybeanAdmin 为您提供了一站式的后台管理解决方案，无需额外配置，开箱即用。同样是一个快速学习前沿技术的最佳实践。`,
+      introduction: `Megichains 是一个优雅且功能强大的数字货币交易管理模板。`,
       projectInfo: {
         title: '项目信息',
         version: '版本',
@@ -608,7 +615,9 @@ const local: App.I18n.Schema = {
         success_count: '成功数',
         description: '描述',
         collect_amount_min: '归集最小金额',
-        collect_id: '归集ID'
+        collect_id: '归集ID',
+        total_gas_fee: '总燃料费',
+        total_gas_fee_currency: '本币总燃料费'
       },
       collect: {
         title: '资金归集列表',

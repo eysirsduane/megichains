@@ -51,6 +51,11 @@ declare namespace Api {
       from_address: string;
       receiver_address: string;
       amount: number;
+      transaction_id: string;
+      gas_used: number;
+      gas_price: number;
+      effective_gas_price: number;
+      total_gas_fee: number;
       description: string;
     }>;
 

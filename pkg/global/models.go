@@ -26,6 +26,7 @@ type EPayOrderAddress struct {
 }
 
 type CollectCalc struct {
-	SuccessCount  int64   `gorm:"column:success_count"`
-	SuccessAmount float64 `gorm:"column:success_amount"`
+	SuccessCount        int64   `gorm:"column:success_count"`
+	SuccessAmount       float64 `gorm:"column:success_amount"`
+	TotalGasFee         int64   `gorm:"column:total_gas_fee"`
 }

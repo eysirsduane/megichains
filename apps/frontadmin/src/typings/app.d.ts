@@ -338,6 +338,9 @@ declare namespace App {
         trigger: string;
         update: string;
         updateSuccess: string;
+        saveSuccess: string;
+        saveFailed: string;
+        paramsInvalid: string;
         userCenter: string;
         yesOrNo: {
           yes: string;
@@ -380,6 +383,10 @@ declare namespace App {
         currency: string;
         chain: string;
         transaction_id: string;
+        gas_used: string;
+        gas_price: string;
+        effective_gas_price: string;
+        total_gas_fee: string;
       };
       request: {
         logout: string;
@@ -784,6 +791,8 @@ declare namespace App {
             description: string;
             collect_amount_min: string;
             collect_id: string;
+            total_gas_fee: string;
+            total_gas_fee_currency: string;
           };
           collect: {
             title: string;

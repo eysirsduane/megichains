@@ -15,8 +15,8 @@ const targetId = defineModel<number>('targetId', {
 });
 
 type Model = Pick<
-  Api.Address.Address,
-  'id' | 'group_id' | 'typo' | 'status' | 'chain' | 'address' | 'address2' | 'description' | 'updated_at' | 'created_at'
+  Api.Fund.AddressFundCollectLog,
+  'id' | 'status' | 'chain' | 'description' | 'updated_at' | 'created_at'
 >;
 
 const model = ref(createDefaultModel());
@@ -24,25 +24,12 @@ const model = ref(createDefaultModel());
 function createDefaultModel(): Model {
   return {
     id: 0,
-    group_id: 0,
-    typo: '',
     status: '',
     chain: '',
-    address: '',
-    address2: '',
     description: '',
     updated_at: 0,
     created_at: 0
   };
-}
-
-async function getAddressDetail(id: number): Promise<Model> {
-  const { data, error } = await fetchGetAddressDetail(id);
-  if (!error) {
-    return data;
-  }
-
-  return createDefaultModel();
 }
 
 const timeHuman = (time: number) => {

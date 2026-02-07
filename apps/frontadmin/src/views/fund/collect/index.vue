@@ -91,6 +91,8 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     { prop: 'success_amount', label: $t('page.fund.common.success_amount'), width: 200 },
     { prop: 'total_count', label: $t('page.fund.common.total_count'), width: 100 },
     { prop: 'success_count', label: $t('page.fund.common.success_count'), width: 100 },
+    { prop: 'total_gas_fee', label: $t('page.fund.common.total_gas_fee'), width: 200 },
+    { prop: 'total_gas_fee_currency', label: $t('page.fund.common.total_gas_fee_currency'), width: 180 },
     { prop: 'amount_min', label: $t('page.fund.common.collect_amount_min'), width: 120 },
     { prop: 'fee_max', label: $t('page.fund.common.fee_max'), width: 120 },
     { prop: 'description', label: $t('page.fund.common.description'), width: 200 },

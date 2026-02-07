@@ -293,8 +293,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'fund_statistics',
           i18nKey: 'route.fund_statistics',
           icon: 'mdi:chart-areaspline',
-          order: 1,
-          keepAlive: true
+          order: 1
         }
       }
     ]

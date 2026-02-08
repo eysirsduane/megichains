@@ -69,7 +69,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 
 	req.Seconds += 120
 	switch req.Chain {
-	case global.ChainNameEth, global.ChainNameBsc:
+	case global.ChainNameBsc, global.ChainNameEth:
 		emu.Lock()
 		c, err1 := s.getClientItem(req.Chain)
 		if err1 != nil {
@@ -213,7 +213,7 @@ func (s *ListenService) getClientItem(chain global.ChainName) (item any, err err
 			} else {
 				if s.clilen < MonitorClientCount {
 					switch chain {
-					case global.ChainNameEth, global.ChainNameBsc:
+					case global.ChainNameBsc, global.ChainNameEth:
 						client, err1 := s.newEvmClient(chain)
 						if err1 != nil {
 							logx.Errorf("EVM chain Dial failed, try again err:%v", err1)
@@ -484,7 +484,7 @@ func (s *ListenService) listenTron(chain global.ChainName, currency global.Curre
 			return
 		}
 
-		s.chainservie.TronFunds(receiver)
+		s.chainservie.TronFunds(receiver, global.ChainNameTron)
 	}
 }
 

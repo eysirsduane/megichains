@@ -55,7 +55,7 @@ Solana:
 
 Tron:
   WssNetwork: ""
-  GrpcNetwork: ""
+  GrpcNetwork: "grpc://grpc.nile.trongrid.io:50051"
   HttpNetwork: https://nile.trongrid.io
   ApiKey: ""
 

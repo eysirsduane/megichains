@@ -96,4 +96,6 @@ var (
 	AddressFundCollectFeeOverLimit             = NewSpecificError(927, "地址资金归集手续费超过上限")
 	AddressFundCollectFindFailed               = NewSpecificError(928, "地址资金归集列表查询失败")
 	AddressFundCollectCountFailed              = NewSpecificError(929, "地址资金归集总数查询失败")
+	AddressFundCollectInitClientFailed         = NewSpecificError(930, "地址资金归集初始化客户端失败")
+	AddressFundCollectSaveFailed               = NewSpecificError(931, "地址资金归集保存失败")
 )

@@ -93,6 +93,8 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     { prop: 'bsc_usdc', label: $t('page.fund.common.bsc_usdc'), width: 200 },
     { prop: 'eth_usdt', label: $t('page.fund.common.eth_usdt'), width: 200 },
     { prop: 'eth_usdc', label: $t('page.fund.common.eth_usdc'), width: 200 },
+    { prop: 'solana_usdt', label: $t('page.fund.common.solana_usdt'), width: 200 },
+    { prop: 'solana_usdc', label: $t('page.fund.common.solana_usdc'), width: 200 },
     { prop: 'address2', label: $t('page.address.common.address2'), width: 400 },
     {
       prop: 'updated_at',

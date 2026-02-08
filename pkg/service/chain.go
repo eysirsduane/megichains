@@ -110,11 +110,12 @@ func (s *ChainService) ScanAddressesFunds() {
 	for _, addr := range addrs {
 		switch global.ChainName(addr.Chain) {
 		case global.ChainNameEvm:
-
 			s.EvmFunds(addr.Address, global.ChainNameBsc)
 			s.EvmFunds(addr.Address, global.ChainNameEth)
 		case global.ChainNameTron:
 			s.TronFunds(addr.Address, global.ChainNameTron)
+		case global.ChainNameSolana:
+			s.SolanaFunds(addr.Address, global.ChainNameSolana)
 		default:
 			logx.Errorf("scan addresses funds found unknown chain, chain:%v", addr.Chain)
 		}
@@ -177,14 +178,21 @@ func (s *ChainService) TronFunds(addr string, chain global.ChainName) {
 		return
 	}
 
-	s.updateDB(addr, global.ChainNameTron, usdt, usdc)
+	s.updateDB(addr, chain, usdt, usdc)
+}
+
+func (s *ChainService) SolanaFunds(addr string, chain global.ChainName) {
+
+	zero0 := new(big.Int)
+	s.updateDB(addr, chain, zero0, zero0)
 }
 
 func (s *ChainService) updateDB(addr string, chain global.ChainName, usdt, usdc *big.Int) {
-	ctx := context.Background()
+	balance := &entity.AddressBalance{
+		Address: addr,
+	}
 
-	db := gorm.G[entity.Address](s.db)
-	address, err := db.Where("address = ?", addr).First(ctx)
+	err := s.db.Model(&entity.AddressBalance{}).Where("address = ?", addr).FirstOrCreate(balance).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		logx.Errorf("address fund find unknown address, addr:%v", addr)
 	} else if err != nil {
@@ -192,17 +200,20 @@ func (s *ChainService) updateDB(addr string, chain global.ChainName, usdt, usdc 
 	} else {
 		switch chain {
 		case global.ChainNameBsc:
-			address.BscUsdt = global.Amount(usdt.Int64(), global.AmountTypo18e)
-			address.BscUsdc = global.Amount(usdc.Int64(), global.AmountTypo18e)
+			balance.BscUsdt = global.Amount(usdt.Int64(), global.AmountTypo18e)
+			balance.BscUsdc = global.Amount(usdc.Int64(), global.AmountTypo18e)
 		case global.ChainNameEth:
-			address.EthUsdt = global.Amount(usdt.Int64(), global.AmountTypo6e)
-			address.EthUsdc = global.Amount(usdc.Int64(), global.AmountTypo6e)
+			balance.EthUsdt = global.Amount(usdt.Int64(), global.AmountTypo6e)
+			balance.EthUsdc = global.Amount(usdc.Int64(), global.AmountTypo6e)
 		case global.ChainNameTron:
-			address.TronUsdt = global.Amount(usdt.Int64(), global.AmountTypo6e)
-			address.TronUsdc = global.Amount(usdc.Int64(), global.AmountTypo6e)
+			balance.TronUsdt = global.Amount(usdt.Int64(), global.AmountTypo6e)
+			balance.TronUsdc = global.Amount(usdc.Int64(), global.AmountTypo6e)
+		case global.ChainNameSolana:
+			balance.TronUsdt = global.Amount(usdt.Int64(), global.AmountTypo6e)
+			balance.TronUsdc = global.Amount(usdc.Int64(), global.AmountTypo6e)
 		}
 
-		_, err = db.Updates(ctx, address)
+		err = s.db.Save(balance).Error
 		if err != nil {
 			logx.Errorf("address fund first updates failed, err:%v", err)
 		}
@@ -272,6 +283,13 @@ func (s *ChainService) GetTRC20(addr, contract string) (balance *big.Int, err er
 	balance = new(big.Int)
 	balance.SetString(r.ConstantResult[0], 16)
 
+	// c, err := client.NewClient(s.cfg.Tron.GrpcNetwork)
+	// if err != nil {
+	// 	logx.Errorf("tron collect client new clinet failed, collect:%v, err:%v", collect.Id, err)
+	// 	err = biz.AddressFundCollectInitClientFailed
+	// 	return
+	// }
+
 	return
 }
 
@@ -298,7 +316,7 @@ func (s *ChainService) getContractAddress(currency global.CurrencyTypo, chain st
 }
 
 func (s *ChainService) ERC20Balance(chain global.ChainName, uaddr common.Address, owner common.Address) (*big.Int, error) {
-	cli, _ := s.newEvmClient(global.ChainNameBsc)
+	cli, _ := s.newEvmClient(chain)
 	defer cli.Close()
 
 	erc20c, err := erc20.NewErc20(uaddr, cli)
@@ -319,20 +337,9 @@ func (s *ChainService) ERC20Balance(chain global.ChainName, uaddr common.Address
 }
 
 func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.AddressFundCollectReq) (resp *converter.AddressFundCollectResp, err error) {
-	collect := &entity.AddressFundCollect{
-		UserId:         uid,
-		AddressGroupId: req.AddressGroupId,
-		Chain:          req.Chain,
-		Currency:       req.Currency,
-		AmountMin:      req.AmountMin,
-		FeeMax:         req.FeeMax,
-		Status:         string(global.CollectStatusProcessing),
-	}
-
+	cchain := ""
 	chain := global.ChainName(req.Chain)
 	currency := global.CurrencyTypo(req.Currency)
-
-	cchain := ""
 	if chain == global.ChainNameBsc || chain == global.ChainNameEth {
 		cchain = "EVM"
 	} else {
@@ -345,14 +352,13 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 		err = biz.AddressFundCollectReceiverAddressNotFound
 		return
 	}
-	collect.ReceiverAddress = receiver.Address
 
 	var c any
 	var caddr string
-	jquery := `"group_id" = ? and "chain" = ? and typo = ? `
+	jquery := `addresses.group_id = ? and addresses.chain = ? and addresses.typo = ? `
 	var updateAddressFund func(addr string, chain global.ChainName)
 	var sendTransaction func(c any, log *entity.AddressFundCollectLog, chain global.ChainName, from, to, prikey, caddr string, amount, fmax float64) (err error)
-	
+
 	switch chain {
 	case global.ChainNameBsc:
 		switch currency {
@@ -391,9 +397,9 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 	case global.ChainNameTron:
 		switch currency {
 		case global.CurrencyTypoUsdt:
-			jquery += " and tron_usdt >= ?"
+			jquery += " and address_balances.tron_usdt >= ?"
 		case global.CurrencyTypoUsdc:
-			jquery += " and tron_usdc >= ?"
+			jquery += " and address_balances.tron_usdc >= ?"
 		}
 
 		updateAddressFund = s.TronFunds
@@ -401,7 +407,7 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 
 		c, err = client.NewClient(s.cfg.Tron.GrpcNetwork)
 		if err != nil {
-			logx.Errorf("tron collect client new clinet failed, collect:%v, err:%v", collect.Id, err)
+			logx.Errorf("tron collect client new clinet failed, err:%v", err)
 			err = biz.AddressFundCollectInitClientFailed
 			return
 		}
@@ -414,13 +420,24 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 	}
 
 	froms := make([]*entity.Address, 0)
-	err = s.db.Model(entity.Address{}).Where(jquery, req.AddressGroupId, cchain, global.AddressTypoIn, req.AmountMin).Find(&froms).Error
+	err = s.db.Model(entity.Address{}).Preload("AddressBalance").Debug().Joins("left join address_balances on addresses.address = address_balances.address").Where(jquery, req.AddressGroupId, cchain, global.AddressTypoIn, req.AmountMin).Find(&froms).Error
 	if err != nil {
 		logx.Errorf("collect get from address failed, group:%v, chain:%v, err:%v", req.AddressGroupId, chain, err)
 		err = biz.AddressFundCollectFromAddressNotFound
 		return
 	}
-	collect.TotalCount = int64(len(froms))
+
+	collect := &entity.AddressFundCollect{
+		UserId:          uid,
+		AddressGroupId:  req.AddressGroupId,
+		Chain:           req.Chain,
+		Currency:        req.Currency,
+		AmountMin:       req.AmountMin,
+		FeeMax:          req.FeeMax,
+		Status:          string(global.CollectStatusProcessing),
+		ReceiverAddress: receiver.Address,
+		TotalCount:      int64(len(froms)),
+	}
 
 	err = s.db.Save(collect).Error
 	if err != nil {

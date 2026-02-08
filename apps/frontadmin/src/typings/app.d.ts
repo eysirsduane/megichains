@@ -387,6 +387,7 @@ declare namespace App {
         gas_price: string;
         effective_gas_price: string;
         total_gas_fee: string;
+        solana: string;
       };
       request: {
         logout: string;
@@ -793,6 +794,8 @@ declare namespace App {
             collect_id: string;
             total_gas_fee: string;
             total_gas_fee_currency: string;
+            solana_usdt: string;
+            solana_usdc: string;
           };
           collect: {
             title: string;

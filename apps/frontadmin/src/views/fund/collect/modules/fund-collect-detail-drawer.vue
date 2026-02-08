@@ -52,6 +52,10 @@ const chains = [
   {
     value: 'TRON',
     label: 'TRON'
+  },
+  {
+    value: 'SOLANA',
+    label: 'SOLANA'
   }
 ];
 

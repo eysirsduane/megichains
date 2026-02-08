@@ -118,12 +118,14 @@ type AddressFundStatisticsReq struct {
 }
 
 type AddressFundStatisticsResp struct {
-	TronUsdt float64 `json:"tron_usdt"`
-	TronUsdc float64 `json:"tron_usdc"`
-	BscUsdt  float64 `json:"bsc_usdt"`
-	BscUsdc  float64 `json:"bsc_usdc"`
-	EthUsdt  float64 `json:"eth_usdt"`
-	EthUsdc  float64 `json:"eth_usdc"`
+	TronUsdt   float64 `json:"tron_usdt"`
+	TronUsdc   float64 `json:"tron_usdc"`
+	BscUsdt    float64 `json:"bsc_usdt"`
+	BscUsdc    float64 `json:"bsc_usdc"`
+	EthUsdt    float64 `json:"eth_usdt"`
+	EthUsdc    float64 `json:"eth_usdc"`
+	SolanaUsdt float64 `json:"solana_usdt"`
+	SolanaUsdc float64 `json:"solana_usdc"`
 }
 
 type AddressGroupAllResp struct {
@@ -167,6 +169,8 @@ type AddressItem struct {
 	BscUsdc     float64 `json:"bsc_usdc"`
 	EthUsdt     float64 `json:"eth_usdt"`
 	EthUsdc     float64 `json:"eth_usdc"`
+	SolanaUsdt  float64 `json:"solana_usdt"`
+	SolanaUsdc  float64 `json:"solana_usdc"`
 	Description string  `json:"description"`
 	TimeAts
 }

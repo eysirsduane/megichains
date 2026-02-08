@@ -4,13 +4,15 @@ export const chainTyposRecord: Record<Api.Common.ChainTypos, App.I18n.I18nKey> =
   '': 'common.all',
   TRON: 'common.tron',
   ETH: 'common.eth',
-  BSC: 'common.bsc'
+  BSC: 'common.bsc',
+  SOLANA: 'common.solana'
 };
 
 export const chainBigTyposRecord: Record<Api.Common.ChainBigTypos, App.I18n.I18nKey> = {
   '': 'common.all',
   TRON: 'common.tron',
-  EVM: 'common.evm'
+  EVM: 'common.evm',
+  SOLANA: 'common.solana'
 };
 
 export const currencyTyposRecord: Record<Api.Common.CurrencyTypos, App.I18n.I18nKey> = {

@@ -18,7 +18,7 @@ const statistics: ECOption = {
   },
   xAxis: {
     type: 'category',
-    data: ['波场USDT', '波场USDC', '币安USDT', '币安USDC', '以太坊USDT', '以太坊USDC']
+    data: ['波场USDT', '波场USDC', '币安USDT', '币安USDC', '以太坊USDT', '以太坊USDC', '索拉纳USDT', '索拉纳USDC']
   },
   yAxis: {
     type: 'value'

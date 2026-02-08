@@ -4,16 +4,19 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"megichains/pkg/biz"
 	"megichains/pkg/converter"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
+	"os"
 	"strings"
 
 	"github.com/btcsuite/btcd/btcec/v2"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/gagliardetto/solana-go"
 	"github.com/jinzhu/copier"
 	"github.com/mr-tron/base58/base58"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -104,7 +107,7 @@ func (s *AddressService) GroupFind(ctx context.Context, req *converter.AddressGr
 }
 
 func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq) (resp *converter.RespConverter[converter.AddressWithGroup], err error) {
-	db := s.db.Model(&entity.Address{})
+	db := s.db.Model(&entity.Address{}).Order("typo")
 	if req.Address != "" {
 		db = db.Where("address = ?", req.Address)
 	}
@@ -129,8 +132,8 @@ func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq
 	if req.End > 0 {
 		db = db.Where("created_at <= ?", req.End)
 	}
-	items := make([]converter.AddressWithGroup, 0, req.Size)
-	err = db.Session(&gorm.Session{}).Debug().Joins("left join address_groups on addresses.group_id = address_groups.id").Order("addresses.tron_usdt desc NULLS LAST, addresses.bsc_usdt desc NULLS LAST, addresses.eth_usdt desc NULLS LAST").Select("addresses.id, addresses.group_id, addresses.chain, addresses.typo, addresses.status, addresses.address, addresses.address2, addresses.updated_at, addresses.created_at, address_groups.name as group_name, addresses.tron_usdt, addresses.tron_usdc, addresses.bsc_usdt, addresses.bsc_usdc, addresses.eth_usdt, addresses.eth_usdc").Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Scan(&items).Error
+	addrs := make([]*entity.Address, 0, req.Size)
+	err = db.Session(&gorm.Session{}).Preload("AddressBalance").Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Find(&addrs).Error
 	if err != nil {
 		logx.Errorf("address list find failed, err:%v", err)
 		err = biz.AddressFindFailed
@@ -142,6 +145,34 @@ func (s *AddressService) Find(ctx context.Context, req *converter.AddressListReq
 		logx.Errorf("address list count failed, err:%v", err)
 		err = biz.AddressCountFailed
 		return
+	}
+
+	gids := make([]int64, 0, len(addrs))
+	for _, addr := range addrs {
+		gids = append(gids, addr.GroupId)
+	}
+	groups := make([]*entity.AddressGroup, 0)
+	err = s.db.Model(&entity.AddressGroup{}).Where("id in (?)", gids).Find(&groups).Error
+	if err != nil {
+		logx.Errorf("address list find groups failed, err:%v", err)
+		err = biz.AddressFindGroupFailed
+		return
+	}
+
+	items := make([]converter.AddressWithGroup, 0, len(addrs))
+	for _, addr := range addrs {
+		aitem := converter.AddressItem{}
+		copier.Copy(&aitem, addr)
+
+		gname := ""
+		for _, group := range groups {
+			if addr.GroupId == group.Id {
+				gname = group.Name
+				break
+			}
+		}
+
+		items = append(items, converter.AddressWithGroup{AddressItem: aitem, GroupName: gname})
 	}
 
 	resp = converter.ConvertToPagingRecordsResp(items, req.Current, req.Size, total)
@@ -170,6 +201,11 @@ func (s *AddressService) CreateAddress(req *converter.ChainAddressCreateReq) (er
 		for i := range req.Count {
 			fmt.Println(i)
 			s.createTronAddress(req.Chain)
+		}
+	case "SOLANA":
+		for i := range req.Count {
+			fmt.Println(i)
+			s.createSolanaAddresses(req.Chain)
 		}
 	default:
 		err = biz.AddressCreateFailed
@@ -216,6 +252,7 @@ func (s *AddressService) createEvmAddress(chain string) {
 		panic(err)
 	}
 }
+
 func (s *AddressService) createTronAddress(chain string) {
 	privateKey, err := btcec.NewPrivateKey()
 	if err != nil {
@@ -252,6 +289,29 @@ func (s *AddressService) createTronAddress(chain string) {
 	}
 
 	err = s.db.Create(addr).Error
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (s *AddressService) createSolanaAddresses(chain string) {
+	keypair := solana.NewWallet()
+	data, _ := json.MarshalIndent(keypair, "", "  ")
+	fileName := fmt.Sprintf("wallet_%d.json", 1)
+	_ = os.WriteFile(fileName, data, 0644)
+	fmt.Printf("Wallet prikey:%v, pubkey:%v \n", keypair.PrivateKey.String(), keypair.PublicKey())
+
+	addr := &entity.Address{
+		Chain:      chain,
+		Typo:       string(global.AddressTypoIn),
+		Status:     string(global.AddressStatusInFree),
+		Address:    keypair.PublicKey().String(),
+		Address2:   "",
+		PrivateKey: fmt.Sprintf("%x", keypair.PrivateKey.String()),
+		PublicKey:  "",
+	}
+
+	err := s.db.Create(addr).Error
 	if err != nil {
 		panic(err)
 	}

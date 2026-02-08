@@ -46,7 +46,7 @@ func (s *FundService) Find(ctx context.Context, req *converter.AddressFundListRe
 
 func (s *FundService) Statistics(ctx context.Context) (resp *converter.AddressFundStatisticsResp, err error) {
 	resp = &converter.AddressFundStatisticsResp{}
-	err = gorm.G[entity.Address](s.db).Select("sum(tron_usdt) as tron_usdt, sum(tron_usdc) as tron_usdc, sum(bsc_usdt) as bsc_usdt, sum(bsc_usdc) as bsc_usdc, sum(eth_usdt) as eth_usdt, sum(eth_usdc) as eth_usdc").Scan(ctx, resp)
+	err = gorm.G[entity.AddressBalance](s.db).Select("sum(tron_usdt) as tron_usdt, sum(tron_usdc) as tron_usdc, sum(bsc_usdt) as bsc_usdt, sum(bsc_usdc) as bsc_usdc, sum(eth_usdt) as eth_usdt, sum(eth_usdc) as eth_usdc, sum(solana_usdt) as solana_usdt, sum(solana_usdc) as solana_usdc").Scan(ctx, resp)
 	if err != nil {
 		logx.Errorf("address fund statistics failed, err:%v", err)
 	}

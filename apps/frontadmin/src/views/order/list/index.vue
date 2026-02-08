@@ -48,7 +48,6 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     { prop: 'selection', type: 'selection', width: 48 },
     { prop: 'id', type: 'id', label: $t('common.id') },
     { prop: 'merch_order_id', label: $t('page.order.common.merch_order_id'), width: 320 },
-    { prop: 'received_amount', label: $t('page.order.common.received_amount'), width: 160 },
     { prop: 'chain', label: $t('page.order.common.chain') },
     {
       prop: 'typo',
@@ -109,6 +108,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
         );
       }
     },
+    { prop: 'received_amount', label: $t('page.order.common.received_amount'), width: 160 },
     // { prop: 'received_sun', label: $t('page.order.common.received_sun'), width: 180 },
     { prop: 'from_address', label: $t('page.order.common.from_address'), width: 400 },
     { prop: 'to_address', label: $t('page.order.common.to_address'), width: 400 },

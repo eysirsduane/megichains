@@ -17,6 +17,8 @@ declare namespace Api {
       bsc_usdc: number;
       eth_usdt: number;
       eth_usdc: number;
+      solana_usdt: number;
+      solana_usdc: number;
       address2: string;
       description: string;
     }>;

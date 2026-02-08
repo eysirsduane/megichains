@@ -39,6 +39,7 @@ var (
 	AddressGroupFindFailed   = NewSpecificError(4005, "获取地址分组失败")
 	AddressGroupSaveFailed   = NewSpecificError(4006, "地址分组保存失败")
 	AddressGroupFieldInvalid = NewSpecificError(4007, "地址分组字段非法")
+	AddressFindGroupFailed   = NewSpecificError(4008, "获取地址分组失败")
 )
 
 var (

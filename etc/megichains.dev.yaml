@@ -78,6 +78,9 @@ ContractAddresses:
   - Chain: TRON
     Address: "TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj"
     Currency: "USDC"
+  - Chain: SOLANA
+    Address: "9gzkywhjpa3vP9XhvPVp1WtmnfYPdbYN7hKcfvUrmJqT"
+    Currency: "USDC"
 
 
 

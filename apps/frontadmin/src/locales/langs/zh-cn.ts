@@ -93,7 +93,8 @@ const local: App.I18n.Schema = {
     gas_used: '消耗燃料总数',
     gas_price: '燃料单价(BSC)',
     effective_gas_price: '燃料单价(ETH)',
-    total_gas_fee: '总费用'
+    total_gas_fee: '总费用',
+    solana: 'SOLANA'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -617,7 +618,9 @@ const local: App.I18n.Schema = {
         collect_amount_min: '归集最小金额',
         collect_id: '归集ID',
         total_gas_fee: '总燃料费',
-        total_gas_fee_currency: '本币总燃料费'
+        total_gas_fee_currency: '本币总燃料费',
+        solana_usdt: '索拉纳USDT',
+        solana_usdc: '索拉纳USDC'
       },
       collect: {
         title: '资金归集列表',

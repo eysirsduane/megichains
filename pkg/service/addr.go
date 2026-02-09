@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"megichains/pkg/biz"
 	"megichains/pkg/converter"
+	"megichains/pkg/crypt"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
 	"os"
@@ -301,17 +302,35 @@ func (s *AddressService) createSolanaAddresses(chain string) {
 	_ = os.WriteFile(fileName, data, 0644)
 	fmt.Printf("Wallet prikey:%v, pubkey:%v \n", keypair.PrivateKey.String(), keypair.PublicKey())
 
+	prikey := keypair.PrivateKey.String()
+	encrypted, err := crypt.Encrypt(prikey, crypt.PrivateKeySecretPassword, crypt.PrivateKeySecretSalt)
+	if err != nil {
+		fmt.Printf("encrypt private key failed, err:%v", err)
+		return
+	}
+
+	decrypted, err := crypt.Decrypt(encrypted, crypt.PrivateKeySecretPassword, crypt.PrivateKeySecretSalt)
+	if err != nil {
+		fmt.Printf("encrypt private key failed, err:%v", err)
+		return
+	}
+
+	fmt.Println(prikey == decrypted)
+
 	addr := &entity.Address{
 		Chain:      chain,
 		Typo:       string(global.AddressTypoIn),
 		Status:     string(global.AddressStatusInFree),
 		Address:    keypair.PublicKey().String(),
 		Address2:   "",
-		PrivateKey: fmt.Sprintf("%x", keypair.PrivateKey.String()),
+		PrivateKey: encrypted,
 		PublicKey:  "",
+		AddressBalance: entity.AddressBalance{
+			Address: keypair.PublicKey().String(),
+		},
 	}
 
-	err := s.db.Create(addr).Error
+	err = s.db.Create(addr).Error
 	if err != nil {
 		panic(err)
 	}

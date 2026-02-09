@@ -12,6 +12,7 @@ var (
 	ChainClientUpToMaxCount  = NewSpecificError(901, "链客户端已达到数量上西安")
 	ContractAddressNotFound  = NewSpecificError(902, "不支持的币种")
 	AlreadyListenThisAddress = NewSpecificError(903, "该地址已经被监听了")
+	ConvertClientFailed      = NewSpecificError(904, "转换客户端失败")
 )
 
 var (

@@ -12,6 +12,7 @@ type AmountTypo int64
 
 const (
 	AmountTypo6e  AmountTypo = 1_000_000
+	AmountTypo9e  AmountTypo = 1_000_000_000
 	AmountTypo18e AmountTypo = 1_000_000_000_000_000_000
 )
 

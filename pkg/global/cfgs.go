@@ -54,9 +54,9 @@ type Bsc struct {
 type Solana struct {
 	ChainId     int64
 	WssNetwork  string
+	WssNetwork2 string
 	GrpcNetwork string
 	ApiKey      string
-	UsdtMint    string
 }
 
 type Tron struct {

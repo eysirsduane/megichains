@@ -13,6 +13,7 @@ import (
 	"math/big"
 	"megichains/pkg/biz"
 	"megichains/pkg/converter"
+	"megichains/pkg/crypt"
 	"megichains/pkg/entity"
 	"megichains/pkg/erc20"
 	"megichains/pkg/global"
@@ -26,6 +27,11 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/gagliardetto/solana-go"
+	"github.com/gagliardetto/solana-go/programs/token"
+	"github.com/gagliardetto/solana-go/rpc"
+	confirm "github.com/gagliardetto/solana-go/rpc/sendAndConfirmTransaction"
+	"github.com/gagliardetto/solana-go/rpc/ws"
 	"github.com/kslamph/tronlib/pb/api"
 	"github.com/kslamph/tronlib/pkg/client"
 	"github.com/kslamph/tronlib/pkg/signer"
@@ -36,35 +42,42 @@ import (
 )
 
 type ChainService struct {
-	cfg     *global.BackendesConfig
-	db      *gorm.DB
-	running bool
+	cfg          *global.BackendesConfig
+	db           *gorm.DB
+	running      bool
+	cli          any
+	BscClinet    *ethclient.Client
+	EthClient    *ethclient.Client
+	SolanaClient *rpc.Client
 }
 
 func NewChainService(cfg *global.BackendesConfig, db *gorm.DB) *ChainService {
 	return &ChainService{cfg: cfg, db: db}
 }
 
-func (s *ChainService) newEvmClient(chain global.ChainName) (client *ethclient.Client, err error) {
-	port := ""
+func (s *ChainService) initChainClient(chain global.ChainName) (err error) {
 	switch chain {
 	case global.ChainNameBsc:
-		port = s.cfg.Bsc.WssNetwork2
-	case global.ChainNameEth:
-		// port = fmt.Sprintf("%v%v", s.cfg.Eth.WssNetwork, s.cfg.Eth.ApiKey)
-		port = s.cfg.Eth.WssNetwork2
-	case global.ChainNameTron:
-		// port = s.cfg.Tron.WssNetwork
-	case global.ChainNameSolana:
-		// port = s.cfg.Solana.WssNetwork
-	default:
-		return nil, fmt.Errorf("chain client found unknown chain:%v", chain)
-	}
+		client, ierr := ethclient.Dial(s.cfg.Bsc.WssNetwork2)
+		if ierr != nil {
+			logx.Errorf("chain client Dial failed, chain:%v, err:%v", chain, err)
+			return
+		}
 
-	client, err = ethclient.Dial(port)
-	if err != nil {
-		logx.Errorf("chain client Dial failed, chain:%v, err:%v", chain, err)
-		return
+		s.cli = client
+	case global.ChainNameEth:
+		client, ierr := ethclient.Dial(s.cfg.Eth.WssNetwork2)
+		if ierr != nil {
+			logx.Errorf("chain client Dial failed, chain:%v, err:%v", chain, err)
+			return
+		}
+
+		s.cli = client
+	case global.ChainNameTron:
+	case global.ChainNameSolana:
+		s.cli = rpc.New(s.cfg.Solana.GrpcNetwork)
+	default:
+		return fmt.Errorf("chain client found unknown chain:%v", chain)
 	}
 
 	return
@@ -72,13 +85,13 @@ func (s *ChainService) newEvmClient(chain global.ChainName) (client *ethclient.C
 
 func (s *ChainService) EncryptPrivateKey() {
 	ctx := context.Background()
-	addrs, err := gorm.G[entity.Address](s.db).Where("chain = ?", global.ChainNameTron).Order("id asc").Find(ctx)
+	addrs, err := gorm.G[entity.Address](s.db).Where("chain = ? and id = 1102", global.ChainNameSolana).Order("id asc").Find(ctx)
 	if err != nil {
 		logx.Errorf("encrypt private key address find failed, err:%v", err)
 		return
 	}
 	for _, addr := range addrs {
-		encrypted, err := global.EncryptEthPrivateKey(addr.PrivateKey, global.SecretKey)
+		encrypted, err := crypt.EncryptEthPrivateKey(addr.PrivateKey, crypt.PrivateKeySecretSalt)
 		if err != nil {
 			logx.Errorf("encrypt private key encrypted failed, addr:%v, err:%v", addr.Address, err)
 			continue
@@ -91,7 +104,33 @@ func (s *ChainService) EncryptPrivateKey() {
 	}
 }
 
-func (s *ChainService) ScanAddressesFunds() {
+func (s *ChainService) ReEncryptPrivateKey() {
+	ctx := context.Background()
+	addrs, err := gorm.G[entity.Address](s.db).Where("chain = ?", global.ChainNameTron).Order("id asc").Find(ctx)
+	if err != nil {
+		logx.Errorf("encrypt private key address find failed, err:%v", err)
+		return
+	}
+	for _, addr := range addrs {
+		decrypted, err := crypt.DecryptEthPrivateKey(addr.PrivateKey, crypt.PrivateKeySecretSalt)
+		if err != nil {
+			logx.Errorf("encrypt private key encrypted failed, addr:%v, err:%v", addr.Address, err)
+			continue
+		}
+		encrypted, err := crypt.Encrypt(decrypted, crypt.PrivateKeySecretPassword, crypt.PrivateKeySecretSalt)
+		if err != nil {
+			logx.Errorf("encrypt private key encrypted failed, addr:%v, err:%v", addr.Address, err)
+			continue
+		}
+		addr.PrivateKey = encrypted
+
+		if err := s.db.Save(&addr).Error; err != nil {
+			logx.Errorf("encrypt private key save encrypted key failed, addr:%v, err:%v", addr.Address, err)
+		}
+	}
+}
+
+func (s *ChainService) ScanAddressesFunds(chain global.ChainName) {
 	if s.running {
 		return
 	}
@@ -101,9 +140,15 @@ func (s *ChainService) ScanAddressesFunds() {
 	}()
 
 	ctx := context.Background()
-	addrs, err := gorm.G[entity.Address](s.db).Order("id asc").Find(ctx)
+	addrs, err := gorm.G[entity.Address](s.db).Where("chain = ?", chain).Order("id asc").Find(ctx)
 	if err != nil {
 		logx.Errorf("scan addresses funds cron address find failed, err:%v", err)
+		return
+	}
+
+	err = s.initChainClient(chain)
+	if err != nil {
+		logx.Errorf("collect new chain client failed, chain:%v, err:%v", global.ChainNameBsc, err)
 		return
 	}
 
@@ -120,7 +165,7 @@ func (s *ChainService) ScanAddressesFunds() {
 			logx.Errorf("scan addresses funds found unknown chain, chain:%v", addr.Chain)
 		}
 
-		time.Sleep(time.Millisecond * 500)
+		time.Sleep(time.Millisecond * 300)
 	}
 }
 
@@ -141,18 +186,44 @@ func (s *ChainService) EvmFunds(addr string, chain global.ChainName) {
 	usdtAddr := common.HexToAddress(taddr)
 	usdcAddr := common.HexToAddress(caddr)
 
-	usdt, err := s.ERC20Balance(chain, usdtAddr, address)
+	usdt, err := s.GetERC20Balance(chain, usdtAddr, address)
 	if err != nil {
 		logx.Errorf("evm fund get usdt balance failed, chain:%v, err:%v", chain, err)
 		return
 	}
-	usdc, err := s.ERC20Balance(chain, usdcAddr, address)
+	usdc, err := s.GetERC20Balance(chain, usdcAddr, address)
 	if err != nil {
 		logx.Errorf("evm fund get usdc balance failed, chain:%v, err:%v", chain, err)
 		return
 	}
 
 	s.updateDB(addr, chain, usdt, usdc)
+}
+
+func (s *ChainService) GetERC20Balance(chain global.ChainName, uaddr common.Address, owner common.Address) (balance int64, err error) {
+	cli, ok := s.cli.(*ethclient.Client)
+	if !ok {
+		err = biz.ConvertClientFailed
+		return
+	}
+
+	erc20c, err := erc20.NewErc20(uaddr, cli)
+	if err != nil {
+		logx.Errorf("evm collect new erc20 instance failed, uaddr:%v, err:%v", uaddr.Hex(), err)
+		err = biz.AddressFundCollectNewErc20InstanceFailed
+		return
+	}
+
+	b, err := erc20c.BalanceOf(&bind.CallOpts{}, owner)
+	if err != nil {
+		logx.Errorf("evm collect get erc20 balance failed, uaddr:%v, err:%v", uaddr.Hex(), err)
+		err = biz.AddressFundCollectErc20TransferFailed
+		return
+	}
+
+	balance = b.Int64()
+
+	return
 }
 
 func (s *ChainService) TronFunds(addr string, chain global.ChainName) {
@@ -167,12 +238,12 @@ func (s *ChainService) TronFunds(addr string, chain global.ChainName) {
 		return
 	}
 
-	usdt, err := s.GetTRC20(addr, taddr)
+	usdt, err := s.GetTRC20Balance(addr, taddr)
 	if err != nil {
 		logx.Errorf("tron fund get usdt balance failed, chain:%v, err:%v", global.ChainNameTron, err)
 		return
 	}
-	usdc, err := s.GetTRC20(addr, caddr)
+	usdc, err := s.GetTRC20Balance(addr, caddr)
 	if err != nil {
 		logx.Errorf("tron fund get usdc balance failed, chain:%v, err:%v", global.ChainNameTron, err)
 		return
@@ -181,13 +252,95 @@ func (s *ChainService) TronFunds(addr string, chain global.ChainName) {
 	s.updateDB(addr, chain, usdt, usdc)
 }
 
-func (s *ChainService) SolanaFunds(addr string, chain global.ChainName) {
+func (s *ChainService) GetTRC20Balance(addr, contract string) (balance int64, err error) {
+	userHex, _ := s.Base58ToHex(addr)
+	contractHex, _ := s.Base58ToHex(contract)
 
-	zero0 := new(big.Int)
-	s.updateDB(addr, chain, zero0, zero0)
+	param := "000000000000000000000000" + userHex[2:]
+
+	resp, err := s.post("/wallet/triggersmartcontract", map[string]any{
+		"owner_address":     userHex,
+		"contract_address":  contractHex,
+		"function_selector": "balanceOf(address)",
+		"parameter":         param,
+	})
+	if err != nil {
+		return
+	}
+
+	var r struct {
+		ConstantResult []string `json:"constant_result"`
+	}
+	json.Unmarshal(resp, &r)
+
+	if len(r.ConstantResult) == 0 {
+		return 0, nil
+	}
+
+	b, _ := new(big.Int).SetString(r.ConstantResult[0], 16)
+	balance = b.Int64()
+
+	// c, err := client.NewClient(s.cfg.Tron.GrpcNetwork)
+	// if err != nil {
+	// 	logx.Errorf("tron collect client new clinet failed, collect:%v, err:%v", collect.Id, err)
+	// 	err = biz.AddressFundCollectInitClientFailed
+	// 	return
+	// }
+
+	return
 }
 
-func (s *ChainService) updateDB(addr string, chain global.ChainName, usdt, usdc *big.Int) {
+func (s *ChainService) SolanaFunds(addr string, chain global.ChainName) {
+	taddr, err := s.getContractAddress(global.CurrencyTypoUsdt, string(global.ChainNameSolana))
+	if err != nil {
+		logx.Errorf("solana fund get usdc contract address failed, err:%v", err)
+		return
+	}
+	caddr, err := s.getContractAddress(global.CurrencyTypoUsdc, string(global.ChainNameSolana))
+	if err != nil {
+		logx.Errorf("solana fund get usdc contract address failed, err:%v", err)
+		return
+	}
+
+	usdt, err := s.GetSolanaUsdBalance(addr, taddr)
+	if err != nil {
+		logx.Errorf("solana fund get usdt balance failed, chain:%v, err:%v", global.ChainNameSolana, err)
+	}
+	usdc, err := s.GetSolanaUsdBalance(addr, caddr)
+	if err != nil {
+		logx.Errorf("solana fund get usdc balance failed, chain:%v, err:%v", global.ChainNameSolana, err)
+	}
+
+	s.updateDB(addr, chain, usdt, usdc)
+}
+
+func (s *ChainService) GetSolanaUsdBalance(addr, contract string) (balance int64, err error) {
+	cli, ok := s.cli.(*rpc.Client)
+	if !ok {
+		err = biz.ConvertClientFailed
+		return
+	}
+
+	umint := solana.MustPublicKeyFromBase58(contract)
+	owner := solana.MustPublicKeyFromBase58(addr)
+
+	uata, _, err := solana.FindAssociatedTokenAddress(owner, umint)
+	if err != nil {
+		return
+	}
+
+	ub, err := cli.GetTokenAccountBalance(context.Background(), uata, rpc.CommitmentFinalized)
+	if err != nil {
+		return
+	}
+
+	b, _ := new(big.Int).SetString(ub.Value.Amount, 10)
+	balance = b.Int64()
+
+	return
+}
+
+func (s *ChainService) updateDB(addr string, chain global.ChainName, usdt, usdc int64) {
 	balance := &entity.AddressBalance{
 		Address: addr,
 	}
@@ -200,17 +353,17 @@ func (s *ChainService) updateDB(addr string, chain global.ChainName, usdt, usdc 
 	} else {
 		switch chain {
 		case global.ChainNameBsc:
-			balance.BscUsdt = global.Amount(usdt.Int64(), global.AmountTypo18e)
-			balance.BscUsdc = global.Amount(usdc.Int64(), global.AmountTypo18e)
+			balance.BscUsdt = global.Amount(usdt, global.AmountTypo18e)
+			balance.BscUsdc = global.Amount(usdc, global.AmountTypo18e)
 		case global.ChainNameEth:
-			balance.EthUsdt = global.Amount(usdt.Int64(), global.AmountTypo6e)
-			balance.EthUsdc = global.Amount(usdc.Int64(), global.AmountTypo6e)
+			balance.EthUsdt = global.Amount(usdt, global.AmountTypo6e)
+			balance.EthUsdc = global.Amount(usdc, global.AmountTypo6e)
 		case global.ChainNameTron:
-			balance.TronUsdt = global.Amount(usdt.Int64(), global.AmountTypo6e)
-			balance.TronUsdc = global.Amount(usdc.Int64(), global.AmountTypo6e)
+			balance.TronUsdt = global.Amount(usdt, global.AmountTypo6e)
+			balance.TronUsdc = global.Amount(usdc, global.AmountTypo6e)
 		case global.ChainNameSolana:
-			balance.TronUsdt = global.Amount(usdt.Int64(), global.AmountTypo6e)
-			balance.TronUsdc = global.Amount(usdc.Int64(), global.AmountTypo6e)
+			balance.SolanaUsdt = global.Amount(usdt, global.AmountTypo6e)
+			balance.SolanaUsdc = global.Amount(usdc, global.AmountTypo6e)
 		}
 
 		err = s.db.Save(balance).Error
@@ -255,44 +408,6 @@ func (s *ChainService) Base58ToHex(addr string) (string, error) {
 	return hex.EncodeToString(payload), nil
 }
 
-func (s *ChainService) GetTRC20(addr, contract string) (balance *big.Int, err error) {
-	userHex, _ := s.Base58ToHex(addr)
-	contractHex, _ := s.Base58ToHex(contract)
-
-	param := "000000000000000000000000" + userHex[2:]
-
-	resp, err := s.post("/wallet/triggersmartcontract", map[string]any{
-		"owner_address":     userHex,
-		"contract_address":  contractHex,
-		"function_selector": "balanceOf(address)",
-		"parameter":         param,
-	})
-	if err != nil {
-		return
-	}
-
-	var r struct {
-		ConstantResult []string `json:"constant_result"`
-	}
-	json.Unmarshal(resp, &r)
-
-	if len(r.ConstantResult) == 0 {
-		return big.NewInt(0), nil
-	}
-
-	balance = new(big.Int)
-	balance.SetString(r.ConstantResult[0], 16)
-
-	// c, err := client.NewClient(s.cfg.Tron.GrpcNetwork)
-	// if err != nil {
-	// 	logx.Errorf("tron collect client new clinet failed, collect:%v, err:%v", collect.Id, err)
-	// 	err = biz.AddressFundCollectInitClientFailed
-	// 	return
-	// }
-
-	return
-}
-
 func (s *ChainService) getContractAddress(currency global.CurrencyTypo, chain string) (caddr string, err error) {
 	switch currency {
 	case global.CurrencyTypoUsdt:
@@ -315,28 +430,12 @@ func (s *ChainService) getContractAddress(currency global.CurrencyTypo, chain st
 	return
 }
 
-func (s *ChainService) ERC20Balance(chain global.ChainName, uaddr common.Address, owner common.Address) (*big.Int, error) {
-	cli, _ := s.newEvmClient(chain)
-	defer cli.Close()
-
-	erc20c, err := erc20.NewErc20(uaddr, cli)
-	if err != nil {
-		logx.Errorf("evm collect new erc20 instance failed, uaddr:%v, err:%v", uaddr.Hex(), err)
-		err = biz.AddressFundCollectNewErc20InstanceFailed
-		return nil, err
-	}
-
-	balance, err := erc20c.BalanceOf(&bind.CallOpts{}, owner)
-	if err != nil {
-		logx.Errorf("evm collect get erc20 balance failed, uaddr:%v, err:%v", uaddr.Hex(), err)
-		err = biz.AddressFundCollectErc20TransferFailed
-		return nil, err
-	}
-
-	return balance, nil
-}
-
 func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.AddressFundCollectReq) (resp *converter.AddressFundCollectResp, err error) {
+	// s.ScanAddressesFunds(global.ChainNameSolana)
+	// return
+	// s.ReEncryptPrivateKey()
+	// return
+
 	cchain := ""
 	chain := global.ChainName(req.Chain)
 	currency := global.CurrencyTypo(req.Currency)
@@ -345,19 +444,25 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 	} else {
 		cchain = string(chain)
 	}
+
+	err = s.initChainClient(chain)
+	if err != nil {
+		logx.Errorf("collect new chain client failed, chain:%v, err:%v", chain, err)
+		return
+	}
+
 	receiver := &entity.Address{}
 	err = s.db.Model(&entity.Address{}).Where("chain = ? and typo = ?", cchain, global.AddressTypoCollect).First(receiver).Error
 	if err != nil {
-		logx.Errorf("tron collect get receiver address failed, err:%v", err)
+		logx.Errorf("collect get receiver address failed, err:%v", err)
 		err = biz.AddressFundCollectReceiverAddressNotFound
 		return
 	}
 
-	var c any
 	var caddr string
 	jquery := `addresses.group_id = ? and addresses.chain = ? and addresses.typo = ? `
 	var updateAddressFund func(addr string, chain global.ChainName)
-	var sendTransaction func(c any, log *entity.AddressFundCollectLog, chain global.ChainName, from, to, prikey, caddr string, amount, fmax float64) (err error)
+	var sendTransaction func(log *entity.AddressFundCollectLog, chain global.ChainName, from, to, prikey, caddr string, amount, fmax float64) (err error)
 
 	switch chain {
 	case global.ChainNameBsc:
@@ -370,8 +475,6 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 
 		updateAddressFund = s.EvmFunds
 		sendTransaction = s.sendEvmTransaction
-
-		c, _ = s.newEvmClient(global.ChainNameBsc)
 
 		caddr, err = s.getContractAddress(currency, string(global.ChainNameBsc))
 		if err != nil {
@@ -388,8 +491,6 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 		updateAddressFund = s.EvmFunds
 		sendTransaction = s.sendEvmTransaction
 
-		c, _ = s.newEvmClient(global.ChainNameEth)
-
 		caddr, err = s.getContractAddress(currency, string(global.ChainNameEth))
 		if err != nil {
 			return
@@ -405,22 +506,29 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 		updateAddressFund = s.TronFunds
 		sendTransaction = s.sendTronTransaction
 
-		c, err = client.NewClient(s.cfg.Tron.GrpcNetwork)
-		if err != nil {
-			logx.Errorf("tron collect client new clinet failed, err:%v", err)
-			err = biz.AddressFundCollectInitClientFailed
-			return
-		}
-
 		caddr, err = s.getContractAddress(currency, string(global.ChainNameTron))
 		if err != nil {
 			return
 		}
 	case global.ChainNameSolana:
+		switch currency {
+		case global.CurrencyTypoUsdt:
+			jquery += " and address_balances.solana_usdt >= ?"
+		case global.CurrencyTypoUsdc:
+			jquery += " and address_balances.solana_usdc >= ?"
+		}
+
+		updateAddressFund = s.SolanaFunds
+		sendTransaction = s.sendSolanaTransaction
+
+		caddr, err = s.getContractAddress(currency, string(global.ChainNameSolana))
+		if err != nil {
+			return
+		}
 	}
 
 	froms := make([]*entity.Address, 0)
-	err = s.db.Model(entity.Address{}).Preload("AddressBalance").Debug().Joins("left join address_balances on addresses.address = address_balances.address").Where(jquery, req.AddressGroupId, cchain, global.AddressTypoIn, req.AmountMin).Find(&froms).Error
+	err = s.db.Model(entity.Address{}).Preload("AddressBalance").Joins("left join address_balances on addresses.address = address_balances.address").Where(jquery, req.AddressGroupId, cchain, global.AddressTypoIn, req.AmountMin).Find(&froms).Error
 	if err != nil {
 		logx.Errorf("collect get from address failed, group:%v, chain:%v, err:%v", req.AddressGroupId, chain, err)
 		err = biz.AddressFundCollectFromAddressNotFound
@@ -462,20 +570,20 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 
 			err = s.db.Save(log).Error
 			if err != nil {
-				logx.Errorf("tron collect log create failed, collect:%v, from:%v, to:%v, err:%v", collect.Id, from.Address, receiver.Address, err)
+				logx.Errorf("collect log create failed, collect:%v, from:%v, to:%v, err:%v", collect.Id, from.Address, receiver.Address, err)
 				return
 			}
 
-			decrypted, err := global.DecryptEthPrivateKey(from.PrivateKey, global.SecretKey)
+			prikey, err := crypt.Decrypt(from.PrivateKey, crypt.PrivateKeySecretPassword, crypt.PrivateKeySecretSalt)
 			if err != nil {
+				logx.Errorf("collect decrypted private key failed, from:%v, err:%v", from.Address, err)
 				return
 			}
 
-			err = sendTransaction(c, log, chain, from.Address, receiver.Address, decrypted, caddr, amount, req.FeeMax)
+			err = sendTransaction(log, chain, from.Address, receiver.Address, prikey, caddr, amount, req.FeeMax)
 			if err != nil {
 				logx.Errorf("collect send transaction failed, chain:%v, collect:%v, from:%v, to:%v, err:%v", chain, collect.Id, from.Address, receiver.Address, err)
 				err = biz.AddressFundCollectSendTxFailed
-				return
 			}
 
 			err = s.db.Save(log).Error
@@ -484,14 +592,19 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 			}
 
 			updateAddressFund(from.Address, chain)
+			updateAddressFund(receiver.Address, chain)
 		}()
 	}
 
 	return
 }
 
-func (s *ChainService) sendEvmTransaction(c any, log *entity.AddressFundCollectLog, chain global.ChainName, from, to, prikey, caddr string, amount, fmax float64) (err error) {
-	cli := c.(*ethclient.Client)
+func (s *ChainService) sendEvmTransaction(log *entity.AddressFundCollectLog, chain global.ChainName, from, to, prikey, caddr string, amount, fmax float64) (err error) {
+	cli, ok := s.cli.(*ethclient.Client)
+	if !ok {
+		logx.Errorf("send transaction convert cli failed, chain:%v, log:%v", chain, log.Id)
+		return
+	}
 
 	tx, err := s.evmTransfer(cli, chain, to, prikey, caddr, amount, fmax)
 	if err != nil {
@@ -661,13 +774,20 @@ func clearPendingTransaction(ctx context.Context, cli *ethclient.Client, cid *bi
 	return
 }
 
-func (s *ChainService) sendTronTransaction(c any, log *entity.AddressFundCollectLog, chain global.ChainName, from, to, prikey, caddr string, amount, fmax float64) (err error) {
-	cli := c.(*client.Client)
+func (s *ChainService) sendTronTransaction(log *entity.AddressFundCollectLog, chain global.ChainName, from, to, prikey, caddr string, amount, fmax float64) (err error) {
+	cli, ok := s.cli.(*client.Client)
+	if !ok {
+		logx.Errorf("send transaction convert cli failed, chain:%v, log:%v", chain, log.Id)
+		return
+	}
+
 	ctx := context.Background()
 
 	ffrom := ttypes.MustNewAddressFromBase58(from)
 	tto := ttypes.MustNewAddressFromBase58(to)
 	uaddr := ttypes.MustNewAddressFromBase58(caddr)
+
+	// cli.SmartContract().EstimateEnergy()
 
 	ustx, err := cli.TRC20(uaddr).Transfer(ctx, ffrom, tto, decimal.NewFromFloat(amount))
 	if err != nil {
@@ -684,8 +804,10 @@ func (s *ChainService) sendTronTransaction(c any, log *entity.AddressFundCollect
 		return
 	}
 
+	log.TransactionId = result.TxID
+
 	if result.Success && result.Code == api.Return_SUCCESS {
-		logx.Infof("🎉 tron collect transfer success, chain:%v, currency:%v, from:%v, to:%v, txid:%v", global.ChainNameTron, log.Currency, from, to, result.TxID)
+		logx.Infof("🎉 tron collect transfer success, chain:%v, currency:%v, from:%v, to:%v, txid:%v", global.ChainNameSolana, log.Currency, from, to, result.TxID)
 
 		log.Status = string(global.CollectLogStatusSuccess)
 		log.GasUsed = uint64(result.EnergyUsage)
@@ -698,4 +820,141 @@ func (s *ChainService) sendTronTransaction(c any, log *entity.AddressFundCollect
 	}
 
 	return
+}
+
+func (s *ChainService) sendSolanaTransaction(log *entity.AddressFundCollectLog, chain global.ChainName, from, to, prikey, caddr string, amount, fmax float64) (err error) {
+	cli, ok := s.cli.(*rpc.Client)
+	if !ok {
+		err = fmt.Errorf("send transaction convert cli failed, chain:%v, log:%v", chain, log.Id)
+		return
+	}
+	txid, statuses, detail, err := s.solanaTransfer(cli, caddr, prikey, from, to, amount)
+	if err != nil {
+		logx.Errorf("solona send transaction failed, err:%v", err)
+
+		log.Status = string(global.CollectLogStatusFailed)
+		log.Description = err.Error()[0:1022]
+
+		err = biz.AddressFundCollectSendTxFailed
+		return
+	}
+
+	log.TransactionId = txid
+
+	if len(statuses.Value) > 0 && (statuses.Value[0].ConfirmationStatus == rpc.ConfirmationStatusConfirmed || statuses.Value[0].ConfirmationStatus == rpc.ConfirmationStatusFinalized) {
+		logx.Infof("🎉 solana collect transfer success, chain:%v, currency:%v, from:%v, to:%v, txid:%v", global.ChainNameTron, log.Currency, from, to, txid)
+
+		log.Status = string(global.CollectLogStatusSuccess)
+		log.TotalGasFee = int64(detail.Meta.Fee)
+	} else {
+		logx.Errorf("solana collect transfer failed, chain:%v, currency:%v, from:%v, to:%v, txid:%v", chain, log.Currency, from, to, txid)
+
+		log.Status = string(global.CollectLogStatusFailed)
+		log.Description = fmt.Sprintf("solana collect transfer failed, currency:%v, from:%v, to:%v", log.Currency, from, to)
+	}
+
+	return
+}
+
+func (s *ChainService) solanaTransfer(cli *rpc.Client, caddr, prikey, from, to string, amount float64) (txid string, statuses *rpc.GetSignatureStatusesResult, detail *rpc.GetTransactionResult, err error) {
+	ctx := context.Background()
+
+	pkey, err := solana.PrivateKeyFromBase58(prikey)
+	if err != nil {
+		return
+	}
+	ffrom := pkey.PublicKey()
+	tto, err := solana.PublicKeyFromBase58(to)
+	if err != nil {
+		return
+	}
+
+	umint, err := solana.PublicKeyFromBase58(caddr)
+	if err != nil {
+		return
+	}
+
+	fromt, err := getTokenAccountAddress(ffrom, umint)
+	if err != nil {
+		return
+	}
+	tot, err := getTokenAccountAddress(tto, umint)
+	if err != nil {
+		return
+	}
+
+	fbal, err := checkTokenAccountBalance(ctx, cli, fromt)
+	if err != nil {
+		return
+	}
+	if fbal < amount {
+		err = fmt.Errorf("solana account token balance insufficient, from:%v, now:%v, need:%v, caddr:%v", from, fbal, amount, caddr)
+		return
+	}
+
+	lblock, err := cli.GetLatestBlockhash(ctx, rpc.CommitmentFinalized)
+	if err != nil {
+		return
+	}
+
+	ins, err := token.NewTransferInstruction(uint64(global.Sun(amount, global.AmountTypo6e)), fromt, tot, ffrom, nil).ValidateAndBuild()
+	if err != nil {
+		return
+	}
+
+	tx, err := solana.NewTransaction([]solana.Instruction{ins}, lblock.Value.Blockhash, solana.TransactionPayer(ffrom))
+	if err != nil {
+		return
+	}
+
+	_, err = tx.Sign(func(key solana.PublicKey) *solana.PrivateKey {
+		if key.Equals(ffrom) {
+			return &pkey
+		}
+		return nil
+	})
+	if err != nil {
+		return
+	}
+
+	wscli, err := ws.Connect(context.Background(), s.cfg.Solana.WssNetwork2)
+	if err != nil {
+		return
+	}
+	sig, err := confirm.SendAndConfirmTransaction(context.TODO(), cli, wscli, tx)
+	if err != nil {
+		return
+	}
+
+	txid = sig.String()
+
+	statuses, err = cli.GetSignatureStatuses(ctx, false, []solana.Signature{sig}...)
+	if err != nil {
+		return
+	}
+
+	detail, err = cli.GetTransaction(ctx, sig, &rpc.GetTransactionOpts{Commitment: rpc.CommitmentConfirmed, Encoding: solana.EncodingBase64})
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func checkTokenAccountBalance(ctx context.Context, rpcClient *rpc.Client, owner solana.PublicKey) (balance float64, err error) {
+	tbal, err := rpcClient.GetTokenAccountBalance(ctx, owner, rpc.CommitmentFinalized)
+	if err != nil {
+		return
+	}
+
+	balance = *tbal.Value.UiAmount
+	return
+}
+
+func getTokenAccountAddress(wallet solana.PublicKey, mint solana.PublicKey) (solana.PublicKey, error) {
+	tokenAccount, _, err := solana.FindAssociatedTokenAddress(wallet, mint)
+	if err != nil {
+		return solana.PublicKey{}, err
+	}
+	return tokenAccount, nil
 }

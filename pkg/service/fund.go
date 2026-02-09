@@ -117,7 +117,16 @@ func (s *FundService) ScanFundCollectsStatus() {
 			continue
 		}
 		coll.TotalGasFee = calc.TotalGasFee
-		coll.TotalGasFeeCurrency = global.Amount(calc.TotalGasFee, global.AmountTypo18e)
+		switch global.ChainName(coll.Chain) {
+		case global.ChainNameBsc:
+			coll.TotalGasFeeCurrency = global.Amount(calc.TotalGasFee, global.AmountTypo18e)
+		case global.ChainNameEth:
+			coll.TotalGasFeeCurrency = global.Amount(calc.TotalGasFee, global.AmountTypo18e)
+		case global.ChainNameTron:
+			// coll.TotalGasFeeCurrency = global.Amount(calc.TotalGasFee, global.AmountTypo18e)
+		case global.ChainNameSolana:
+			coll.TotalGasFeeCurrency = global.Amount(calc.TotalGasFee, global.AmountTypo9e)
+		}
 		if coll.TotalCount == calc.SuccessCount {
 			coll.Status = string(global.CollectLogStatusSuccess)
 		} else {

@@ -49,9 +49,9 @@ BSC:
 Solana:
   ChainId: 23
   WssNetwork: wss://solana-devnet.g.alchemy.com/v2/
-  GrpcNetwork: https://solana-devnet.g.alchemy.com/v2/
+  WssNetwork2: wss://api.devnet.solana.com
+  GrpcNetwork: https://api.devnet.solana.com
   ApiKey: e9NHfWClRByVJCAgbZsq7
-  UsdtMint: "ArssLTduvvnue32EKwZtWcKDdg4dGWbm86EEW1Ci2CST"
 
 Tron:
   WssNetwork: ""
@@ -79,7 +79,10 @@ ContractAddresses:
     Address: "TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj"
     Currency: "USDC"
   - Chain: SOLANA
-    Address: "9gzkywhjpa3vP9XhvPVp1WtmnfYPdbYN7hKcfvUrmJqT"
+    Address: "4huGP1w5QyrvRMakfEGErsuP5fgrtKzBenLZh1vySkki"
+    Currency: "USDT"
+  - Chain: SOLANA
+    Address: "5xTbR2MzXoxBmUMVCJ4YjvWs9vvcDJk9zU1AZeDgpt2n"
     Currency: "USDC"
 
 

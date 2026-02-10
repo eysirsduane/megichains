@@ -381,6 +381,10 @@ type AddressFundCollectLogItem {
 	TimeAts
 }
 
+type AddressFundCollectLogDetailReq {
+	Id int64 `path:"id"`
+}
+
 @server (
 	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
 	// goctl 生成代码时会将当前 service 代码块下的接口
@@ -536,5 +540,8 @@ service backendadmin {
 
 	@handler AddressFundCollectLogListHandler
 	get /fund/collect/log/list (AddressFundCollectLogListReq) returns (AddressFundCollectLogListResp)
+
+	@handler AddressFundCollectLogDetailHandler
+	get /fund/collect/log/:id (AddressFundCollectLogDetailReq) returns (AddressFundCollectLogItem)
 }
 

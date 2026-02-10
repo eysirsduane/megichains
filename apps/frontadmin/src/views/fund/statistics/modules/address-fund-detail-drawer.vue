@@ -118,7 +118,7 @@ watch(visible, async () => {
 </script>
 
 <template>
-  <ElDrawer v-model="visible" :title="$t('page.address.list.title')" :size="500">
+  <ElDrawer v-model="visible" :title="$t('page.address.list.title')" :size="560">
     <ElForm :model="model" label-position="top">
       <ElFormItem :label="$t('common.id')" prop="id">
         <ElInput v-model="model.id" disabled />

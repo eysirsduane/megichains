@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
-import { chainBigTyposOptions, chainTyposOptions } from '@/constants/business';
+import { chainTyposOptions, collectLogStatusOptions, currencyTyposOptions } from '@/constants/business';
 import { fetchGetAddressGroupAll } from '@/service/api';
 import { useForm } from '@/hooks/common/form';
 import { translateOptions } from '@/utils/common';
@@ -80,15 +80,15 @@ onMounted(async () => {
                 <ElSelect
                   v-model="model.address_group_id"
                   clearable
-                  :empty-values="['']"
-                  value-on-clear=""
+                  :empty-values="[0]"
+                  :value-on-clear="0"
                   :placeholder="$t('page.fund.common.group')"
                 >
                   <ElOption
-                    v-for="(item, idx) in translateOptions(chainBigTyposOptions)"
+                    v-for="(item, idx) in addrGroupOptions"
                     :key="idx"
-                    :label="item.label"
-                    :value="item.value"
+                    :label="item.name"
+                    :value="item.id"
                   ></ElOption>
                 </ElSelect>
               </ElFormItem>
@@ -103,7 +103,7 @@ onMounted(async () => {
                   :placeholder="$t('page.fund.common.currency')"
                 >
                   <ElOption
-                    v-for="(item, idx) in translateOptions(chainBigTyposOptions)"
+                    v-for="(item, idx) in translateOptions(currencyTyposOptions)"
                     :key="idx"
                     :label="item.label"
                     :value="item.value"
@@ -121,7 +121,7 @@ onMounted(async () => {
                   :placeholder="$t('page.fund.common.status')"
                 >
                   <ElOption
-                    v-for="(item, idx) in translateOptions(chainBigTyposOptions)"
+                    v-for="(item, idx) in translateOptions(collectLogStatusOptions)"
                     :key="idx"
                     :label="item.label"
                     :value="item.value"

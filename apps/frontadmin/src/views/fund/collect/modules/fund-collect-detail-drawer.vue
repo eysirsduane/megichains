@@ -121,7 +121,7 @@ const rules = {
 </script>
 
 <template>
-  <ElDrawer v-model="visible" :title="$t('page.fund.collect.detail')" :size="500">
+  <ElDrawer v-model="visible" :title="$t('page.fund.collect.detail')" :size="560">
     <ElForm ref="formRef" :rules="rules" :model="model" label-position="top">
       <ElFormItem :label="$t('common.id')" prop="id">
         <ElInput v-model="model.id" disabled />

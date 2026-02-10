@@ -1,8 +1,8 @@
 <script setup lang="tsx">
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useBoolean } from '@sa/hooks';
 import { collectStatusRecord, currencyTyposRecord } from '@/constants/business';
-import { fetchGetAddressFundCollectList } from '@/service/api';
+import { fetchGetAddressFundCollectList, fetchGetAddressGroupAll } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
@@ -127,6 +127,13 @@ function add() {
   targetId.value = 0;
   openDrawer();
 }
+
+const addrGroupOptions = ref<Api.Address.AddressGroup[] | undefined>();
+
+onMounted(async () => {
+  const all = await fetchGetAddressGroupAll();
+  addrGroupOptions.value = all.data?.records;
+});
 </script>
 
 <template>

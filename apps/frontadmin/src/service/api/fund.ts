@@ -38,3 +38,10 @@ export function fetchGetAddressFundLogList(params?: Api.Fund.AddressFundCollectL
     params
   });
 }
+
+export function fetchGetAddressFundCollectLogDetail(id: number) {
+  return request<Api.Fund.AddressFundCollectLog>({
+    url: `/fund/collect/log/${id}`,
+    method: 'get'
+  });
+}

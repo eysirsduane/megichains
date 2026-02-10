@@ -109,6 +109,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodGet,
+				Path:    "/fund/collect/log/:id",
+				Handler: fund.AddressFundCollectLogDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
 				Path:    "/fund/collect/log/list",
 				Handler: fund.AddressFundCollectLogListHandler(serverCtx),
 			},

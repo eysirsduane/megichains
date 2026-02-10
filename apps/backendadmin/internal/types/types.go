@@ -43,6 +43,10 @@ type AddressFundCollectListResp struct {
 	PagesBody
 }
 
+type AddressFundCollectLogDetailReq struct {
+	Id int64 `path:"id"`
+}
+
 type AddressFundCollectLogItem struct {
 	Id                int64   `json:"id"`
 	CollectId         int64   `json:"collect_id"`

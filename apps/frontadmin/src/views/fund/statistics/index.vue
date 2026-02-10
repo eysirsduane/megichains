@@ -50,7 +50,16 @@ onBeforeMount(async () => {
     setStaticsOptions({
       series: [
         {
-          data: [data.tron_usdt, data.tron_usdc, data.bsc_usdt, data.bsc_usdc, data.eth_usdt, data.eth_usdc]
+          data: [
+            data.tron_usdt,
+            data.tron_usdc,
+            data.bsc_usdt,
+            data.bsc_usdc,
+            data.eth_usdt,
+            data.eth_usdc,
+            data.solana_usdt,
+            data.solana_usdc
+          ]
         }
       ]
     });

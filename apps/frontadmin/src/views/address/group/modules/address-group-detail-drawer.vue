@@ -88,7 +88,7 @@ const options = [
 </script>
 
 <template>
-  <ElDrawer v-model="visible" :title="$t('page.order.detail.title')" :size="500">
+  <ElDrawer v-model="visible" :title="$t('page.order.detail.title')" :size="560">
     <ElForm :model="model" label-position="top">
       <ElFormItem :label="$t('common.id')" prop="id">
         <ElInput v-model="model.id" disabled />

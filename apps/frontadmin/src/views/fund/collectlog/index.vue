@@ -1,12 +1,14 @@
 <script setup lang="tsx">
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
+import { ElButton } from 'element-plus';
+import { useBoolean } from '@sa/hooks';
 import { collectLogStatusRecord, currencyTyposRecord } from '@/constants/business';
 import { fetchGetAddressFundLogList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
 import AddressFundLogSearch from './modules/fund-collectlog-search.vue';
-// import AddressFundDetailDrawer from './modules/address-fund-detail-drawer.vue';
+import AddressFundCollectLogDetailDrawer from './modules/fund-collectlog-detail-drawer.vue';
 
 defineOptions({ name: 'AddressFundCollectLogListView' });
 
@@ -92,7 +94,6 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     { prop: 'effective_gas_price', label: $t('common.effective_gas_price'), width: 200 },
     { prop: 'total_gas_fee', label: $t('common.total_gas_fee'), width: 200 },
     { prop: 'transaction_id', label: $t('common.transaction_id'), width: 600 },
-    { prop: 'description', label: $t('common.description'), width: 300 },
     {
       prop: 'updated_at',
       label: $t('common.updated_at'),
@@ -108,9 +109,31 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       formatter: row => {
         return getHumannessDateTime(row.created_at);
       }
+    },
+    {
+      prop: 'operate',
+      fixed: true,
+      label: $t('common.operate'),
+      align: 'center',
+      width: 80,
+      formatter: row => (
+        <div class="flex-center">
+          <ElButton plain type="primary" size="small" onClick={() => detail(row.id)}>
+            {$t('page.order.common.detail')}
+          </ElButton>
+        </div>
+      )
     }
   ]
 });
+
+const { bool: drawerVisible, setTrue: openDrawer } = useBoolean();
+const targetId = ref(0);
+
+function detail(id: number) {
+  targetId.value = id;
+  openDrawer();
+}
 
 function resetSearchParams() {
   Object.assign(searchParams, getInitSearchParams());
@@ -155,7 +178,7 @@ function resetSearchParams() {
           @size-change="mobilePagination['size-change']"
         />
       </div>
-      <!-- <AddressFundDetailDrawer v-model:visible="drawerVisible" :target-id="targetId" @saved="getDataByPage" /> -->
+      <AddressFundCollectLogDetailDrawer v-model:visible="drawerVisible" :target-id="targetId" />
     </ElCard>
   </div>
 </template>

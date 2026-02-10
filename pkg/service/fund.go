@@ -195,3 +195,14 @@ func (s *FundService) FindCollectLogList(ctx context.Context, req *converter.Add
 
 	return
 }
+
+func (s *FundService) FindCollectLogDetail(ctx context.Context, id int64) (resp *entity.AddressFundCollectLog, err error) {
+	resp = &entity.AddressFundCollectLog{}
+	if s.db.Model(&entity.AddressFundCollectLog{}).First(resp, id).Error != nil {
+		logx.Errorf("address fund get log detail failed, id:%v, err:%v", id, err)
+		err = biz.AddressFundCollectLogGetFailed
+		return
+	}
+
+	return
+}

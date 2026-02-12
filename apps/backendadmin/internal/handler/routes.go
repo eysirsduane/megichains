@@ -12,6 +12,7 @@ import (
 	fund "megichains/apps/backendadmin/internal/handler/fund"
 	open "megichains/apps/backendadmin/internal/handler/open"
 	order "megichains/apps/backendadmin/internal/handler/order"
+	solana "megichains/apps/backendadmin/internal/handler/solana"
 	tron "megichains/apps/backendadmin/internal/handler/tron"
 	"megichains/apps/backendadmin/internal/svc"
 
@@ -159,6 +160,18 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/order/list",
 				Handler: order.OrderListHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/v1"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/solana/trans/list",
+				Handler: solana.SolanaTransListHandler(serverCtx),
 			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),

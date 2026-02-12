@@ -380,3 +380,31 @@ type UserInfo struct {
 	Id       string
 	Username string
 }
+
+type SolanaTransListReq struct {
+	Pages
+	StartEnd
+	Id            int64  `form:"id"`
+	Currency      string `form:"currency"`
+	TransactionId string `form:"transaction_id"`
+	FromBase58    string `form:"from_base58"`
+	ToBase58      string `form:"to_base58"`
+}
+
+type SolanaTransListResp struct {
+	Records []*SolanaTransItem `json:"records"`
+	*PagesBody
+}
+
+type SolanaTransItem struct {
+	Id            int64   `json:"id"`
+	Chain         string  `json:"chain"`
+	Currency      string  `json:"currency"`
+	TransactionId string  `json:"transaction_id"`
+	Amount        float64 `json:"amount"`
+	Lamport       int64   `json:"lamport"`
+	FromBase58    string  `json:"from_base58"`
+	ToBase58      string  `json:"to_base58"`
+	Mint          string  `json:"mint"`
+	BlockTime     uint64  `json:"block_time"`
+}

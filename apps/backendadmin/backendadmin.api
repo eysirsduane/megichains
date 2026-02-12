@@ -236,10 +236,10 @@ type AddressListResp {
 }
 
 type AddressGroupItem {
-	Id          int64  `json:"id,optional"`
+	Id          int64  `json:"id"`
 	Name        string `json:"name"`
 	Status      string `json:"status"`
-	Description string `json:"description,optional"`
+	Description string `json:"description"`
 	TimeAts
 }
 
@@ -385,6 +385,34 @@ type AddressFundCollectLogDetailReq {
 	Id int64 `path:"id"`
 }
 
+type SolanaTransListReq {
+	Pages
+	StartEnd
+	Id            int64  `form:"id,optional"`
+	Currency      string `form:"currency,optional"`
+	TransactionId string `form:"transaction_id,optional"`
+	FromBase58    string `form:"from_base58,optional"`
+	ToBase58      string `form:"to_base58,optional"`
+}
+
+type SolanaTransListResp {
+	Records []*SolanaTransItem `json:"records"`
+	PagesBody
+}
+
+type SolanaTransItem {
+	Id            int64   `json:"id"`
+	Chain         string  `json:"chain"`
+	Currency      string  `json:"currency"`
+	TransactionId string  `json:"transaction_id"`
+	Amount        float64 `json:"amount"`
+	Lamport       int64   `json:"lamport"`
+	FromBase58    string  `json:"from_base58"`
+	ToBase58      string  `json:"to_base58"`
+	Mint          string  `json:"mint"`
+	BlockTime     uint64  `json:"block_time"`
+}
+
 @server (
 	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
 	// goctl 生成代码时会将当前 service 代码块下的接口
@@ -478,6 +506,22 @@ service backendadmin {
 service backendadmin {
 	@handler EvmLogListHandler
 	get /evm/log/list (EvmLogListReq) returns (EvmLogListResp)
+}
+
+@server (
+	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
+	// goctl 生成代码时会将当前 service 代码块下的接口
+	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
+	// 等信息配置的 golang 结构体名称
+	jwt: Auth
+	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
+	group: solana
+	// 定义路由前缀为 "/v1"
+	prefix: /v1
+)
+service backendadmin {
+	@handler SolanaTransListHandler
+	get /solana/trans/list (SolanaTransListReq) returns (SolanaTransListResp)
 }
 
 @server (

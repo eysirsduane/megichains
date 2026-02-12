@@ -141,10 +141,10 @@ type AddressGroupDetailReq struct {
 }
 
 type AddressGroupItem struct {
-	Id          int64  `json:"id,optional"`
+	Id          int64  `json:"id"`
 	Name        string `json:"name"`
 	Status      string `json:"status"`
-	Description string `json:"description,optional"`
+	Description string `json:"description"`
 	TimeAts
 }
 
@@ -323,6 +323,34 @@ type Request struct {
 
 type Response struct {
 	Msg string `json:"msg"`
+}
+
+type SolanaTransItem struct {
+	Id            int64   `json:"id"`
+	Chain         string  `json:"chain"`
+	Currency      string  `json:"currency"`
+	TransactionId string  `json:"transaction_id"`
+	Amount        float64 `json:"amount"`
+	Lamport       int64   `json:"lamport"`
+	FromBase58    string  `json:"from_base58"`
+	ToBase58      string  `json:"to_base58"`
+	Mint          string  `json:"mint"`
+	BlockTime     uint64  `json:"block_time"`
+}
+
+type SolanaTransListReq struct {
+	Pages
+	StartEnd
+	Id            int64  `form:"id,optional"`
+	Currency      string `form:"currency,optional"`
+	TransactionId string `form:"transaction_id,optional"`
+	FromBase58    string `form:"from_base58,optional"`
+	ToBase58      string `form:"to_base58,optional"`
+}
+
+type SolanaTransListResp struct {
+	Records []*SolanaTransItem `json:"records"`
+	PagesBody
 }
 
 type StartEnd struct {

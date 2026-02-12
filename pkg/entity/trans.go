@@ -44,3 +44,22 @@ type TronTransaction struct {
 
 	TimeAts `gorm:"embedded"`
 }
+
+type SolanaTransaction struct {
+	Id int64 `gorm:"primaryKey;autoIncrement"`
+
+	Chain         string `gorm:""`
+	Currency      string `gorm:"size:15"`
+	TransactionId string `gorm:"size:255;uniqueIndex"`
+
+	Amount float64 `gorm:""`
+	Lamport    int64   `gorm:""`
+
+	FromBase58 string `gorm:"size:255"`
+	ToBase58   string `gorm:"size:255"`
+
+	Mint      string `gorm:"size:255"`
+	BlockTime uint64 `gorm:""`
+
+	TimeAts `gorm:"embedded"`
+}

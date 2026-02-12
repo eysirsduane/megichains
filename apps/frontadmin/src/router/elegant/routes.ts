@@ -497,6 +497,17 @@ export const generatedRoutes: GeneratedRoute[] = [
         }
       },
       {
+        name: 'order_solana',
+        path: '/order/solana',
+        component: 'view.order_solana',
+        meta: {
+          title: 'order_solana',
+          i18nKey: 'route.order_solana',
+          order: 4,
+          keepAlive: true
+        }
+      },
+      {
         name: 'order_tron',
         path: '/order/tron',
         component: 'view.order_tron',

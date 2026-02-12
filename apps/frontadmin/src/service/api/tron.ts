@@ -1,6 +1,6 @@
 import { request } from '../request';
 
-export function fetchGetTransList(params?: Api.Tron.TransSearchParams) {
+export function getTronTransList(params?: Api.Tron.TransSearchParams) {
   return request<Api.Tron.TransList>({
     url: '/tron/trans/list',
     method: 'get',
@@ -8,7 +8,7 @@ export function fetchGetTransList(params?: Api.Tron.TransSearchParams) {
   });
 }
 
-export function fetchGetTransDetail(id: number) {
+export function getTronTransDetail(id: number) {
   return request<Api.Tron.TransDetail>({
     url: `/tron/trans/detail?id=${id}`,
     method: 'get'

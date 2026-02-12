@@ -46,6 +46,7 @@ export const views: Record<LastLevelRouteKey, RouteComponent | (() => Promise<Ro
   "multi-menu_second_child_home": () => import("@/views/multi-menu/second_child_home/index.vue"),
   order_evm: () => import("@/views/order/evm/index.vue"),
   order_list: () => import("@/views/order/list/index.vue"),
+  order_solana: () => import("@/views/order/solana/index.vue"),
   order_tron: () => import("@/views/order/tron/index.vue"),
   plugin_barcode: () => import("@/views/plugin/barcode/index.vue"),
   plugin_charts_antv: () => import("@/views/plugin/charts/antv/index.vue"),

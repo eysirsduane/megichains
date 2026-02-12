@@ -63,7 +63,8 @@ func main() {
 	tronservice := service.NewTronService(db)
 	evmservice := service.NewEvmService(db)
 	fundservice := service.NewFundService(db)
-	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, addrservice, orderservice, chainservice, tronservice, evmservice, fundservice)
+	solanaservice := service.NewSolanaService(db)
+	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, addrservice, orderservice, chainservice, tronservice, evmservice, fundservice, solanaservice)
 	handler.RegisterHandlers(server, ctx)
 
 	httpx.SetOkHandler(biz.OkHandler)

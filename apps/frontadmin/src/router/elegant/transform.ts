@@ -219,6 +219,7 @@ const routeMap: RouteMap = {
   "order": "/order",
   "order_evm": "/order/evm",
   "order_list": "/order/list",
+  "order_solana": "/order/solana",
   "order_tron": "/order/tron",
   "plugin": "/plugin",
   "plugin_barcode": "/plugin/barcode",

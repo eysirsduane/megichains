@@ -73,6 +73,7 @@ declare module "@elegant-router/types" {
     "order": "/order";
     "order_evm": "/order/evm";
     "order_list": "/order/list";
+    "order_solana": "/order/solana";
     "order_tron": "/order/tron";
     "plugin": "/plugin";
     "plugin_barcode": "/plugin/barcode";
@@ -209,6 +210,7 @@ declare module "@elegant-router/types" {
     | "multi-menu_second_child_home"
     | "order_evm"
     | "order_list"
+    | "order_solana"
     | "order_tron"
     | "plugin_barcode"
     | "plugin_charts_antv"

@@ -57,15 +57,17 @@ var (
 )
 
 var (
-	SolanaOrderSaveFailed = NewSpecificError(7001, "Solana订单保存失败")
+	SolanaOrderSaveFailed        = NewSpecificError(7001, "Solana订单保存失败")
+	SolanaTransactionFindFailed  = NewSpecificError(7002, "Solana交易查询失败")
+	SolanaTransactionCountFailed = NewSpecificError(7003, "Solana交易总数统计失败")
 )
 
 var (
 	TronOrderSaveFailed        = NewSpecificError(8001, "Tron订单保存失败")
 	TronTransactionSaveFailed  = NewSpecificError(8002, "Tron交易保存失败")
 	TronOrderNotifyFailed      = NewSpecificError(8003, "Tron订单通知失败")
-	TronTransactionFindFailed  = NewSpecificError(8004, "Tron订单通知失败")
-	TronTransactionCountFailed = NewSpecificError(8005, "Tron订单总数统计失败")
+	TronTransactionFindFailed  = NewSpecificError(8004, "Tron交易通知失败")
+	TronTransactionCountFailed = NewSpecificError(8005, "Tron交易总数统计失败")
 )
 
 var (

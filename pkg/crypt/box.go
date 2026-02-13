@@ -100,9 +100,6 @@ func DeriveKey(password string, salt []byte) ([32]byte, error) {
 	return key, nil
 }
 
-// =======================
-// 2️⃣ 加密
-// =======================
 func Encrypt(plain, password, salt string) (string, error) {
 	key, err := DeriveKey(password, []byte(salt))
 	if err != nil {
@@ -111,21 +108,15 @@ func Encrypt(plain, password, salt string) (string, error) {
 
 	var nonce [nonceSize]byte
 
-	// 生成随机 nonce
 	if _, err := io.ReadFull(rand.Reader, nonce[:]); err != nil {
 		return "", err
 	}
 
-	// 加密
 	encrypted := secretbox.Seal(nonce[:], []byte(plain), &nonce, &key)
 
-	// Base64 输出
 	return base64.StdEncoding.EncodeToString(encrypted), nil
 }
 
-// =======================
-// 3️⃣ 解密
-// =======================
 func Decrypt(cipherText, password, salt string) (string, error) {
 	key, err := DeriveKey(password, []byte(salt))
 	if err != nil {

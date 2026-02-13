@@ -1,7 +1,7 @@
 import { request } from '../request';
 
 export function getSolanaTransList(params?: Api.Solana.TransSearchParams) {
-  return request<Api.Tron.TransList>({
+  return request<Api.Solana.TransList>({
     url: '/solana/trans/list',
     method: 'get',
     params
@@ -9,7 +9,7 @@ export function getSolanaTransList(params?: Api.Solana.TransSearchParams) {
 }
 
 export function getSolanaTransDetail(id: number) {
-  return request<Api.Tron.TransDetail>({
+  return request<Api.Solana.TransDetail>({
     url: `/solana/trans/detail/${id}`,
     method: 'get'
   });

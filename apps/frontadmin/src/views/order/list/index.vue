@@ -112,7 +112,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     // { prop: 'received_sun', label: $t('page.order.common.received_sun'), width: 180 },
     { prop: 'from_address', label: $t('page.order.common.from_address'), width: 400 },
     { prop: 'to_address', label: $t('page.order.common.to_address'), width: 400 },
-    { prop: 'transaction_id', label: $t('page.order.common.transaction_id'), width: 600 },
+    // { prop: 'transaction_id', label: $t('page.order.common.transaction_id'), width: 600 },
     {
       prop: 'updated_at',
       label: $t('common.updated_at'),

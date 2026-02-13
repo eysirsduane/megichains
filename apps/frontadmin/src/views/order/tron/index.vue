@@ -63,9 +63,9 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     { prop: 'amount', label: $t('page.order.common.amount'), width: 160 },
     { prop: 'sun', label: $t('page.order.common.sun'), width: 180 },
     { prop: 'contract', label: $t('page.order.common.contract'), width: 340 },
-    { prop: 'transaction_id', label: $t('page.order.common.transaction_id'), width: 560 },
     { prop: 'from_base58', label: $t('page.order.common.from_address'), width: 320 },
     { prop: 'to_base58', label: $t('page.order.common.to_address'), width: 320 },
+    { prop: 'transaction_id', label: $t('page.order.common.transaction_id'), width: 560 },
     { prop: 'block_timestamp', label: $t('page.order.common.block_timestamp'), width: 150 },
     {
       prop: 'updated_at',

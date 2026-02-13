@@ -93,7 +93,6 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     { prop: 'gas_price', label: $t('common.gas_price'), width: 200 },
     { prop: 'effective_gas_price', label: $t('common.effective_gas_price'), width: 200 },
     { prop: 'total_gas_fee', label: $t('common.total_gas_fee'), width: 200 },
-    { prop: 'transaction_id', label: $t('common.transaction_id'), width: 600 },
     {
       prop: 'updated_at',
       label: $t('common.updated_at'),

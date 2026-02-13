@@ -1,7 +1,7 @@
 <script setup lang="tsx">
 import { reactive } from 'vue';
 import { currencyTyposRecord } from '@/constants/business';
-import { getTronTransList } from '@/service/api';
+import { getSolanaTransList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
@@ -11,7 +11,7 @@ defineOptions({ name: 'TransSearch' });
 
 const searchParams = reactive(getInitSearchParams());
 
-function getInitSearchParams(): Api.Tron.TransSearchParams {
+function getInitSearchParams(): Api.Solana.TransSearchParams {
   return {
     current: 1,
     size: 20,
@@ -29,7 +29,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     currentPage: searchParams.current,
     pageSize: searchParams.size
   },
-  api: () => getTronTransList(searchParams),
+  api: () => getSolanaTransList(searchParams),
   transform: response => {
     return defaultSearchform(response);
   },
@@ -61,12 +61,12 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       }
     },
     { prop: 'amount', label: $t('page.order.common.amount'), width: 160 },
-    { prop: 'sun', label: $t('page.order.common.sun'), width: 180 },
-    { prop: 'contract', label: $t('page.order.common.contract'), width: 340 },
-    { prop: 'transaction_id', label: $t('page.order.common.transaction_id'), width: 560 },
-    { prop: 'from_base58', label: $t('page.order.common.from_address'), width: 320 },
-    { prop: 'to_base58', label: $t('page.order.common.to_address'), width: 320 },
-    { prop: 'block_timestamp', label: $t('page.order.common.block_timestamp'), width: 150 },
+    { prop: 'lamport', label: $t('page.order.common.lamport'), width: 180 },
+    { prop: 'mint', label: $t('page.order.common.contract'), width: 400 },
+    { prop: 'from_base58', label: $t('page.order.common.from_address'), width: 400 },
+    { prop: 'to_base58', label: $t('page.order.common.to_address'), width: 400 },
+    { prop: 'transaction_id', label: $t('page.order.common.transaction_id'), width: 760 },
+    { prop: 'block_time', label: $t('page.order.common.block_timestamp'), width: 150 },
     {
       prop: 'updated_at',
       label: $t('common.updated_at'),

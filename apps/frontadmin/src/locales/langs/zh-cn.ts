@@ -557,7 +557,7 @@ const local: App.I18n.Schema = {
         typo: '出入类型',
         status: '状态',
         currency: '币种',
-        from_address: '来源地址',
+        from_address: '发送地址',
         to_address: '接收地址',
         received_amount: '收到金额',
         received_sun: '收到金额(SUN)',
@@ -567,7 +567,8 @@ const local: App.I18n.Schema = {
         trans: '区块',
         contract: '合约地址',
         block_timestamp: '区块交易时间',
-        removed: '被移除'
+        removed: '被移除',
+        lamport: '收到金额(LAM)'
       },
       detail: {
         title: '订单明细'

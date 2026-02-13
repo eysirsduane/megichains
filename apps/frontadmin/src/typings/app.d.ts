@@ -742,6 +742,7 @@ declare namespace App {
             contract: string;
             block_timestamp: string;
             removed: string;
+            lamport: string;
           };
           detail: {
             title: string;

@@ -111,7 +111,7 @@ func (m *EvmClientItem) Listen(ctx context.Context, chain global.ChainName, icha
 					return
 				}
 
-				order := &entity.EvmLog{
+				log := &entity.EvmLog{
 					Currency:       currency,
 					ChainId:        cid.Uint64(),
 					TxHash:         log.TxHash.Hex(),
@@ -128,7 +128,7 @@ func (m *EvmClientItem) Listen(ctx context.Context, chain global.ChainName, icha
 					Removed:        log.Removed,
 				}
 
-				ichan <- order
+				ichan <- log
 			}
 
 			return

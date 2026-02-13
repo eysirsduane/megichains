@@ -22,6 +22,10 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/gorm"
+
+	"github.com/gagliardetto/solana-go"
+	"github.com/gagliardetto/solana-go/rpc"
+	"github.com/gagliardetto/solana-go/rpc/ws"
 )
 
 var emu sync.Mutex
@@ -34,30 +38,32 @@ const (
 )
 
 type ListenService struct {
-	db           *gorm.DB
-	cfg          *global.BackendesConfig
-	clients      sync.Map
-	clilen       int
-	qclilen      int
-	Receivers    sync.Map
-	addrservice  *AddressService
-	orderservice *MerchOrderService
-	chainservie  *ChainService
-	evmservice   *EvmService
-	tronservice  *TronService
+	db            *gorm.DB
+	cfg           *global.BackendesConfig
+	clients       sync.Map
+	clilen        int
+	qclilen       int
+	Receivers     sync.Map
+	addrservice   *AddressService
+	orderservice  *MerchOrderService
+	chainservie   *ChainService
+	evmservice    *EvmService
+	tronservice   *TronService
+	solanaservice *SolanaService
 }
 
-func NewListenService(cfg *global.BackendesConfig, db *gorm.DB, addrservice *AddressService, orderservice *MerchOrderService, chainservie *ChainService, evmservice *EvmService, tronservice *TronService) *ListenService {
+func NewListenService(cfg *global.BackendesConfig, db *gorm.DB, addrservice *AddressService, orderservice *MerchOrderService, chainservie *ChainService, evmservice *EvmService, tronservice *TronService, solanaservice *SolanaService) *ListenService {
 	return &ListenService{
-		db:           db,
-		cfg:          cfg,
-		clients:      sync.Map{},
-		Receivers:    sync.Map{},
-		addrservice:  addrservice,
-		orderservice: orderservice,
-		chainservie:  chainservie,
-		evmservice:   evmservice,
-		tronservice:  tronservice,
+		db:            db,
+		cfg:           cfg,
+		clients:       sync.Map{},
+		Receivers:     sync.Map{},
+		addrservice:   addrservice,
+		orderservice:  orderservice,
+		chainservie:   chainservie,
+		evmservice:    evmservice,
+		tronservice:   tronservice,
+		solanaservice: solanaservice,
 	}
 }
 
@@ -81,18 +87,6 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		emu.Unlock()
 
 		s.listenEvm(req.Chain, req.Currency, req.MerchOrderId, req.Receiver, req.Seconds, item)
-	case global.ChainNameSolana:
-		emu.Lock()
-		c, err1 := s.getClientItem(req.Chain)
-		if err1 != nil {
-			logx.Errorf("SOLANA 获取客户端失败, 已退出事务.")
-			return
-		}
-		item := c.(*clients.SolanaClientItem)
-		item.RunningQueryCount++
-		emu.Unlock()
-
-		s.listenSolana(req.Chain, req.MerchOrderId, req.Receiver, req.Seconds, item)
 	case global.ChainNameTron:
 		tmu.Lock()
 		c, err1 := s.getClientItem(req.Chain)
@@ -104,6 +98,18 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		tmu.Unlock()
 
 		s.listenTron(req.Chain, global.CurrencyTypo(req.Currency), req.MerchOrderId, req.Receiver, req.Seconds, item)
+	case global.ChainNameSolana:
+		emu.Lock()
+		c, err1 := s.getClientItem(req.Chain)
+		if err1 != nil {
+			logx.Errorf("SOLANA 获取客户端失败, 已退出事务.")
+			return
+		}
+		item := c.(*clients.SolanaClientItem)
+		item.RunningQueryCount++
+		emu.Unlock()
+
+		s.listenSolana(req.Chain, global.CurrencyTypo(req.Currency), req.MerchOrderId, req.Receiver, req.Seconds, item)
 	default:
 		logx.Errorf("=== 监听了未知的链 ===")
 		return
@@ -132,13 +138,14 @@ func (s *ListenService) newEvmClient(chain global.ChainName) (client *ethclient.
 	return
 }
 
-func (s *ListenService) newSolanaClient(chain global.ChainName) (conn *websocket.Conn, err error) {
-	port := fmt.Sprintf("%v%v", s.cfg.Solana.WssNetwork, s.cfg.Solana.ApiKey)
-	conn, _, err = websocket.DefaultDialer.Dial(port, nil)
+func (s *ListenService) newSolanaClient(chain global.ChainName) (wsc *ws.Client, rpcc *rpc.Client, err error) {
+	wsc, err = ws.Connect(context.Background(), s.cfg.Solana.WssNetwork2)
 	if err != nil {
-		logx.Errorf("Solana req.Chain connect failed, err:%v", err)
+		logx.Errorf("SOLANA new ws client failed, chain:%v, err:%v", chain, err)
 		return
 	}
+
+	rpcc = rpc.New(s.cfg.Solana.GrpcNetwork)
 
 	return
 }
@@ -150,6 +157,8 @@ func (s *ListenService) newTronClient(chain global.ChainName) (conn *websocket.C
 	// 	logx.Errorf("Tron req.Chain connect failed, err:%v", err)
 	// 	return
 	// }
+
+	logx.Infof("TRON new client, chain:%v", chain)
 
 	return
 }
@@ -167,20 +176,20 @@ func (s *ListenService) getClientItem(chain global.ChainName) (item any, err err
 			}
 		}
 
-		scli, ok := val.(*clients.SolanaClientItem)
+		tcli, ok := val.(*clients.TronClientItem)
 		if ok {
-			if scli.Chain == chain && scli.RunningQueryCount < MonitorClientSingleQueryLimit {
-				item = scli
+			if tcli.Chain == chain && tcli.RunningQueryCount < MonitorClientSingleQueryLimit {
+				item = tcli
 				found = true
 
 				return false
 			}
 		}
 
-		tcli, ok := val.(*clients.TronClientItem)
+		scli, ok := val.(*clients.SolanaClientItem)
 		if ok {
-			if tcli.Chain == chain && tcli.RunningQueryCount < MonitorClientSingleQueryLimit {
-				item = tcli
+			if scli.Chain == chain && scli.RunningQueryCount < MonitorClientSingleQueryLimit {
+				item = scli
 				found = true
 
 				return false
@@ -233,7 +242,7 @@ func (s *ListenService) getClientItem(chain global.ChainName) (item any, err err
 
 						return
 					case global.ChainNameSolana:
-						client, err1 := s.newSolanaClient(chain)
+						wsc, rpcc, err1 := s.newSolanaClient(chain)
 						if err1 != nil {
 							logx.Errorf("SOLANA chain Dial failed, try again err:%v", err1)
 							time.Sleep(time.Second * 2)
@@ -244,7 +253,9 @@ func (s *ListenService) getClientItem(chain global.ChainName) (item any, err err
 						name := uuid.NewString()
 						c.Chain = chain
 						c.Name = name
-						c.Client = client
+						c.WsClient = wsc
+						c.RpcClient = rpcc
+						c.Signatures = make(map[string]bool, 1)
 						item = c
 						s.clients.Store(name, item)
 						s.clilen++
@@ -304,7 +315,8 @@ func (s *ListenService) clearClients() {
 		scli, ok := val.(*clients.SolanaClientItem)
 		if ok {
 			if scli.RunningQueryCount <= 0 {
-				scli.Client.Close()
+				scli.WsClient.Close()
+				scli.RpcClient.Close()
 				s.clients.Delete(key)
 				s.clilen--
 				logx.Infof("SOLANA chain delete client, cname:%v, clen:%v", scli.Name, s.clilen)
@@ -398,11 +410,11 @@ func (s *ListenService) listenEvm(chain global.ChainName, currency, moid, receiv
 		order.ReceivedSun = log.Sun
 		order.Status = string(global.OrderStatusSuccess)
 
-		err = global.NotifyEPay(s.cfg.EPay.NotifyUrl, order.MerchOrderId, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount)
+		err = global.NotifyMerchant(s.cfg.EPay.NotifyUrl, order.MerchOrderId, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount)
 		if err != nil {
 			logx.Errorf("EVM chain notify failed, moid:%v, txid:%v, err:%v", moid, log.TxHash, err)
 			order.Status = string(global.OrderStatusNotifyFailed)
-			order.Description = err.Error()
+			order.Description = fmt.Sprintf("EVM notify failed. moid:%v, txid:%v, err:%v", moid, log.TxHash, err)
 		}
 
 		err = s.orderservice.Save(order)
@@ -412,12 +424,9 @@ func (s *ListenService) listenEvm(chain global.ChainName, currency, moid, receiv
 			return
 		}
 
+		s.chainservie.initChainClient(chain)
 		s.chainservie.EvmFunds(receiver, chain)
 	}
-}
-
-func (s *ListenService) listenSolana(chain global.ChainName, oid, receiver string, seconds int64, item *clients.SolanaClientItem) {
-
 }
 
 func (s *ListenService) listenTron(chain global.ChainName, currency global.CurrencyTypo, moid, receiver string, seconds int64, item *clients.TronClientItem) {
@@ -470,11 +479,11 @@ func (s *ListenService) listenTron(chain global.ChainName, currency global.Curre
 		order.ReceivedSun = trans.Sun
 		order.Status = string(global.OrderStatusSuccess)
 
-		err = global.NotifyEPay(s.cfg.EPay.NotifyUrl, order.MerchOrderId, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount)
+		err = global.NotifyMerchant(s.cfg.EPay.NotifyUrl, order.MerchOrderId, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount)
 		if err != nil {
 			logx.Errorf("Tron chain notify failed, moid:%v, txid:%v, err:%v", moid, trans.TransactionId, err)
 			order.Status = string(global.OrderStatusNotifyFailed)
-			order.Description = err.Error()
+			order.Description = fmt.Sprintf("TRON notify failed. moid:%v, txid:%v, err:%v", moid, trans.TransactionId, err)
 		}
 
 		err = s.orderservice.Save(order)
@@ -484,7 +493,96 @@ func (s *ListenService) listenTron(chain global.ChainName, currency global.Curre
 			return
 		}
 
+		s.chainservie.initChainClient(global.ChainNameTron)
 		s.chainservie.TronFunds(receiver, global.ChainNameTron)
+	}
+}
+
+func (s *ListenService) listenSolana(chain global.ChainName, currency global.CurrencyTypo, moid, receiver string, seconds int64, item *clients.SolanaClientItem) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(seconds)*time.Second)
+	defer cancel()
+
+	caddr, err := s.getContractAddress(currency, string(chain))
+	if err != nil {
+		logx.Errorf("SOLANA contract address get failed, chain:%v, currency:%v, err:%v", chain, currency, err)
+		err = biz.ContractAddressNotFound
+		return
+	}
+	umint := solana.MustPublicKeyFromBase58(caddr)
+
+	raddr, err := solana.PublicKeyFromBase58(receiver)
+	if err != nil {
+		logx.Errorf("SOLANA parse base58 addrress failed, err:%v", err)
+		return
+	}
+
+	ata, _, err := solana.FindAssociatedTokenAddress(raddr, umint)
+	if err != nil {
+		logx.Errorf("SOLANA find token address failed, raddr:%v, mint:%v, err:%v", raddr.String(), umint.String(), err)
+		return
+	}
+
+	sub, err := item.WsClient.LogsSubscribeMentions(ata, rpc.CommitmentFinalized)
+	if err != nil {
+		logx.Errorf("SOLANA subscribe account transaction failed, receiver:%v, err:%v", receiver, err)
+		return
+	}
+
+	order := &entity.MerchOrder{
+		MerchOrderId: moid,
+		Chain:        string(chain),
+		Typo:         string(global.OrderTypoIn),
+		Status:       string(global.OrderStatusCreated),
+		Currency:     string(currency),
+		ToAddress:    receiver,
+		Description:  "",
+	}
+	err = s.orderservice.Save(order)
+	if err != nil {
+		logx.Errorf("order service create tron order failed, moid:%v, receiver:%v, err:%v", moid, receiver, err)
+		err = biz.TronOrderSaveFailed
+		return
+	}
+
+	ichan := make(chan *entity.SolanaTransaction, 1)
+	go item.Listen(ctx, chain, ichan, currency, sub, receiver)
+
+	for trans := range ichan {
+		trans.Chain = string(chain)
+		err = s.solanaservice.TransSave(trans)
+		if err != nil {
+			logx.Errorf("tron service save trans failed, err:%v", err)
+			err = biz.SolanaTransactionSaveFailed
+			continue
+		}
+
+		logx.Infof("🎉🎉🎉 SOLANA 收到转账, [%v]:[%v]:[%v], from:%v, to:%v", chain, trans.Currency, global.GetFloat64String(trans.Amount), trans.FromBase58, trans.ToBase58)
+
+		order.LogId = trans.Id
+		order.MerchOrderId = moid
+		order.TransactionId = trans.TransactionId
+		order.Chain = string(chain)
+		order.FromAddress = trans.FromBase58
+		order.ReceivedAmount = trans.Amount
+		order.ReceivedSun = trans.Lamport
+		order.Status = string(global.OrderStatusSuccess)
+
+		err = global.NotifyMerchant(s.cfg.EPay.NotifyUrl, order.MerchOrderId, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount)
+		if err != nil {
+			logx.Errorf("Tron chain notify failed, moid:%v, txid:%v, err:%v", moid, trans.TransactionId, err)
+			order.Status = string(global.OrderStatusNotifyFailed)
+			order.Description = fmt.Sprintf("notify failed, moid:%v, txid:%v, err:%v", moid, trans.TransactionId, err)
+		}
+
+		err = s.orderservice.Save(order)
+		if err != nil {
+			logx.Errorf("Tron chain order service save order failed, moid:%v, txid:%v, err:%v", moid, order.TransactionId, err)
+			err = biz.SolanaOrderSaveFailed
+			return
+		}
+
+		s.chainservie.initChainClient(global.ChainNameSolana)
+		s.chainservie.SolanaFunds(receiver, global.ChainNameSolana)
 	}
 }
 

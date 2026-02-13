@@ -1,74 +1,28 @@
 package clients
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"fmt"
+	"math/big"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
-	"net/http"
-	"strconv"
 	"strings"
 
-	"github.com/gorilla/websocket"
+	"github.com/gagliardetto/solana-go/rpc"
+	"github.com/gagliardetto/solana-go/rpc/ws"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type SolanaClientItem struct {
 	Name              string
 	Chain             global.ChainName
-	Client            *websocket.Conn
+	WsClient          *ws.Client
+	RpcClient         *rpc.Client
 	Status            int // 0: 空闲, 1: 使用中
 	RunningQueryCount int
+	Signatures        map[string]bool
 }
 
-type LogsSubscribeReq struct {
-	Jsonrpc string `json:"jsonrpc"`
-	ID      int    `json:"id"`
-	Method  string `json:"method"`
-	Params  any    `json:"params"`
-}
-
-type LogsNotification struct {
-	Jsonrpc string `json:"jsonrpc"`
-	Method  string `json:"method"`
-	Params  struct {
-		Result struct {
-			Context struct {
-				Slot uint64 `json:"slot"`
-			} `json:"context"`
-			Value struct {
-				Signature string   `json:"signature"`
-				Err       any      `json:"err"`
-				Logs      []string `json:"logs"`
-			} `json:"value"`
-		} `json:"result"`
-		Subscription int `json:"subscription"`
-	} `json:"params"`
-}
-
-type TxResp struct {
-	Result struct {
-		Slot      uint64 `json:"slot"`
-		BlockTime int64  `json:"blockTime"`
-		Meta      struct {
-			PreTokenBalances  []TokenBalance `json:"preTokenBalances"`
-			PostTokenBalances []TokenBalance `json:"postTokenBalances"`
-		} `json:"meta"`
-	} `json:"result"`
-}
-
-type TokenBalance struct {
-	Mint          string `json:"mint"`
-	Owner         string `json:"owner"`
-	UiTokenAmount struct {
-		Amount   string `json:"amount"`
-		Decimals uint8  `json:"decimals"`
-	} `json:"uiTokenAmount"`
-}
-
-func (m *SolanaClientItem) listen(ctx context.Context, rpcurl, mint string, ichan chan *entity.MerchOrder, receiver string) {
+func (m *SolanaClientItem) Listen(ctx context.Context, chain global.ChainName, ichan chan *entity.SolanaTransaction, currency global.CurrencyTypo, sub *ws.LogSubscription, receiver string) {
 	logx.Infof("SOLANA chain 实时状态开始, cname:%v, count:%v, receiver:%v", m.Name, m.RunningQueryCount, receiver)
 	defer func() {
 		close(ichan)
@@ -81,121 +35,92 @@ func (m *SolanaClientItem) listen(ctx context.Context, rpcurl, mint string, icha
 		case <-ctx.Done():
 			logx.Infof("SOLANA chain 订阅超时, 已退出单笔订阅, to:%v", receiver)
 			return
-		default:
-			for {
-				var log LogsNotification
-				if err := m.Client.ReadJSON(&log); err != nil {
-					logx.Errorf("read err:%v", err)
-					return
+		case msg := <-sub.Response():
+			ctx := context.Background()
+			if msg.Value.Err != nil {
+				logx.Errorf("SOLANA sub response value has error, receiver:%v, err:%v", receiver, msg.Value.Err)
+				return
+			}
+
+			sig := msg.Value.Signature
+			if m.Signatures[sig.String()] == true {
+				return
+			}
+
+			if msg.Value.Signature.IsZero() {
+				continue
+			}
+
+			if !containsTransfer(msg.Value.Logs) {
+				continue
+			}
+
+			tx, err := m.RpcClient.GetTransaction(ctx, sig, &rpc.GetTransactionOpts{Commitment: rpc.CommitmentConfirmed})
+			if err != nil {
+				logx.Errorf("SOLANA get transaction failed, receiver:%v, err:%v", receiver, err)
+				return
+			}
+
+			if tx.Meta == nil {
+				logx.Errorf("SOLANA tx meta is nil, receiver:%v", receiver)
+				return
+			}
+
+			from := ""
+			ttx, _ := tx.Transaction.GetTransaction()
+			accs, _ := ttx.AccountMetaList()
+			for _, addr := range accs {
+				if addr.IsSigner {
+					from = addr.PublicKey.String()
+					logx.Infof("SOLANA trans account meta list get from address, currency:%v, from:%v, receiver:%v, txid:%v", currency, from, receiver, sig.String())
+
+					break
 				}
+			}
 
-				if log.Method != "logsNotification" {
-					continue
-				}
+			mint := ""
+			amount := float64(0)
+			sun := int64(0)
+			for _, post := range tx.Meta.PostTokenBalances {
+				mint = post.Mint.String()
+				if post.Owner.String() == receiver {
+					for _, pre := range tx.Meta.PreTokenBalances {
+						if pre.AccountIndex == post.AccountIndex {
+							preAmt, _ := new(big.Int).SetString(pre.UiTokenAmount.Amount, 10)
+							postAmt, _ := new(big.Int).SetString(post.UiTokenAmount.Amount, 10)
+							diff := new(big.Int).Sub(postAmt, preAmt)
+							sun = diff.Int64()
 
-				if log.Params.Result.Value.Err != nil {
-					continue
-				}
-
-				sig := log.Params.Result.Value.Signature
-				tx := m.getTransaction(rpcurl, sig)
-				if tx == nil || tx.Result.Meta.PostTokenBalances == nil {
-					return
-				}
-
-				pre := make(map[string]uint64)
-
-				// 先记录 pre balances
-				for _, b := range tx.Result.Meta.PreTokenBalances {
-					if b.Mint == mint && b.Owner == receiver {
-						amt, _ := strconv.ParseUint(b.UiTokenAmount.Amount, 10, 64)
-						pre[b.Owner] = amt
-					}
-				}
-
-				// 再对比 post balances
-				for _, b := range tx.Result.Meta.PostTokenBalances {
-					if b.Mint != mint || b.Owner != receiver {
-						continue
-					}
-
-					postAmt, _ := strconv.ParseUint(b.UiTokenAmount.Amount, 10, 64)
-					preAmt := pre[b.Owner]
-
-					if postAmt > preAmt {
-						diff := postAmt - preAmt
-
-						fmt.Printf(`
-								====== INCOMING TRANSFER ======
-								Chain        : solana-devnet
-								TxID         : %s
-								Mint         : %s
-								To           : %s
-								Amount       : %d
-								Slot         : %d
-								BlockTime    : %d
-								================================
-								`,
-							sig,
-							mint,
-							receiver,
-							diff,
-							tx.Result.Slot,
-							tx.Result.BlockTime,
-						)
-
-						break
+							amount = *post.UiTokenAmount.UiAmount - *pre.UiTokenAmount.UiAmount
+						}
 					}
 				}
 			}
+
+			trans := &entity.SolanaTransaction{
+				Currency:      string(currency),
+				Chain:         string(chain),
+				TransactionId: sig.String(),
+				Amount:        amount,
+				Lamport:       sun,
+				FromBase58:    from,
+				ToBase58:      receiver,
+				Mint:          mint,
+				BlockTime:     uint64(*tx.BlockTime),
+			}
+
+			m.Signatures[sig.String()] = true
+
+			ichan <- trans
 		}
 	}
 }
 
-func (m *SolanaClientItem) getTransaction(rpcurl string, signature string) *TxResp {
-	payload := map[string]any{
-		"jsonrpc": "2.0",
-		"id":      1,
-		"method":  "getTransaction",
-		"params": []any{
-			signature,
-			map[string]string{
-				"encoding": "jsonParsed",
-			},
-		},
-	}
-
-	b, _ := json.Marshal(payload)
-	resp, err := http.Post(rpcurl, "application/json", bytes.NewReader(b))
-	if err != nil {
-		return nil
-	}
-	defer resp.Body.Close()
-
-	var r TxResp
-	if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {
-		return nil
-	}
-
-	return &r
-}
-
-func isUSDTTransfer(logs []string) bool {
-	hasTokenProgram := false
-	hasTransfer := false
-	hasUSDT := false
-
+func containsTransfer(logs []string) bool {
 	for _, l := range logs {
-		if strings.Contains(l, "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA") {
-			hasTokenProgram = true
-		}
 		if strings.Contains(l, "Instruction: Transfer") {
-			hasTransfer = true
-		}
-		if strings.Contains(l, "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB") {
-			hasUSDT = true
+			return true
 		}
 	}
-
-	return hasTokenProgram && hasTransfer && hasUSDT
+	return false
 }

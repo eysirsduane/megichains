@@ -60,6 +60,7 @@ var (
 	SolanaOrderSaveFailed        = NewSpecificError(7001, "Solana订单保存失败")
 	SolanaTransactionFindFailed  = NewSpecificError(7002, "Solana交易查询失败")
 	SolanaTransactionCountFailed = NewSpecificError(7003, "Solana交易总数统计失败")
+	SolanaTransactionSaveFailed  = NewSpecificError(8001, "Solana交易保存失败")
 )
 
 var (

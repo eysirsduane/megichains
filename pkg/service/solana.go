@@ -29,6 +29,10 @@ func (s *SolanaService) Save(order *entity.MerchOrder) (err error) {
 	return
 }
 
+func (s *SolanaService) TransSave(trans *entity.SolanaTransaction) (err error) {
+	return s.db.Save(trans).Error
+}
+
 func (s *SolanaService) CreateAddresses(addrs []*entity.Address) (err error) {
 	err = s.db.Create(addrs).Error
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -828,12 +829,17 @@ func (s *ChainService) sendSolanaTransaction(log *entity.AddressFundCollectLog, 
 		err = fmt.Errorf("send transaction convert cli failed, chain:%v, log:%v", chain, log.Id)
 		return
 	}
-	txid, statuses, detail, err := s.solanaTransfer(cli, caddr, prikey, from, to, amount)
+	txid, statuses, detail, err := s.solanaTransfer(cli, caddr, prikey, from, to, amount, fmax)
 	if err != nil {
 		logx.Errorf("solona send transaction failed, err:%v", err)
 
 		log.Status = string(global.CollectLogStatusFailed)
-		log.Description = err.Error()[0:1022]
+		emsg := err.Error()
+		if len(emsg) > 1022 {
+			log.Description = emsg[0:1022]
+		} else {
+			log.Description = emsg
+		}
 
 		err = biz.AddressFundCollectSendTxFailed
 		return
@@ -856,7 +862,7 @@ func (s *ChainService) sendSolanaTransaction(log *entity.AddressFundCollectLog, 
 	return
 }
 
-func (s *ChainService) solanaTransfer(cli *rpc.Client, caddr, prikey, from, to string, amount float64) (txid string, statuses *rpc.GetSignatureStatusesResult, detail *rpc.GetTransactionResult, err error) {
+func (s *ChainService) solanaTransfer(cli *rpc.Client, caddr, prikey, from, to string, amount, fmax float64) (txid string, statuses *rpc.GetSignatureStatusesResult, detail *rpc.GetTransactionResult, err error) {
 	ctx := context.Background()
 
 	pkey, err := solana.PrivateKeyFromBase58(prikey)
@@ -904,6 +910,22 @@ func (s *ChainService) solanaTransfer(cli *rpc.Client, caddr, prikey, from, to s
 
 	tx, err := solana.NewTransaction([]solana.Instruction{ins}, lblock.Value.Blockhash, solana.TransactionPayer(ffrom))
 	if err != nil {
+		return
+	}
+
+	serialized, err := tx.Message.MarshalBinary()
+	if err != nil {
+		return
+	}
+
+	bmsg := base64.StdEncoding.EncodeToString(serialized)
+	fee, err := cli.GetFeeForMessage(ctx, bmsg, rpc.CommitmentFinalized)
+	if err != nil {
+		return
+	}
+	need := global.Amount(int64(*fee.Value), global.AmountTypo9e)
+	if fmax < need {
+		err = fmt.Errorf("solana collect fee limit overflow, need:%v, actual:%v, fmax:%v", need, fee.Value, fmax)
 		return
 	}
 

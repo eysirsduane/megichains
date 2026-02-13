@@ -100,36 +100,38 @@ func DeriveKey(password string, salt []byte) ([32]byte, error) {
 	return key, nil
 }
 
-func Encrypt(plain, password, salt string) (string, error) {
+func Encrypt(plain, password, salt string) (enc string, err error) {
 	key, err := DeriveKey(password, []byte(salt))
 	if err != nil {
-		return "", err
+		return
 	}
 
 	var nonce [nonceSize]byte
 
-	if _, err := io.ReadFull(rand.Reader, nonce[:]); err != nil {
-		return "", err
+	if _, err = io.ReadFull(rand.Reader, nonce[:]); err != nil {
+		return
 	}
 
 	encrypted := secretbox.Seal(nonce[:], []byte(plain), &nonce, &key)
+	enc = base64.StdEncoding.EncodeToString(encrypted)
 
-	return base64.StdEncoding.EncodeToString(encrypted), nil
+	return
 }
 
-func Decrypt(cipherText, password, salt string) (string, error) {
+func Decrypt(cipherText, password, salt string) (dec string, err error) {
 	key, err := DeriveKey(password, []byte(salt))
 	if err != nil {
-		return "", err
+		return
 	}
 
 	data, err := base64.StdEncoding.DecodeString(cipherText)
 	if err != nil {
-		return "", err
+		return
 	}
 
 	if len(data) < nonceSize {
-		return "", fmt.Errorf("ciphertext too short")
+		err = fmt.Errorf("ciphertext too short")
+		return
 	}
 
 	var nonce [nonceSize]byte
@@ -137,8 +139,11 @@ func Decrypt(cipherText, password, salt string) (string, error) {
 
 	decrypted, ok := secretbox.Open(nil, data[nonceSize:], &nonce, &key)
 	if !ok {
-		return "", fmt.Errorf("decryption failed")
+		err = fmt.Errorf("decryption failed")
+		return
 	}
 
-	return string(decrypted), nil
+	dec = string(decrypted)
+
+	return
 }

@@ -132,6 +132,12 @@ type AddressFundStatisticsResp struct {
 	SolanaUsdc float64 `json:"solana_usdc"`
 }
 
+type AddressGenerateReq struct {
+	Chain   string `json:"chain"`
+	GroupId int64  `json:"group_id"`
+	Count   int16  `json:"count"`
+}
+
 type AddressGroupAllResp struct {
 	Records []*AddressGroupItem `json:"records"`
 }

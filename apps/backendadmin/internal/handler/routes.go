@@ -28,6 +28,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: address.AddressDetailHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodPost,
+				Path:    "/address/generate",
+				Handler: address.AddressGenerateHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodGet,
 				Path:    "/address/group/all",
 				Handler: address.AddressGroupAllHandler(serverCtx),

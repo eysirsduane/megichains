@@ -1,27 +1,27 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package bsc
+package address
 
 import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"megichains/apps/backend/internal/logic/bsc"
-	"megichains/apps/backend/internal/svc"
-	"megichains/apps/backend/internal/types"
+	"megichains/apps/backendadmin/internal/logic/address"
+	"megichains/apps/backendadmin/internal/svc"
+	"megichains/apps/backendadmin/internal/types"
 )
 
-func BscLogListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func AddressGenerateHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.BscLogListReq
+		var req types.AddressGenerateReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := bsc.NewBscLogListLogic(r.Context(), svcCtx)
-		resp, err := l.BscLogList(&req)
+		l := address.NewAddressGenerateLogic(r.Context(), svcCtx)
+		resp, err := l.AddressGenerate(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

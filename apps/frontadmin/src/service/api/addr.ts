@@ -60,3 +60,11 @@ export function postCreateAddressGroup(params?: Api.Address.AddressGroup) {
     data: params
   });
 }
+
+export function postGenerateAddress(params?: Api.Address.AddressGenerate) {
+  return request<Api.Address.AddressGenerate>({
+    url: '/address/generate',
+    method: 'post',
+    data: params
+  });
+}

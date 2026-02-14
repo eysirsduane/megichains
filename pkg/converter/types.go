@@ -73,8 +73,9 @@ type ChainListenReq struct {
 }
 
 type ChainAddressCreateReq struct {
-	Chain string `json:"chain"`
-	Count int16  `json:"count"`
+	Chain   string `json:"chain"`
+	GroupId int64
+	Count   int16 `json:"count"`
 }
 
 type OrderListReq struct {

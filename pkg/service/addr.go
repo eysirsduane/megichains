@@ -196,17 +196,17 @@ func (s *AddressService) CreateAddress(req *converter.ChainAddressCreateReq) (er
 	case "EVM":
 		for i := range req.Count {
 			fmt.Println(i)
-			s.createEvmAddress(req.Chain)
+			s.createEvmAddress(req.Chain, req.GroupId)
 		}
 	case "TRON":
 		for i := range req.Count {
 			fmt.Println(i)
-			s.createTronAddress(req.Chain)
+			s.createTronAddress(req.Chain, req.GroupId)
 		}
 	case "SOLANA":
 		for i := range req.Count {
 			fmt.Println(i)
-			s.createSolanaAddresses(req.Chain)
+			s.createSolanaAddresses(req.Chain, req.GroupId)
 		}
 	default:
 		err = biz.AddressCreateFailed
@@ -215,11 +215,12 @@ func (s *AddressService) CreateAddress(req *converter.ChainAddressCreateReq) (er
 	return
 }
 
-func (s *AddressService) createEvmAddress(chain string) {
+func (s *AddressService) createEvmAddress(chain string, gid int64) {
 	// 1. 生成私钥
 	privateKey, err := crypto.GenerateKey()
 	if err != nil {
-		panic(err)
+		logx.Errorf("address create gen key failed, chain:%v, err:%v", chain, err)
+		return
 	}
 
 	// 2. 私钥转字节 / hex
@@ -231,21 +232,26 @@ func (s *AddressService) createEvmAddress(chain string) {
 	publicKey := privateKey.Public()
 	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
 	if !ok {
-		panic("cannot assert public key type")
+		logx.Errorf("address create public key gen failed, chain:%v, err:%v", chain, err)
+		return
 	}
 
 	// 4. 生成地址（ETH / BSC 通用）
 	address := crypto.PubkeyToAddress(*publicKeyECDSA).Hex()
 
-	fmt.Println("Private Key:", privateKeyHex)
-	fmt.Println("BSC Address:", address)
-
+	enc, err := crypt.Encrypt(privateKeyHex, crypt.PrivateKeySecretPassword, crypt.PrivateKeySecretSalt)
+	if err != nil {
+		logx.Errorf("create address failed, chain:%v, err:%v", chain, err)
+		return
+	}
 	addr := &entity.Address{
-		Chain:      chain,
-		Typo:       string(global.AddressTypoIn),
-		Status:     string(global.AddressStatusInFree),
-		Address:    address,
-		PrivateKey: privateKeyHex,
+		Chain:          chain,
+		GroupId:        gid,
+		Typo:           string(global.AddressTypoIn),
+		Status:         string(global.AddressStatusInFree),
+		Address:        address,
+		PrivateKey:     enc,
+		AddressBalance: entity.AddressBalance{Address: address, BscUsdt: 10, BscUsdc: 10, EthUsdt: 10, EthUsdc: 10},
 	}
 
 	err = s.db.Create(addr).Error
@@ -254,7 +260,7 @@ func (s *AddressService) createEvmAddress(chain string) {
 	}
 }
 
-func (s *AddressService) createTronAddress(chain string) {
+func (s *AddressService) createTronAddress(chain string, gid int64) {
 	privateKey, err := btcec.NewPrivateKey()
 	if err != nil {
 		panic(err)
@@ -276,17 +282,21 @@ func (s *AddressService) createTronAddress(chain string) {
 
 	base58Address := base58.Encode(fullAddress)
 
-	// fmt.Println("Private Key:", fmt.Sprintf("%x", privateKey.Serialize()))
-	// fmt.Println("Public Key :", fmt.Sprintf("%x", pubKey))
-	// fmt.Println("TRON Addr  :", base58Address)
+	enc, err := crypt.Encrypt(fmt.Sprintf("%x", privateKey.Serialize()), crypt.PrivateKeySecretPassword, crypt.PrivateKeySecretSalt)
+	if err != nil {
+		logx.Errorf("address create failed, chain:%v, err:%v", chain, err)
+		return
+	}
 	addr := &entity.Address{
-		Chain:      chain,
-		Typo:       string(global.AddressTypoIn),
-		Status:     string(global.AddressStatusInFree),
-		Address:    base58Address,
-		Address2:   fmt.Sprintf("%x", address),
-		PrivateKey: fmt.Sprintf("%x", privateKey.Serialize()),
-		PublicKey:  fmt.Sprintf("%x", pubKey),
+		Chain:          chain,
+		GroupId:        gid,
+		Typo:           string(global.AddressTypoIn),
+		Status:         string(global.AddressStatusInFree),
+		Address:        base58Address,
+		Address2:       fmt.Sprintf("%x", address),
+		PrivateKey:     enc,
+		PublicKey:      fmt.Sprintf("%x", pubKey),
+		AddressBalance: entity.AddressBalance{Address: base58Address, TronUsdt: 10, TronUsdc: 10},
 	}
 
 	err = s.db.Create(addr).Error
@@ -295,30 +305,22 @@ func (s *AddressService) createTronAddress(chain string) {
 	}
 }
 
-func (s *AddressService) createSolanaAddresses(chain string) {
+func (s *AddressService) createSolanaAddresses(chain string, gid int64) {
 	keypair := solana.NewWallet()
 	data, _ := json.MarshalIndent(keypair, "", "  ")
 	fileName := fmt.Sprintf("wallet_%d.json", 1)
 	_ = os.WriteFile(fileName, data, 0644)
-	fmt.Printf("Wallet prikey:%v, pubkey:%v \n", keypair.PrivateKey.String(), keypair.PublicKey())
 
 	prikey := keypair.PrivateKey.String()
 	encrypted, err := crypt.Encrypt(prikey, crypt.PrivateKeySecretPassword, crypt.PrivateKeySecretSalt)
 	if err != nil {
-		fmt.Printf("encrypt private key failed, err:%v", err)
+		fmt.Printf("address create failed, chain:%v, err:%v", chain, err)
 		return
 	}
-
-	decrypted, err := crypt.Decrypt(encrypted, crypt.PrivateKeySecretPassword, crypt.PrivateKeySecretSalt)
-	if err != nil {
-		fmt.Printf("encrypt private key failed, err:%v", err)
-		return
-	}
-
-	fmt.Println(prikey == decrypted)
 
 	addr := &entity.Address{
 		Chain:      chain,
+		GroupId:    gid,
 		Typo:       string(global.AddressTypoIn),
 		Status:     string(global.AddressStatusInFree),
 		Address:    keypair.PublicKey().String(),
@@ -326,7 +328,9 @@ func (s *AddressService) createSolanaAddresses(chain string) {
 		PrivateKey: encrypted,
 		PublicKey:  "",
 		AddressBalance: entity.AddressBalance{
-			Address: keypair.PublicKey().String(),
+			Address:    keypair.PublicKey().String(),
+			SolanaUsdt: 10,
+			SolanaUsdc: 10,
 		},
 	}
 

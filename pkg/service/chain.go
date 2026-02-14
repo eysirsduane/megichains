@@ -76,6 +76,13 @@ func (s *ChainService) initChainClient(chain global.ChainName) (err error) {
 
 		s.cli = client
 	case global.ChainNameTron:
+		client, err1 := client.NewClient(s.cfg.Tron.GrpcNetwork)
+		if err1 != nil {
+			logx.Errorf("chain client Dial failed, chain:%v, err:%v", chain, err)
+			return
+		}
+
+		s.cli = client
 	case global.ChainNameSolana:
 		s.cli = rpc.New(s.cfg.Solana.GrpcNetwork)
 	default:

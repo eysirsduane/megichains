@@ -4,7 +4,7 @@ import { fetchGetAddressDetail, fetchGetAddressGroupAll, postSaveAddress } from 
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
 
-defineOptions({ name: 'ExchangeBillDrawer' });
+defineOptions({ name: 'AddressDetailDrawer' });
 
 const visible = defineModel<boolean>('visible', {
   default: false
@@ -16,7 +16,24 @@ const targetId = defineModel<number>('targetId', {
 
 type Model = Pick<
   Api.Address.Address,
-  'id' | 'group_id' | 'typo' | 'status' | 'chain' | 'address' | 'address2' | 'description' | 'updated_at' | 'created_at'
+  | 'id'
+  | 'group_id'
+  | 'typo'
+  | 'status'
+  | 'chain'
+  | 'address'
+  | 'address2'
+  | 'bsc_usdt'
+  | 'bsc_usdc'
+  | 'eth_usdt'
+  | 'eth_usdc'
+  | 'tron_usdt'
+  | 'tron_usdc'
+  | 'solana_usdt'
+  | 'solana_usdc'
+  | 'description'
+  | 'updated_at'
+  | 'created_at'
 >;
 
 const model = ref(createDefaultModel());
@@ -30,6 +47,14 @@ function createDefaultModel(): Model {
     chain: '',
     address: '',
     address2: '',
+    bsc_usdt: 0,
+    bsc_usdc: 0,
+    eth_usdt: 0,
+    eth_usdc: 0,
+    tron_usdt: 0,
+    tron_usdc: 0,
+    solana_usdt: 0,
+    solana_usdc: 0,
     description: '',
     updated_at: 0,
     created_at: 0
@@ -55,8 +80,12 @@ function closeDrawer() {
 
 watch(visible, async () => {
   if (visible.value) {
-    const detail = await getAddressDetail(targetId.value);
-    model.value = detail;
+    if (targetId.value > 0) {
+      const detail = await getAddressDetail(targetId.value);
+      model.value = detail;
+    } else {
+      model.value = createDefaultModel();
+    }
   }
 });
 

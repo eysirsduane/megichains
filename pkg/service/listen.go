@@ -587,11 +587,11 @@ func (s *ListenService) listenSolana(chain global.ChainName, currency global.Cur
 }
 
 func (s *ListenService) ListenMany() {
-	cnames := []string{"BSC", "ETH", "TRON"}
+	cnames := []string{"BSC", "ETH", "TRON", "SOLANA"}
 	currencys := []string{"USDT", "USDC"}
 
 	ctx := context.Background()
-	for i := 1; i < 500; i++ {
+	for i := 1; i < 2000; i++ {
 		chain := ""
 		iaddr := rand.IntN(1000)
 		addr, _ := s.addrservice.Get(ctx, int64(iaddr))
@@ -601,6 +601,8 @@ func (s *ListenService) ListenMany() {
 			chain = cnames[iname]
 		case "TRON":
 			chain = cnames[2]
+		case "SOLANA":
+			chain = cnames[3]
 		default:
 			continue
 		}
@@ -616,6 +618,6 @@ func (s *ListenService) ListenMany() {
 			Seconds:      180,
 		})
 
-		time.Sleep(time.Millisecond * 100)
+		// time.Sleep(time.Millisecond * 100)
 	}
 }

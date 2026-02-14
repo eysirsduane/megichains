@@ -413,6 +413,12 @@ type SolanaTransItem {
 	BlockTime     uint64  `json:"block_time"`
 }
 
+type AddressGenerateReq {
+	Chain   string `json:"chain"`
+	GroupId int64  `json:"group_id"`
+	Count   int16  `json:"count"`
+}
+
 @server (
 	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
 	// goctl 生成代码时会将当前 service 代码块下的接口
@@ -556,6 +562,9 @@ service backendadmin {
 
 	@handler AddressGroupSaveHandler
 	post /address/group/save (AddressGroupItem) returns (Response)
+
+	@handler AddressGenerateHandler
+	post /address/generate (AddressGenerateReq) returns (Response)
 }
 
 @server (

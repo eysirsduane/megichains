@@ -94,7 +94,9 @@ const local: App.I18n.Schema = {
     gas_price: '燃料单价(BSC)',
     effective_gas_price: '燃料单价(ETH)',
     total_gas_fee: '总费用',
-    solana: 'SOLANA'
+    solana: 'SOLANA',
+    count: '数量',
+    group: '分组'
   },
   request: {
     logout: '请求失败后登出用户',

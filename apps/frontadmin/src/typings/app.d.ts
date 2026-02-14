@@ -388,6 +388,8 @@ declare namespace App {
         effective_gas_price: string;
         total_gas_fee: string;
         solana: string;
+        count: string;
+        group: string;
       };
       request: {
         logout: string;

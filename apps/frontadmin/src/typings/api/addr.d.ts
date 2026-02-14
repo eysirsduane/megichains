@@ -29,6 +29,12 @@ declare namespace Api {
       description: string;
     }>;
 
+    type AddressGenerate = {
+      chain: string;
+      group_id: number;
+      count: number;
+    };
+
     type AddressSearchParams = CommonType.RecordNullable<
       Pick<Api.Address.Address, 'address' | 'address2' | 'group_id' | 'chain' | 'typo' | 'status' | 'id'> &
         Api.Common.CommonTimeSearchParams

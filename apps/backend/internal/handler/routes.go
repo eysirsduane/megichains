@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	auth "megichains/apps/backend/internal/handler/auth"
-	bsc "megichains/apps/backend/internal/handler/bsc"
 	chain "megichains/apps/backend/internal/handler/chain"
 	open "megichains/apps/backend/internal/handler/open"
 	"megichains/apps/backend/internal/svc"
@@ -40,23 +39,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 
 	server.AddRoutes(
 		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/bsc/log/list",
-				Handler: bsc.BscLogListHandler(serverCtx),
-			},
-		},
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-		rest.WithPrefix("/v1"),
-	)
-
-	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodPost,
-				Path:    "/chain/address/create",
-				Handler: chain.ChainAddressCreateHandler(serverCtx),
-			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/chain/listen",

@@ -9,6 +9,7 @@ import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
 import AddressSearch from './modules/address-search.vue';
 import AddressDetailDrawer from './modules/address-detail-drawer.vue';
+import AddressGenerateDrawer from './modules/address-generate-drawer.vue';
 
 defineOptions({ name: 'AddressList' });
 
@@ -138,10 +139,15 @@ function resetSearchParams() {
 
 const targetId = ref(0);
 const { bool: drawerVisible, setTrue: openDrawer } = useBoolean();
+const { bool: drawerGenerateVisible, setTrue: openGenerateDrawer } = useBoolean();
 
 function edit(id: number) {
   targetId.value = id;
   openDrawer();
+}
+
+function add() {
+  openGenerateDrawer();
 }
 </script>
 
@@ -155,8 +161,8 @@ function edit(id: number) {
           <TableHeaderOperation
             v-model:columns="columnChecks"
             :disabled-delete="true"
-            :disabled-add="true"
             :loading="loading"
+            @add="add"
             @refresh="getData"
           />
         </div>
@@ -184,6 +190,7 @@ function edit(id: number) {
         />
       </div>
       <AddressDetailDrawer v-model:visible="drawerVisible" :target-id="targetId" @saved="getDataByPage" />
+      <AddressGenerateDrawer v-model:visible="drawerGenerateVisible" @saved="getDataByPage" />
     </ElCard>
   </div>
 </template>

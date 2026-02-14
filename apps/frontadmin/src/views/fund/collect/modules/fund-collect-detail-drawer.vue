@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { chainTyposOptions } from '@/constants/business';
 import { fetchGetAddressGroupAll, postCollectAddressFund } from '@/service/api';
+import { translateOptions } from '@/utils/common';
 import { $t } from '@/locales';
 
 defineOptions({ name: 'AddressFundCollectDetailDrawer' });
@@ -39,25 +41,6 @@ function createDefaultModel(): Model {
 function closeDrawer() {
   visible.value = false;
 }
-
-const chains = [
-  {
-    value: 'BSC',
-    label: 'BSC'
-  },
-  {
-    value: 'ETH',
-    label: 'ETH'
-  },
-  {
-    value: 'TRON',
-    label: 'TRON'
-  },
-  {
-    value: 'SOLANA',
-    label: 'SOLANA'
-  }
-];
 
 const currencys = [
   {
@@ -133,7 +116,12 @@ const rules = {
       </ElFormItem>
       <ElFormItem :label="$t('page.fund.common.chain')" prop="chain">
         <ElSelect v-model="model.chain">
-          <ElOption v-for="item in chains" :key="item.value" :label="item.label" :value="item.value"></ElOption>
+          <ElOption
+            v-for="(item, idx) in translateOptions(chainTyposOptions)"
+            :key="idx"
+            :label="item.label"
+            :value="item.value"
+          ></ElOption>
         </ElSelect>
       </ElFormItem>
       <ElFormItem :label="$t('page.fund.common.currency')" prop="currency">

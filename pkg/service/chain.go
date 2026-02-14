@@ -848,8 +848,8 @@ func (s *ChainService) sendTronTransaction(log *entity.AddressFundCollectLog, ch
 		logx.Infof("🎉 tron collect transfer success, chain:%v, currency:%v, from:%v, to:%v, txid:%v", global.ChainNameSolana, log.Currency, from, to, result.TxID)
 
 		log.Status = string(global.CollectLogStatusSuccess)
-		log.GasUsed = uint64(result.EnergyUsage)
 		log.EffectiveGasPrice = result.NetUsage
+		log.TotalGasFee = result.EnergyUsage
 	} else {
 		logx.Errorf("tron collect transfer failed, chain:%v, currency:%v, from:%v, to:%v, txid:%v, status:%d", chain, log.Currency, from, to, result.TxID, result.Code)
 

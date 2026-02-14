@@ -28,7 +28,7 @@ function getInitSearchParams(): Api.Address.AddressSearchParams {
   };
 }
 
-const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useUIPaginatedTable({
+const { columns, data, getDataByPage, loading, mobilePagination } = useUIPaginatedTable({
   paginationProps: {
     currentPage: searchParams.current,
     pageSize: searchParams.size
@@ -152,13 +152,15 @@ function edit(id: number) {
       <template #header>
         <div class="flex items-center justify-between">
           <p>{{ $t('page.address.list.title') }}</p>
-          <TableHeaderOperation
+          <!--
+ <TableHeaderOperation
             v-model:columns="columnChecks"
             :disabled-delete="true"
             :disabled-add="true"
             :loading="loading"
             @refresh="getData"
           />
+-->
         </div>
       </template>
       <div class="h-[calc(100%-50px)]">

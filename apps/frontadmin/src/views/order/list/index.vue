@@ -31,7 +31,7 @@ function getInitSearchParams(): Api.Order.OrderSearchParams {
   };
 }
 
-const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagination } = useUIPaginatedTable({
+const { columns, data, getDataByPage, loading, mobilePagination } = useUIPaginatedTable({
   paginationProps: {
     currentPage: searchParams.current,
     pageSize: searchParams.size
@@ -167,13 +167,15 @@ function resetSearchParams() {
       <template #header>
         <div class="flex items-center justify-between">
           <p>{{ $t('page.order.common.title') }}</p>
-          <TableHeaderOperation
+          <!--
+ <TableHeaderOperation
             v-model:columns="columnChecks"
             :disabled-delete="true"
             :disabled-add="true"
             :loading="loading"
             @refresh="getData"
           />
+-->
         </div>
       </template>
       <div class="h-[calc(100%-50px)]">

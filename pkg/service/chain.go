@@ -558,7 +558,8 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 
 	for _, from := range froms {
 		go func() {
-			amount := 0.000011
+			// amount := 0.000011
+			amount := s.getCollectAmount(chain, currency, from)
 
 			log := &entity.AddressFundCollectLog{
 				CollectId:       collect.Id,
@@ -596,6 +597,41 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 			updateAddressFund(from.Address, chain)
 			updateAddressFund(receiver.Address, chain)
 		}()
+	}
+
+	return
+}
+
+func (s *ChainService) getCollectAmount(chain global.ChainName, currency global.CurrencyTypo, addr *entity.Address) (amount float64) {
+	switch chain {
+	case global.ChainNameBsc:
+		switch currency {
+		case global.CurrencyTypoUsdt:
+			amount = addr.AddressBalance.BscUsdt
+		case global.CurrencyTypoUsdc:
+			amount = addr.AddressBalance.BscUsdc
+		}
+	case global.ChainNameEth:
+		switch currency {
+		case global.CurrencyTypoUsdt:
+			amount = addr.AddressBalance.EthUsdt
+		case global.CurrencyTypoUsdc:
+			amount = addr.AddressBalance.EthUsdc
+		}
+	case global.ChainNameTron:
+		switch currency {
+		case global.CurrencyTypoUsdt:
+			amount = addr.AddressBalance.TronUsdt
+		case global.CurrencyTypoUsdc:
+			amount = addr.AddressBalance.TronUsdc
+		}
+	case global.ChainNameSolana:
+		switch currency {
+		case global.CurrencyTypoUsdt:
+			amount = addr.AddressBalance.SolanaUsdt
+		case global.CurrencyTypoUsdc:
+			amount = addr.AddressBalance.SolanaUsdc
+		}
 	}
 
 	return

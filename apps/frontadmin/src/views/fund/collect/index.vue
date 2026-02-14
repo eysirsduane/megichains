@@ -146,7 +146,6 @@ onMounted(async () => {
           <TableHeaderOperation
             v-model:columns="columnChecks"
             :disabled-delete="true"
-            :disabled-add="true"
             :loading="loading"
             @add="add"
             @refresh="getData"

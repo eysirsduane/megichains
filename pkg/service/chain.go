@@ -558,8 +558,8 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 
 	for _, from := range froms {
 		go func() {
-			// amount := 0.000011
 			amount := s.getCollectAmount(chain, currency, from)
+			amount = 0.000011
 
 			log := &entity.AddressFundCollectLog{
 				CollectId:       collect.Id,

@@ -19,6 +19,7 @@ import (
 	"megichains/pkg/erc20"
 	"megichains/pkg/global"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -687,7 +688,7 @@ func (s *ChainService) evmTransfer(cli *ethclient.Client, chain global.ChainName
 	mwei.Int(mfee)
 
 	if efee.Cmp(mfee) > 0 {
-		err = fmt.Errorf("evm collect fee limit overflow, need:%v, actual:%v, fmax:%v", efee, mfee, fmax)
+		err = fmt.Errorf("evm collect fee limit overflow, need:%v, small:%v, fmax:%v", strconv.FormatFloat(float64(global.Amount(efee.Int64(), global.AmountTypo18e)), 'f', -1, 64), strconv.FormatFloat(float64(efee.Int64()), 'f', -1, 64), strconv.FormatFloat(fmax, 'f', -1, 64))
 		return
 	}
 
@@ -925,7 +926,7 @@ func (s *ChainService) solanaTransfer(cli *rpc.Client, caddr, prikey, from, to s
 	}
 	need := global.Amount(int64(*fee.Value), global.AmountTypo9e)
 	if fmax < need {
-		err = fmt.Errorf("solana collect fee limit overflow, need:%v, actual:%v, fmax:%v", need, fee.Value, fmax)
+		err = fmt.Errorf("solana collect fee limit overflow, need:%s, small:%s, fmax:%s", strconv.FormatFloat(need, 'f', -1, 64), strconv.FormatFloat(float64(*fee.Value), 'f', -1, 64), strconv.FormatFloat(fmax, 'f', -1, 64))
 		return
 	}
 

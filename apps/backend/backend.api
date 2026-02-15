@@ -5,9 +5,7 @@ type Request {
 }
 
 type Response {
-	Code    int           `json:"msg"`
-	Msg     string        `json:"msg"`
-	Records []interface{} `json:"records"`
+	Msg string `json:"msg"`
 }
 
 type LoginReq {
@@ -26,8 +24,14 @@ type Pages {
 }
 
 type PagesBody {
-	Current int `json:"current"`
-	Size    int `json:"size"`
+	Current int   `json:"current"`
+	Size    int   `json:"size"`
+	Total   int64 `json:"total"`
+}
+
+type StartEnd {
+	Start int64 `form:"start,optional"`
+	End   int64 `form:"end,optional"`
 }
 
 type Contacts {
@@ -35,6 +39,12 @@ type Contacts {
 	WhatsApp string `json:"whatsapp"`
 	Wechat   string `json:"wechat"`
 	Other    string `json:"other"`
+}
+
+type TimeAts {
+	UpdatedAt uint64 `json:"updated_at"`
+	DeletedAt uint64 `json:"deleted_at"`
+	CreatedAt uint64 `json:"created_at"`
 }
 
 type TronAccountGetReq {}
@@ -79,29 +89,334 @@ type UserInfoGetResp {
 	Username string `json:"username"`
 }
 
-type BscLogListReq {}
+type OrderListReq {
+	Pages
+	StartEnd
+	Id            int64  `form:"id,optional"`
+	MerchOrderId  string `form:"merch_order_id,optional"`
+	TransactionId string `form:"transaction_id,optional"`
+	Chain         string `form:"chain,optional"`
+	Typo          string `form:"typo,optional"`
+	Status        string `form:"status,optional"`
+	Currency      string `form:"currency,optional"`
+	FromAddress   string `form:"from_address,optional"`
+	ToAddress     string `form:"to_address,optional"`
+}
 
-type BscLogListResp {
-	Records []*BscLogItem
-	Total   int64
+type OrderListResp {
+	Records []*OrderItem `json:"records"`
 	PagesBody
 }
 
-type BscLogItem {}
-
-type ChainListenReq {
-	MerchOrderId string `json:"merch_order_id"`
-	Chain        string `json:"chain"`
-	Currency     string `json:"currency"`
-	Receiver     string `json:"receiver"`
-	Seconds      int64  `json:"seconds"`
+type OrderItem {
+	Id             int64   `json:"id"`
+	MerchOrderId   string  `json:"merch_order_id"`
+	LogId          int64   `json:"log_id"`
+	TransactionId  string  `json:"transaction_id"`
+	Chain          string  `json:"chain"`
+	Typo           string  `json:"typo"`
+	Status         string  `json:"status"`
+	Currency       string  `json:"currency"`
+	ReceivedAmount float64 `json:"received_amount"`
+	ReceivedSun    int64   `json:"received_sun"`
+	FromAddress    string  `json:"from_address"`
+	ToAddress      string  `json:"to_address"`
+	Description    string  `json:"description"`
+	TimeAts
 }
 
-type ChainListenResp {}
+type OrderGetReq {
+	Id int64 `form:"id"`
+}
 
-type ChainAddressCreateReq {
-	Chain string `json:"chain"`
-	Count int16  `json:"count"`
+type TronTransListReq {
+	Pages
+	StartEnd
+	Id            int64  `form:"id,optional"`
+	Currency      string `form:"currency,optional"`
+	TransactionId string `form:"transaction_id,optional"`
+	FromBase58    string `form:"from_base58,optional"`
+	ToBase58      string `form:"to_base58,optional"`
+}
+
+type TronTransItem {
+	Id             int64   `json:"id"`
+	Chain          string  `json:"chain"`
+	Currency       string  `json:"currency"`
+	TransactionId  string  `json:"transaction_id"`
+	Amount         float64 `json:"amount"`
+	Sun            int64   `json:"sun"`
+	FromBase58     string  `json:"from_base58"`
+	ToBase58       string  `json:"to_base58"`
+	Contract       string  `json:"contract"`
+	BlockTimestamp int64   `json:"block_timestamp"`
+	TimeAts
+}
+
+type TronTransListResp {
+	Records []*TronTransItem `json:"records"`
+	PagesBody
+}
+
+type EvmLogItem {
+	Id             int64   `json:"id"`
+	Chain          string  `json:"chain"`
+	Currency       string  `json:"currency"`
+	ChainId        uint64  `json:"chain_id"`
+	TxHash         string  `json:"tx_hash"`
+	Index          uint    `json:"index"`
+	TxIndex        uint    `json:"tx_index"`
+	Amount         float64 `json:"amount"`
+	Sun            int64   `json:"sun"`
+	FromHex        string  `json:"from_hex"`
+	ToHex          string  `json:"to_hex"`
+	Contract       string  `json:"contract"`
+	BlockHash      string  `json:"block_hash"`
+	BlockNumber    uint64  `json:"block_number"`
+	BlockTimestamp uint64  `json:"block_timestamp"`
+	Removed        bool    `json:"removed"`
+	TimeAts
+}
+
+type EvmLogListReq {
+	Pages
+	StartEnd
+	Id       int64  `form:"id,optional"`
+	Chain    string `form:"chain,optional"`
+	Currency string `form:"currency,optional"`
+	TxHash   string `form:"tx_hash,optional"`
+	FromHex  string `form:"from_hex,optional"`
+	ToHex    string `form:"to_hex,optional"`
+}
+
+type EvmLogListResp {
+	Records []*EvmLogItem `json:"records"`
+	PagesBody
+}
+
+type AddressDetailReq {
+	Id int64 `form:"id,optional"`
+}
+
+type AddressItem {
+	Id          int64   `json:"id"`
+	GroupId     int64   `json:"group_id"`
+	GroupName   string  `json:"group_name"`
+	Chain       string  `json:"chain"`
+	Typo        string  `json:"typo"`
+	Status      string  `json:"status"`
+	Address     string  `json:"address"`
+	Address2    string  `json:"address2"`
+	TronUsdt    float64 `json:"tron_usdt"`
+	TronUsdc    float64 `json:"tron_usdc"`
+	BscUsdt     float64 `json:"bsc_usdt"`
+	BscUsdc     float64 `json:"bsc_usdc"`
+	EthUsdt     float64 `json:"eth_usdt"`
+	EthUsdc     float64 `json:"eth_usdc"`
+	SolanaUsdt  float64 `json:"solana_usdt"`
+	SolanaUsdc  float64 `json:"solana_usdc"`
+	Description string  `json:"description"`
+	TimeAts
+}
+
+type AddressListReq {
+	Pages
+	StartEnd
+	Address  string `form:"address,optional"`
+	Address2 string `form:"address2,optional"`
+	Chain    string `form:"chain,optional"`
+	Typo     string `form:"typo,optional"`
+	Status   string `form:"status,optional"`
+	GroupId  int64  `form:"group_id,optional"`
+}
+
+type AddressListResp {
+	Records []*AddressItem `json:"records"`
+	PagesBody
+}
+
+type AddressGroupItem {
+	Id          int64  `json:"id"`
+	Name        string `json:"name"`
+	Status      string `json:"status"`
+	Description string `json:"description"`
+	TimeAts
+}
+
+type AddressGroupAllResp {
+	Records []*AddressGroupItem `json:"records"`
+}
+
+type AddressGroupListReq {
+	Pages
+	status string `form:"status, optional"`
+}
+
+type AddressGroupListResp {
+	PagesBody
+	Records []*AddressGroupItem `json:"records"`
+}
+
+type AddressGroupDetailReq {
+	Id int64 `form:"id"`
+}
+
+type AddressFundListReq {
+	Pages
+	Chain   string `form:"chain,optional"`
+	Address string `form:"address,optional"`
+}
+
+type AddressFundListResp {
+	PagesBody
+	Records []*AddressFundItem `json:"records"`
+}
+
+type AddressFundItem {
+	Id       int64   `json:"id"`
+	Chain    string  `json:"chain"`
+	Address  string  `json:"address"`
+	TronUsdt float64 `json:"tron_usdt"`
+	TronUsdc float64 `json:"tron_usdc"`
+	BscUsdt  float64 `json:"bsc_usdt"`
+	BscUsdc  float64 `json:"bsc_usdc"`
+	EthUsdt  float64 `json:"eth_usdt"`
+	EthUsdc  float64 `json:"eth_usdc"`
+	TimeAts
+}
+
+type AddressFundStatisticsReq {}
+
+type AddressFundStatisticsResp {
+	TronUsdt   float64 `json:"tron_usdt"`
+	TronUsdc   float64 `json:"tron_usdc"`
+	BscUsdt    float64 `json:"bsc_usdt"`
+	BscUsdc    float64 `json:"bsc_usdc"`
+	EthUsdt    float64 `json:"eth_usdt"`
+	EthUsdc    float64 `json:"eth_usdc"`
+	SolanaUsdt float64 `json:"solana_usdt"`
+	SolanaUsdc float64 `json:"solana_usdc"`
+}
+
+type AddressFundCollectReq {
+	AddressGroupId int64   `json:"address_group_id"`
+	Chain          string  `json:"chain"`
+	Currency       string  `json:"currency"`
+	AmountMin      float64 `json:"amount_min"`
+	FeeMax         float64 `json:"fee_max"`
+	SecretKey      string  `json:"secret_key"`
+}
+
+type AddressFundCollectResp {
+	Success bool `json:"success"`
+}
+
+type AddressFundCollectListReq {
+	Pages
+	StartEnd
+	ReceiverAddress string `form:"receiver_address,optional"`
+	AddressGroupId  int64  `form:"address_group_id,optional"`
+	Chain           string `form:"chain,optional"`
+	Currency        string `form:"currency,optional"`
+	Status          string `form:"status,optional"`
+}
+
+type AddressFundCollectListResp {
+	Records []*AddressFundCollectItem `json:"records"`
+	PagesBody
+}
+
+type AddressFundCollectItem {
+	Id                  int64   `json:"id"`
+	UserId              string  `json:"user_id"`
+	Username            string  `json:"username"`
+	AddressGroupId      int64   `json:"address_group_id"`
+	AddressGroupName    string  `json:"address_group_name"`
+	Chain               string  `json:"chain"`
+	Currency            string  `json:"currency"`
+	Status              string  `json:"status"`
+	ReceiverAddress     string  `json:"receiver_address"`
+	AmountMin           float64 `json:"amount_min"`
+	FeeMax              float64 `json:"fee_max"`
+	SuccessAmount       float64 `json:"success_amount"`
+	TotalCount          int64   `json:"total_count"`
+	SuccessCount        int64   `json:"success_count"`
+	TotalGasFee         int64   `json:"total_gas_fee"`
+	TotalGasFeeCurrency float64 `json:"total_gas_fee_currency"`
+	Description         string  `json:"description"`
+	TimeAts
+}
+
+type AddressFundCollectLogListReq {
+	Pages
+	StartEnd
+	CollectId       int64  `form:"collect_id,optional"`
+	FromAddress     string `form:"from_address,optional"`
+	ReceiverAddress string `form:"receiver_address,optional"`
+	Chain           string `form:"chain,optional"`
+	Currency        string `form:"currency,optional"`
+	Status          string `form:"status,optional"`
+}
+
+type AddressFundCollectLogListResp {
+	Records []*AddressFundCollectLogItem `json:"records"`
+	PagesBody
+}
+
+type AddressFundCollectLogItem {
+	Id                int64   `json:"id"`
+	CollectId         int64   `json:"collect_id"`
+	Chain             string  `json:"chain"`
+	Currency          string  `json:"currency"`
+	FromAddress       string  `json:"from_address"`
+	ReceiverAddress   string  `json:"receiver_address"`
+	Amount            float64 `json:"amount"`
+	Status            string  `json:"status"`
+	TransactionId     string  `json:"transaction_id"`
+	GasUsed           uint64  `json:"gas_used"`
+	GasPrice          int64   `json:"gas_price"`
+	EffectiveGasPrice int64   `json:"effective_gas_price"`
+	TotalGasFee       int64   `json:"total_gas_fee"`
+	Description       string  `json:"description"`
+	TimeAts
+}
+
+type AddressFundCollectLogDetailReq {
+	Id int64 `path:"id"`
+}
+
+type SolanaTransListReq {
+	Pages
+	StartEnd
+	Id            int64  `form:"id,optional"`
+	Currency      string `form:"currency,optional"`
+	TransactionId string `form:"transaction_id,optional"`
+	FromBase58    string `form:"from_base58,optional"`
+	ToBase58      string `form:"to_base58,optional"`
+}
+
+type SolanaTransListResp {
+	Records []*SolanaTransItem `json:"records"`
+	PagesBody
+}
+
+type SolanaTransItem {
+	Id            int64   `json:"id"`
+	Chain         string  `json:"chain"`
+	Currency      string  `json:"currency"`
+	TransactionId string  `json:"transaction_id"`
+	Amount        float64 `json:"amount"`
+	Lamport       int64   `json:"lamport"`
+	FromBase58    string  `json:"from_base58"`
+	ToBase58      string  `json:"to_base58"`
+	Mint          string  `json:"mint"`
+	BlockTime     uint64  `json:"block_time"`
+}
+
+type AddressGenerateReq {
+	Chain   string `json:"chain"`
+	GroupId int64  `json:"group_id"`
+	Count   int16  `json:"count"`
 }
 
 @server (
@@ -150,17 +465,136 @@ service backend {
 	// goctl 生成代码时会将当前 service 代码块下的接口
 	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
 	// 等信息配置的 golang 结构体名称
-	// jwt: Auth
+	jwt: Auth
 	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
-	group: chain
+	group: order
 	// 定义路由前缀为 "/v1"
 	prefix: /v1
 )
 service backend {
-	@handler ChainListenHandler
-	post /chain/listen (ChainListenReq) returns (ChainListenResp)
+	@handler OrderListHandler
+	get /order/list (OrderListReq) returns (OrderListResp)
 
-	@handler ChainListensHandler
-	post /chain/listens returns (Response)
+	@handler OrderDetailHandler
+	get /order/detail (OrderGetReq) returns (OrderItem)
+}
+
+@server (
+	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
+	// goctl 生成代码时会将当前 service 代码块下的接口
+	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
+	// 等信息配置的 golang 结构体名称
+	jwt: Auth
+	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
+	group: tron
+	// 定义路由前缀为 "/v1"
+	prefix: /v1
+)
+service backend {
+	@handler TronTransListHandler
+	get /tron/trans/list (TronTransListReq) returns (TronTransListResp)
+
+	@handler TronTransDetailHandler
+	get /tron/trans/detail
+}
+
+@server (
+	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
+	// goctl 生成代码时会将当前 service 代码块下的接口
+	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
+	// 等信息配置的 golang 结构体名称
+	jwt: Auth
+	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
+	group: evm
+	// 定义路由前缀为 "/v1"
+	prefix: /v1
+)
+service backend {
+	@handler EvmLogListHandler
+	get /evm/log/list (EvmLogListReq) returns (EvmLogListResp)
+}
+
+@server (
+	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
+	// goctl 生成代码时会将当前 service 代码块下的接口
+	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
+	// 等信息配置的 golang 结构体名称
+	jwt: Auth
+	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
+	group: solana
+	// 定义路由前缀为 "/v1"
+	prefix: /v1
+)
+service backend {
+	@handler SolanaTransListHandler
+	get /solana/trans/list (SolanaTransListReq) returns (SolanaTransListResp)
+}
+
+@server (
+	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
+	// goctl 生成代码时会将当前 service 代码块下的接口
+	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
+	// 等信息配置的 golang 结构体名称
+	jwt: Auth
+	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
+	group: address
+	// 定义路由前缀为 "/v1"
+	prefix: /v1
+)
+service backend {
+	@handler AddressListHandler
+	get /address/list (AddressListReq) returns (AddressListResp)
+
+	@handler AddressSaveHandler
+	post /address/save (AddressItem) returns (Response)
+
+	@handler AddressDetailHandler
+	get /address/detail (AddressDetailReq) returns (AddressItem)
+
+	@handler AddressGroupAllHandler
+	get /address/group/all returns (AddressGroupAllResp)
+
+	@handler AddressGroupListHandler
+	get /address/group/list (AddressGroupListReq) returns (AddressGroupListResp)
+
+	@handler AddressGroupDetailHandler
+	get /address/group/detail (AddressGroupDetailReq) returns (AddressGroupItem)
+
+	@handler AddressGroupSaveHandler
+	post /address/group/save (AddressGroupItem) returns (Response)
+
+	@handler AddressGenerateHandler
+	post /address/generate (AddressGenerateReq) returns (Response)
+}
+
+@server (
+	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
+	// goctl 生成代码时会将当前 service 代码块下的接口
+	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
+	// 等信息配置的 golang 结构体名称
+	jwt: Auth
+	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
+	group: fund
+	// 定义路由前缀为 "/v1"
+	prefix: /v1
+)
+service backend {
+	@handler AddressFundListHandler
+	get /fund/list (AddressFundListReq) returns (AddressFundListResp)
+
+	@handler AddressFundStatisticsHandler
+	get /fund/statistics (AddressFundStatisticsReq) returns (AddressFundStatisticsResp)
+
+	@handler AddressFundCollectHandler
+	post /fund/collect (AddressFundCollectReq) returns (AddressFundCollectResp)
+
+	@handler AddressFundCollectListHandler
+	get /fund/collect/list (AddressFundCollectListReq) returns (AddressFundCollectListResp)
+
+	@handler AddressFundCollectLogListHandler
+	get /fund/collect/log/list (AddressFundCollectLogListReq) returns (AddressFundCollectLogListResp)
+
+	@handler AddressFundCollectLogDetailHandler
+	get /fund/collect/log/:id (AddressFundCollectLogDetailReq) returns (AddressFundCollectLogItem)
 }
 

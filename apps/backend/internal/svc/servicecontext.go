@@ -9,21 +9,31 @@ import (
 )
 
 type ServiceContext struct {
-	Config        global.BackendesConfig
-	ExcfgService  *service.RangeConfigService
-	UserService   *service.UserService
-	AuthService   *service.AuthService
-	AddrService   *service.AddressService
-	ListenService *service.ListenService
+	Config         global.BackendesConfig
+	ExcfgService   *service.RangeConfigService
+	AuthService    *service.AuthService
+	UserService    *service.UserService
+	AddressService *service.AddressService
+	OrderService   *service.MerchOrderService
+	ChainService   *service.ChainService
+	TronService    *service.TronService
+	EvmService     *service.EvmService
+	FundService    *service.FundService
+	SolanaService  *service.SolanaService
 }
 
-func NewServiceContext(c global.BackendesConfig, excfg *service.RangeConfigService, user *service.UserService, auth *service.AuthService, addrservice *service.AddressService, listen *service.ListenService) *ServiceContext {
+func NewServiceContext(c global.BackendesConfig, excfg *service.RangeConfigService, auth *service.AuthService, user *service.UserService, addr *service.AddressService, order *service.MerchOrderService, chain *service.ChainService, tron *service.TronService, evm *service.EvmService, fund *service.FundService, solana *service.SolanaService) *ServiceContext {
 	return &ServiceContext{
-		Config:        c,
-		ExcfgService:  excfg,
-		UserService:   user,
-		AuthService:   auth,
-		AddrService:   addrservice,
-		ListenService: listen,
+		Config:         c,
+		ExcfgService:   excfg,
+		AuthService:    auth,
+		UserService:    user,
+		AddressService: addr,
+		OrderService:   order,
+		ChainService:   chain,
+		TronService:    tron,
+		EvmService:     evm,
+		FundService:    fund,
+		SolanaService:  solana,
 	}
 }

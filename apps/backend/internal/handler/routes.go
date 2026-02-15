@@ -6,15 +6,67 @@ package handler
 import (
 	"net/http"
 
-	auth "megichains/apps/backend/internal/handler/auth"
-	chain "megichains/apps/backend/internal/handler/chain"
-	open "megichains/apps/backend/internal/handler/open"
-	"megichains/apps/backend/internal/svc"
+	address "megichains/apps/backendadmin/internal/handler/address"
+	auth "megichains/apps/backendadmin/internal/handler/auth"
+	evm "megichains/apps/backendadmin/internal/handler/evm"
+	fund "megichains/apps/backendadmin/internal/handler/fund"
+	open "megichains/apps/backendadmin/internal/handler/open"
+	order "megichains/apps/backendadmin/internal/handler/order"
+	solana "megichains/apps/backendadmin/internal/handler/solana"
+	tron "megichains/apps/backendadmin/internal/handler/tron"
+	"megichains/apps/backendadmin/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/address/detail",
+				Handler: address.AddressDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/address/generate",
+				Handler: address.AddressGenerateHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/address/group/all",
+				Handler: address.AddressGroupAllHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/address/group/detail",
+				Handler: address.AddressGroupDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/address/group/list",
+				Handler: address.AddressGroupListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/address/group/save",
+				Handler: address.AddressGroupSaveHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/address/list",
+				Handler: address.AddressListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/address/save",
+				Handler: address.AddressSaveHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/v1"),
+	)
+
 	server.AddRoutes(
 		[]rest.Route{
 			{
@@ -40,16 +92,49 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				Method:  http.MethodPost,
-				Path:    "/chain/listen",
-				Handler: chain.ChainListenHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/chain/listens",
-				Handler: chain.ChainListensHandler(serverCtx),
+				Method:  http.MethodGet,
+				Path:    "/evm/log/list",
+				Handler: evm.EvmLogListHandler(serverCtx),
 			},
 		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/v1"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/fund/collect",
+				Handler: fund.AddressFundCollectHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/fund/collect/list",
+				Handler: fund.AddressFundCollectListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/fund/collect/log/:id",
+				Handler: fund.AddressFundCollectLogDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/fund/collect/log/list",
+				Handler: fund.AddressFundCollectLogListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/fund/list",
+				Handler: fund.AddressFundListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/fund/statistics",
+				Handler: fund.AddressFundStatisticsHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
 
@@ -66,6 +151,52 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: open.RegisterHandler(serverCtx),
 			},
 		},
+		rest.WithPrefix("/v1"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/order/detail",
+				Handler: order.OrderDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/order/list",
+				Handler: order.OrderListHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/v1"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/solana/trans/list",
+				Handler: solana.SolanaTransListHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/v1"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/tron/trans/detail",
+				Handler: tron.TronTransDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/tron/trans/list",
+				Handler: tron.TronTransListHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
 }

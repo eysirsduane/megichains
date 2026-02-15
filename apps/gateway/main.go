@@ -4,18 +4,16 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
-	"net/http"
 
 	"megichains/pkg/biz"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
 	"megichains/pkg/service"
 
-	"megichains/apps/backendadmin/internal/handler"
-	"megichains/apps/backendadmin/internal/svc"
+	"megichains/apps/backend/internal/handler"
+	"megichains/apps/backend/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -39,38 +37,27 @@ func main() {
 		panic(err)
 	}
 
-	cfg.RestConf.Port = 7001
-	server := rest.MustNewServer(cfg.RestConf, rest.WithUnauthorizedCallback(func(w http.ResponseWriter, r *http.Request, err error) {
-		resp := biz.Response{
-			Code: 401,
-			Msg:  "登录状态失效，请重新登录",
-			Data: nil,
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnauthorized)
-
-		_ = json.NewEncoder(w).Encode(resp)
-	}))
+	cfg.RestConf.Port = 7002
+	server := rest.MustNewServer(cfg.RestConf)
 	defer server.Stop()
 
-	excfgservice := service.NewRangeConfigService(db)
-	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
 	userservice := service.NewUserService(db)
+	excfgservice := service.NewRangeConfigService(db)
+	evmservice := service.NewEvmService(db)
 	addrservice := service.NewAddressService(db)
 	orderservice := service.NewMerchOrderService(db)
-	chainservice := service.NewChainService(&cfg, db)
 	tronservice := service.NewTronService(db)
-	evmservice := service.NewEvmService(db)
-	fundservice := service.NewFundService(db)
+	chainservice := service.NewChainService(&cfg, db)
 	solanaservice := service.NewSolanaService(db)
-	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, addrservice, orderservice, chainservice, tronservice, evmservice, fundservice, solanaservice)
+	listenservice := service.NewListenService(&cfg, db, addrservice, orderservice, chainservice, evmservice, tronservice, solanaservice)
+	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
+	ctx := svc.NewServiceContext(cfg, excfgservice, userservice, authservice, addrservice, listenservice)
 	handler.RegisterHandlers(server, ctx)
 
 	httpx.SetOkHandler(biz.OkHandler)
 	httpx.SetErrorHandlerCtx(biz.ErrHandler(cfg.Name))
 
-	starting := fmt.Sprintf("Starting http server %s at %s:%d ...", cfg.Name, cfg.Host, cfg.RestConf.Port)
+	starting := fmt.Sprintf("Starting http server %s at %s:%d ...", cfg.Name, cfg.Host, cfg.Port)
 	fmt.Println(starting)
 	logx.Info(starting)
 

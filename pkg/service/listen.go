@@ -67,10 +67,10 @@ func NewListenService(cfg *global.BackendesConfig, db *gorm.DB, addrservice *Add
 	}
 }
 
-func (s *ListenService) changeAddressStatus(addr string, status global.AddressStatus) {
-	err := s.addrservice.ChangeStatus(addr, status)
+func (s *ListenService) updateAddressLastUsed(addr string) {
+	err := s.addrservice.SetLastUsed(addr)
 	if err != nil {
-		logx.Errorf("chain listen change address status failed, addr:%v, status:%v", addr, status)
+		logx.Errorf("chain listen free address failed, addr:%v", addr)
 		return
 	}
 }
@@ -80,13 +80,13 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 	s.Receivers.Store(key, true)
 	defer s.Receivers.Delete(key)
 	defer s.clearClients()
-	defer s.changeAddressStatus(req.Receiver, global.AddressStatusInFree)
 
 	order := &entity.MerchOrder{
 		MerchOrderId: req.MerchOrderId,
 		Chain:        string(req.Chain),
 		Typo:         string(global.OrderTypoIn),
 		Status:       string(global.OrderStatusFailed),
+		NotifyStatus: string(global.NotifyStatusUnknown),
 		Currency:     string(req.Currency),
 		ToAddress:    req.Receiver,
 		Description:  "",
@@ -98,7 +98,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		return
 	}
 
-	s.changeAddressStatus(req.Receiver, global.AddressStatusInUse)
+	s.updateAddressLastUsed(req.Receiver)
 
 	req.Seconds += 120
 	switch req.Chain {
@@ -145,8 +145,10 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 	err = global.NotifyMerchant(s.cfg.EPay.NotifyUrl, order.MerchOrderId, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount)
 	if err != nil {
 		logx.Errorf("chain listen notify failed, chain:%v, moid:%v, txid:%v, err:%v", req.Chain, req.MerchOrderId, order.TransactionId, err)
-		order.Status = string(global.OrderStatusNotifyFailed)
+		order.NotifyStatus = string(global.NotifyStatusFailed)
 		order.Description = fmt.Sprintf("chain notify failed. moid:%v, txid:%v, err:%v", req.MerchOrderId, order.TransactionId, err)
+	} else {
+		order.NotifyStatus = string(global.NotifyStatusSuccess)
 	}
 
 	err = s.orderservice.Save(order)
@@ -437,6 +439,8 @@ func (s *ListenService) listenEvm(order *entity.MerchOrder, chain global.ChainNa
 		s.chainservie.initChainClient(chain)
 		s.chainservie.EvmFunds(receiver, chain)
 	}
+
+	order.Status = string(global.OrderStatusTimeout)
 }
 
 func (s *ListenService) listenTron(order *entity.MerchOrder, chain global.ChainName, currency global.CurrencyTypo, moid, receiver string, seconds int64, item *clients.TronClientItem) {
@@ -476,6 +480,8 @@ func (s *ListenService) listenTron(order *entity.MerchOrder, chain global.ChainN
 		s.chainservie.initChainClient(global.ChainNameTron)
 		s.chainservie.TronFunds(receiver, global.ChainNameTron)
 	}
+
+	order.Status = string(global.OrderStatusTimeout)
 }
 
 func (s *ListenService) listenSolana(order *entity.MerchOrder, chain global.ChainName, currency global.CurrencyTypo, moid, receiver string, seconds int64, item *clients.SolanaClientItem) {
@@ -533,7 +539,11 @@ func (s *ListenService) listenSolana(order *entity.MerchOrder, chain global.Chai
 
 		s.chainservie.initChainClient(global.ChainNameSolana)
 		s.chainservie.SolanaFunds(receiver, global.ChainNameSolana)
+
+		return
 	}
+
+	order.Status = string(global.OrderStatusTimeout)
 }
 
 func (s *ListenService) ListenMany() {
@@ -543,7 +553,7 @@ func (s *ListenService) ListenMany() {
 	ctx := context.Background()
 
 	for {
-		addr, err := s.addrservice.First(ctx, string(global.AddressStatusInFree))
+		addr, err := s.addrservice.FirstFree(ctx)
 		if err != nil {
 			break
 		}

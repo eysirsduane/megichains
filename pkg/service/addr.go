@@ -13,6 +13,7 @@ import (
 	"megichains/pkg/global"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/btcsuite/btcd/btcec/v2"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -46,8 +47,9 @@ func (s *AddressService) Get(ctx context.Context, id int64) (resp *converter.Add
 	return
 }
 
-func (s *AddressService) First(ctx context.Context, status string) (resp *converter.AddressItem, err error) {
-	addr, err := gorm.G[entity.Address](s.db).Where("status = ?", status).First(ctx)
+func (s *AddressService) FirstFree(ctx context.Context) (resp *converter.AddressItem, err error) {
+	now := time.Now().Add(time.Minute * -31).UnixMilli()
+	addr, err := gorm.G[entity.Address](s.db).Where("last_used_timestamp <= ? or last_used_timestamp is null", now).First(ctx)
 	if err != nil {
 		logx.Errorf("address detail get failed, err:%v", err)
 		return
@@ -84,6 +86,15 @@ func (s *AddressService) Save(ctx context.Context, req *converter.AddressItem) (
 
 func (s *AddressService) ChangeStatus(addr string, status global.AddressStatus) (err error) {
 	err = s.db.Model(&entity.Address{}).Where("address = ?", addr).Update("status", status).Error
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (s *AddressService) SetLastUsed(addr string) (err error) {
+	err = s.db.Model(&entity.Address{}).Where("address = ?", addr).Update("last_used_timestamp", time.Now().UnixMilli()).Error
 	if err != nil {
 		return
 	}

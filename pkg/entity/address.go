@@ -4,13 +4,14 @@ type Address struct {
 	Id      int64 `gorm:"primaryKey;autoIncrement"`
 	GroupId int64 `gorm:""`
 
-	Chain      string `gorm:"size:31"`
-	Typo       string `gorm:"size:31"`
-	Status     string `gorm:"size:15"`
-	Address    string `gorm:"size:255;uniqueIndex"`
-	Address2   string `gorm:"size:255"`
-	PrivateKey string `gorm:"size:2047"`
-	PublicKey  string `gorm:"size:2047"`
+	Chain             string `gorm:"size:31"`
+	Typo              string `gorm:"size:31"`
+	Status            string `gorm:"size:15"`
+	Address           string `gorm:"size:255;uniqueIndex"`
+	Address2          string `gorm:"size:255"`
+	PrivateKey        string `gorm:"size:2047"`
+	PublicKey         string `gorm:"size:2047"`
+	LastUsedTimestamp uint64 `gorm:""`
 
 	Description string `gorm:"size:2047"`
 

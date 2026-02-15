@@ -1,6 +1,6 @@
 import { request } from '../request';
 
-export function fetchGetOrderList(params?: Api.Order.OrderSearchParams) {
+export function findOrderList(params?: Api.Order.OrderSearchParams) {
   return request<Api.Order.OrderList>({
     url: '/order/list',
     method: 'get',

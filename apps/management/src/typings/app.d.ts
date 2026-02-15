@@ -390,6 +390,8 @@ declare namespace App {
         solana: string;
         count: string;
         group: string;
+        timeout: string;
+        unknown: string;
       };
       request: {
         logout: string;
@@ -745,6 +747,7 @@ declare namespace App {
             block_timestamp: string;
             removed: string;
             lamport: string;
+            notify_status: string;
           };
           detail: {
             title: string;

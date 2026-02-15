@@ -99,6 +99,7 @@ type OrderItem struct {
 	Chain          string  `json:"chain"`
 	Typo           string  `json:"typo"`
 	Status         string  `json:"status"`
+	NotifyStatus   string  `json:"notify_status"`
 	Currency       string  `json:"currency"`
 	ReceivedAmount float64 `json:"received_amount"`
 	ReceivedSun    int64   `json:"received_sun"`

@@ -11,6 +11,7 @@ declare namespace Api {
       typo: Api.Common.OrderTypos;
       currency: Api.Common.CurrencyTypos;
       status: Api.Common.OrderStatus;
+      notify_status: Api.Common.NotifyStatus;
       chain: string;
       received_amount: number;
       received_sun: number;
@@ -30,6 +31,7 @@ declare namespace Api {
         | 'from_address'
         | 'to_address'
         | 'status'
+        | 'notify_status'
         | 'id'
       > &
         Api.Common.CommonTimeSearchParams

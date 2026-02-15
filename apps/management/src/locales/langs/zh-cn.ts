@@ -96,7 +96,9 @@ const local: App.I18n.Schema = {
     total_gas_fee: '总费用',
     solana: 'SOLANA',
     count: '数量',
-    group: '分组'
+    group: '分组',
+    timeout: '超时',
+    unknown: '未知'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -570,7 +572,8 @@ const local: App.I18n.Schema = {
         contract: '合约地址',
         block_timestamp: '区块交易时间',
         removed: '被移除',
-        lamport: '收到金额(LAM)'
+        lamport: '收到金额(LAM)',
+        notify_status: '通知状态'
       },
       detail: {
         title: '订单明细'

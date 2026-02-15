@@ -29,8 +29,15 @@ export const orderTyposRecord: Record<Api.Common.OrderTypos, App.I18n.I18nKey> =
 export const orderStatusRecord: Record<Api.Common.OrderStatus, App.I18n.I18nKey> = {
   '': 'common.all',
   已创建: 'common.created',
-  交易失败: 'common.failed',
-  通知失败: 'common.notifyfailed',
+  超时: 'common.timeout',
+  失败: 'common.failed',
+  成功: 'common.success'
+};
+
+export const notifyStatusRecord: Record<Api.Common.NotifyStatus, App.I18n.I18nKey> = {
+  '': 'common.all',
+  未知: 'common.unknown',
+  失败: 'common.failed',
   成功: 'common.success'
 };
 

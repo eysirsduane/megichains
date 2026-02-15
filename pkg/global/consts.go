@@ -76,10 +76,18 @@ const (
 type OrderStatus string
 
 const (
-	OrderStatusCreated      OrderStatus = "已创建"
-	OrderStatusFailed       OrderStatus = "交易失败"
-	OrderStatusSuccess      OrderStatus = "成功"
-	OrderStatusNotifyFailed OrderStatus = "通知失败"
+	OrderStatusCreated OrderStatus = "已创建"
+	OrderStatusTimeout OrderStatus = "超时"
+	OrderStatusFailed  OrderStatus = "失败"
+	OrderStatusSuccess OrderStatus = "成功"
+)
+
+type NotifyStatus string
+
+const (
+	NotifyStatusUnknown NotifyStatus = "未知"
+	NotifyStatusSuccess NotifyStatus = "成功"
+	NotifyStatusFailed  NotifyStatus = "失败"
 )
 
 type CollectStatus string

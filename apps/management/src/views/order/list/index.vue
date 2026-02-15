@@ -2,8 +2,8 @@
 import { reactive, ref } from 'vue';
 import { ElButton } from 'element-plus';
 import { useBoolean } from '@sa/hooks';
-import { currencyTyposRecord, orderStatusRecord, orderTyposRecord } from '@/constants/business';
-import { fetchGetOrderList } from '@/service/api';
+import { currencyTyposRecord, notifyStatusRecord, orderStatusRecord, orderTyposRecord } from '@/constants/business';
+import { findOrderList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
@@ -27,7 +27,8 @@ function getInitSearchParams(): Api.Order.OrderSearchParams {
     currency: '',
     from_address: '',
     to_address: '',
-    status: ''
+    status: '',
+    notify_status: ''
   };
 }
 
@@ -36,7 +37,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     currentPage: searchParams.current,
     pageSize: searchParams.size
   },
-  api: () => fetchGetOrderList(searchParams),
+  api: () => findOrderList(searchParams),
   transform: response => {
     return defaultSearchform(response);
   },
@@ -76,8 +77,8 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
         const tagMap: Record<Api.Common.OrderStatus, UI.ThemeColor> = {
           '': 'info',
           已创建: 'info',
-          交易失败: 'danger',
-          通知失败: 'danger',
+          超时: 'danger',
+          失败: 'danger',
           成功: 'success'
         };
 
@@ -85,6 +86,27 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
 
         return (
           <el-tag effect="dark" round type={tagMap[row.status]}>
+            {label}
+          </el-tag>
+        );
+      }
+    },
+    {
+      prop: 'notify_status',
+      label: $t('page.order.common.notify_status'),
+      width: 100,
+      formatter: row => {
+        const tagMap: Record<Api.Common.NotifyStatus, UI.ThemeColor> = {
+          '': 'info',
+          未知: 'info',
+          失败: 'danger',
+          成功: 'success'
+        };
+
+        const label = $t(notifyStatusRecord[row.notify_status]);
+
+        return (
+          <el-tag effect="dark" round type={tagMap[row.notify_status]}>
             {label}
           </el-tag>
         );

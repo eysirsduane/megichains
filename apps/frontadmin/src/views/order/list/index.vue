@@ -76,6 +76,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
         const tagMap: Record<Api.Common.OrderStatus, UI.ThemeColor> = {
           '': 'info',
           已创建: 'info',
+          交易失败: 'danger',
           通知失败: 'danger',
           成功: 'success'
         };

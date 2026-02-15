@@ -77,8 +77,9 @@ type OrderStatus string
 
 const (
 	OrderStatusCreated      OrderStatus = "已创建"
-	OrderStatusNotifyFailed OrderStatus = "通知失败"
+	OrderStatusFailed       OrderStatus = "交易失败"
 	OrderStatusSuccess      OrderStatus = "成功"
+	OrderStatusNotifyFailed OrderStatus = "通知失败"
 )
 
 type CollectStatus string

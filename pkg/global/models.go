@@ -13,6 +13,7 @@ type ListenReq struct {
 
 type EPayNotifyReq struct {
 	MerchOrderId string  `json:"merch_order_id"`
+	Status       string  `json:"status"`
 	TxId         string  `json:"txid"`
 	FromHex      string  `json:"from_hex"`
 	ToHex        string  `json:"to_hex"`
@@ -26,7 +27,7 @@ type EPayOrderAddress struct {
 }
 
 type CollectCalc struct {
-	SuccessCount        int64   `gorm:"column:success_count"`
-	SuccessAmount       float64 `gorm:"column:success_amount"`
-	TotalGasFee         int64   `gorm:"column:total_gas_fee"`
+	SuccessCount  int64   `gorm:"column:success_count"`
+	SuccessAmount float64 `gorm:"column:success_amount"`
+	TotalGasFee   int64   `gorm:"column:total_gas_fee"`
 }

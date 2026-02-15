@@ -29,6 +29,7 @@ export const orderTyposRecord: Record<Api.Common.OrderTypos, App.I18n.I18nKey> =
 export const orderStatusRecord: Record<Api.Common.OrderStatus, App.I18n.I18nKey> = {
   '': 'common.all',
   已创建: 'common.created',
+  交易失败: 'common.failed',
   通知失败: 'common.notifyfailed',
   成功: 'common.success'
 };

@@ -46,6 +46,19 @@ func (s *AddressService) Get(ctx context.Context, id int64) (resp *converter.Add
 	return
 }
 
+func (s *AddressService) First(ctx context.Context, status string) (resp *converter.AddressItem, err error) {
+	addr, err := gorm.G[entity.Address](s.db).Where("status = ?", status).First(ctx)
+	if err != nil {
+		logx.Errorf("address detail get failed, err:%v", err)
+		return
+	}
+
+	resp = &converter.AddressItem{}
+	copier.Copy(resp, addr)
+
+	return
+}
+
 func (s *AddressService) Save(ctx context.Context, req *converter.AddressItem) (err error) {
 	addr := &entity.Address{}
 	copier.Copy(&addr, req)
@@ -64,6 +77,15 @@ func (s *AddressService) Save(ctx context.Context, req *converter.AddressItem) (
 			err = biz.AddressCreateFailed
 			return
 		}
+	}
+
+	return
+}
+
+func (s *AddressService) ChangeStatus(addr string, status global.AddressStatus) (err error) {
+	err = s.db.Model(&entity.Address{}).Where("address = ?", addr).Update("status", status).Error
+	if err != nil {
+		return
 	}
 
 	return

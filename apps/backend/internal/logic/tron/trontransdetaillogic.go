@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"megichains/apps/backendadmin/internal/svc"
+	"megichains/apps/backend/internal/svc"
 )
 
 type TronTransDetailLogic struct {

@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"megichains/apps/backendadmin/internal/logic/tron"
-	"megichains/apps/backendadmin/internal/svc"
-	"megichains/apps/backendadmin/internal/types"
+	"megichains/apps/backend/internal/logic/tron"
+	"megichains/apps/backend/internal/svc"
+	"megichains/apps/backend/internal/types"
 )
 
 func TronTransListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

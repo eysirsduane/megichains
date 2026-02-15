@@ -6,8 +6,8 @@ package order
 import (
 	"context"
 
-	"megichains/apps/backendadmin/internal/svc"
-	"megichains/apps/backendadmin/internal/types"
+	"megichains/apps/backend/internal/svc"
+	"megichains/apps/backend/internal/types"
 	"megichains/pkg/converter"
 
 	"github.com/jinzhu/copier"

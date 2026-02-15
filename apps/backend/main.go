@@ -14,8 +14,8 @@ import (
 	"megichains/pkg/global"
 	"megichains/pkg/service"
 
-	"megichains/apps/backendadmin/internal/handler"
-	"megichains/apps/backendadmin/internal/svc"
+	"megichains/apps/backend/internal/handler"
+	"megichains/apps/backend/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"

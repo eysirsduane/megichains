@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"megichains/apps/backendadmin/internal/logic/address"
-	"megichains/apps/backendadmin/internal/svc"
+	"megichains/apps/backend/internal/logic/address"
+	"megichains/apps/backend/internal/svc"
 )
 
 func AddressGroupAllHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

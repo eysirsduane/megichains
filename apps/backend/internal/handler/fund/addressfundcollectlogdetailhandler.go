@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"megichains/apps/backendadmin/internal/logic/fund"
-	"megichains/apps/backendadmin/internal/svc"
-	"megichains/apps/backendadmin/internal/types"
+	"megichains/apps/backend/internal/logic/fund"
+	"megichains/apps/backend/internal/svc"
+	"megichains/apps/backend/internal/types"
 )
 
 func AddressFundCollectLogDetailHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

@@ -6,15 +6,15 @@ package handler
 import (
 	"net/http"
 
-	address "megichains/apps/backendadmin/internal/handler/address"
-	auth "megichains/apps/backendadmin/internal/handler/auth"
-	evm "megichains/apps/backendadmin/internal/handler/evm"
-	fund "megichains/apps/backendadmin/internal/handler/fund"
-	open "megichains/apps/backendadmin/internal/handler/open"
-	order "megichains/apps/backendadmin/internal/handler/order"
-	solana "megichains/apps/backendadmin/internal/handler/solana"
-	tron "megichains/apps/backendadmin/internal/handler/tron"
-	"megichains/apps/backendadmin/internal/svc"
+	address "megichains/apps/backend/internal/handler/address"
+	auth "megichains/apps/backend/internal/handler/auth"
+	evm "megichains/apps/backend/internal/handler/evm"
+	fund "megichains/apps/backend/internal/handler/fund"
+	open "megichains/apps/backend/internal/handler/open"
+	order "megichains/apps/backend/internal/handler/order"
+	solana "megichains/apps/backend/internal/handler/solana"
+	tron "megichains/apps/backend/internal/handler/tron"
+	"megichains/apps/backend/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )

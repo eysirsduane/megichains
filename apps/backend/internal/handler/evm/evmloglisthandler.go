@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"megichains/apps/backendadmin/internal/logic/evm"
-	"megichains/apps/backendadmin/internal/svc"
-	"megichains/apps/backendadmin/internal/types"
+	"megichains/apps/backend/internal/logic/evm"
+	"megichains/apps/backend/internal/svc"
+	"megichains/apps/backend/internal/types"
 )
 
 func EvmLogListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

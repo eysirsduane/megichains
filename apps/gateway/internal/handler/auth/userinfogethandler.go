@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"megichains/apps/backend/internal/logic/auth"
-	"megichains/apps/backend/internal/svc"
-	"megichains/apps/backend/internal/types"
+	"megichains/apps/gateway/internal/logic/auth"
+	"megichains/apps/gateway/internal/svc"
+	"megichains/apps/gateway/internal/types"
 )
 
 func UserInfoGetHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

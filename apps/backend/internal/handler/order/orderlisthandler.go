@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"megichains/apps/backendadmin/internal/logic/order"
-	"megichains/apps/backendadmin/internal/svc"
-	"megichains/apps/backendadmin/internal/types"
+	"megichains/apps/backend/internal/logic/order"
+	"megichains/apps/backend/internal/svc"
+	"megichains/apps/backend/internal/types"
 )
 
 func OrderListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

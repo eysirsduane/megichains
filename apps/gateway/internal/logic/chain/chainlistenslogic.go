@@ -6,8 +6,8 @@ package chain
 import (
 	"context"
 
-	"megichains/apps/backend/internal/svc"
-	"megichains/apps/backend/internal/types"
+	"megichains/apps/gateway/internal/svc"
+	"megichains/apps/gateway/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

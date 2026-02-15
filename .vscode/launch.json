@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch Gateway",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/apps/gateway/main.go"
+        },
+        {
             "name": "Launch Backend",
             "type": "go",
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}/apps/backend/main.go"
-        },
-        {
-            "name": "Launch BackendAdmin",
-            "type": "go",
-            "request": "launch",
-            "mode": "auto",
-            "program": "${workspaceFolder}/apps/backendadmin/main.go"
         },
         {
             "name": "Launch Job",
@@ -30,7 +30,7 @@
             "type": "chrome",
             "request": "launch",
             "url": "http://localhost:9527",
-            "webRoot": "${workspaceFolder}/apps/frontadmin"
+            "webRoot": "${workspaceFolder}/apps/management"
         },
         {
             "name": "TS Debugger",
@@ -39,7 +39,7 @@
             "runtimeExecutable": "tsx",
             "skipFiles": [
                 "<node_internals>/**",
-                "${workspaceFolder}/apps/frontadmin/node_modules/**"
+                "${workspaceFolder}/apps/management/node_modules/**"
             ],
             "program": "${file}",
             "console": "integratedTerminal",
@@ -50,8 +50,8 @@
         {
             "name": "Start Both (Frontend & Backend)",
             "configurations": [
+                "Launch Gateway",
                 "Launch Backend",
-                "Launch BackendAdmin",
                 "Launch Job",
                 "Vue Debugger",
                 "TS Debugger"

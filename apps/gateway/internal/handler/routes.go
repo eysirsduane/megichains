@@ -6,10 +6,10 @@ package handler
 import (
 	"net/http"
 
-	auth "megichains/apps/backend/internal/handler/auth"
-	chain "megichains/apps/backend/internal/handler/chain"
-	open "megichains/apps/backend/internal/handler/open"
-	"megichains/apps/backend/internal/svc"
+	auth "megichains/apps/gateway/internal/handler/auth"
+	chain "megichains/apps/gateway/internal/handler/chain"
+	open "megichains/apps/gateway/internal/handler/open"
+	"megichains/apps/gateway/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )

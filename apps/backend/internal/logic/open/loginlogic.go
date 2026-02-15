@@ -6,8 +6,8 @@ package open
 import (
 	"context"
 
-	"megichains/apps/backendadmin/internal/svc"
-	"megichains/apps/backendadmin/internal/types"
+	"megichains/apps/backend/internal/svc"
+	"megichains/apps/backend/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

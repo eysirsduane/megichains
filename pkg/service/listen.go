@@ -8,6 +8,7 @@ import (
 	"math/rand/v2"
 	"megichains/pkg/biz"
 	"megichains/pkg/converter"
+	"megichains/pkg/crypt"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
 	"megichains/pkg/service/clients"
@@ -48,6 +49,7 @@ type ListenService struct {
 	clilen        int
 	qclilen       int
 	Receivers     sync.Map
+	merchservice  *MerchService
 	addrservice   *AddressService
 	orderservice  *MerchOrderService
 	chainservie   *ChainService
@@ -56,12 +58,13 @@ type ListenService struct {
 	solanaservice *SolanaService
 }
 
-func NewListenService(cfg *global.BackendesConfig, db *gorm.DB, addrservice *AddressService, orderservice *MerchOrderService, chainservie *ChainService, evmservice *EvmService, tronservice *TronService, solanaservice *SolanaService) *ListenService {
+func NewListenService(cfg *global.BackendesConfig, db *gorm.DB, merchservice *MerchService, addrservice *AddressService, orderservice *MerchOrderService, chainservie *ChainService, evmservice *EvmService, tronservice *TronService, solanaservice *SolanaService) *ListenService {
 	return &ListenService{
-		db:            db,
 		cfg:           cfg,
+		db:            db,
 		clients:       sync.Map{},
 		Receivers:     sync.Map{},
+		merchservice:  merchservice,
 		addrservice:   addrservice,
 		orderservice:  orderservice,
 		chainservie:   chainservie,
@@ -162,7 +165,13 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		return
 	}
 
-	err = s.NotifyMerchant(log, req.NotifyUrl, order.OrderNo, order.MerchantOrderNo, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount, order.ReceivedSun)
+	merch, err := s.merchservice.Get(req.MerchantAccount)
+	if err != nil {
+		order.Description = fmt.Sprintf("chain listen order notify not found merchant, account:%v", req.MerchantAccount)
+		return
+	}
+
+	err = s.NotifyMerchant(log, merch, req.NotifyUrl, order.OrderNo, order.MerchantOrderNo, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount, order.ReceivedSun)
 	if err != nil {
 		logx.Errorf("chain listen notify failed, chain:%v, ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.Chain, req.MerchantOrderNo, order.TransactionId, err)
 		order.NotifyStatus = string(global.NotifyStatusFailed)
@@ -189,7 +198,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 	logx.Infof("监听事务结束, chain:%v, clen:%v, from:%v", req.Chain, s.clilen, req.Receiver)
 }
 
-func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderNotifyLog, url, ono, mono, status, txid, from, to, currency string, amount float64, sun int64) (err error) {
+func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderNotifyLog, merch *entity.Merchant, url, ono, mono, status, txid, from, to, currency string, amount float64, sun int64) (err error) {
 	req := global.OrderNotifyReq{
 		OrderNo:         ono,
 		MerchantOrderNo: mono,
@@ -209,9 +218,11 @@ func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderNotifyLog, url, 
 	if err != nil {
 		return
 	}
+
+	sign := crypt.HmacSHA256(log.RequestBody, merch.SecretKey)
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("Merchant-Account", "")
-	request.Header.Add("Sign", "")
+	request.Header.Add("Merchant-Account", merch.MerchantAccount)
+	request.Header.Add("Sign", sign)
 
 	log.RequestHeader = global.ObjToJsonString(request.Header)
 

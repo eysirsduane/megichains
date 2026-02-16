@@ -97,7 +97,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		MerchantOrderNo: req.MerchantOrderNo,
 		Chain:           string(req.Chain),
 		Typo:            string(global.OrderTypoIn),
-		Status:          string(global.OrderStatusFailed),
+		Status:          string(global.OrderStatusCreated),
 		NotifyStatus:    string(global.NotifyStatusUnknown),
 		Currency:        string(req.Currency),
 		ToAddress:       req.Receiver,

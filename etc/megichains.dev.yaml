@@ -31,7 +31,7 @@ Bot:
   Token: "8365546663:AAHzYZpB0KvwSguCNzLLYsR9DbtvMjrJSEg"
   Service: "@eysirs"
 
-EPay:
+Megi:
   NotifyUrl: "http://localhost:8080/api/v1/epay/notify"
 
 BSC:

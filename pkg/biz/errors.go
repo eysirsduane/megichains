@@ -44,9 +44,10 @@ var (
 )
 
 var (
-	OrderFindFailed  = NewSpecificError(5001, "订单查询失败")
-	OrderCountFailed = NewSpecificError(5002, "订单总数统计失败")
-	OrderSaveFailed  = NewSpecificError(6001, "订单保存失败")
+	OrderFindFailed          = NewSpecificError(5001, "订单查询失败")
+	OrderCountFailed         = NewSpecificError(5002, "订单总数统计失败")
+	OrderSaveFailed          = NewSpecificError(5003, "订单保存失败")
+	OrderNotifyLogSaveFailed = NewSpecificError(5004, "订单通知日志保存失败")
 )
 
 var (

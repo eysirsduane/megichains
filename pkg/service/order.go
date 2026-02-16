@@ -19,24 +19,28 @@ func NewMerchOrderService(db *gorm.DB) *MerchOrderService {
 	return &MerchOrderService{db: db}
 }
 
-func (s *MerchOrderService) Save(order *entity.MerchOrder) (err error) {
+func (s *MerchOrderService) Save(order *entity.MerchantOrder) (err error) {
 	return s.db.Save(order).Error
 }
 
-func (s *MerchOrderService) Get(id int64) (order *entity.MerchOrder, err error) {
-	order = &entity.MerchOrder{}
-	err = s.db.Model(&entity.MerchOrder{}).Where("id = ?", id).First(order).Error
+func (s *MerchOrderService) LogSave(log *entity.MerchantOrderNotifyLog) (err error) {
+	return s.db.Save(log).Error
+}
+
+func (s *MerchOrderService) Get(id int64) (order *entity.MerchantOrder, err error) {
+	order = &entity.MerchantOrder{}
+	err = s.db.Model(&entity.MerchantOrder{}).Where("id = ?", id).First(order).Error
 	return
 }
 
-func (s *MerchOrderService) GetByMerchId(moid string) (order *entity.MerchOrder, err error) {
-	order = &entity.MerchOrder{}
-	err = s.db.Model(&entity.MerchOrder{}).Where("merch_order_id = ?", moid).First(order).Error
+func (s *MerchOrderService) GetByMerchId(moid string) (order *entity.MerchantOrder, err error) {
+	order = &entity.MerchantOrder{}
+	err = s.db.Model(&entity.MerchantOrder{}).Where("merch_order_id = ?", moid).First(order).Error
 	return
 }
 
-func (s *MerchOrderService) Find(ctx context.Context, req *converter.OrderListReq) (resp *converter.RespConverter[entity.MerchOrder], err error) {
-	db := gorm.G[entity.MerchOrder](s.db).Order("updated_at desc")
+func (s *MerchOrderService) Find(ctx context.Context, req *converter.OrderListReq) (resp *converter.RespConverter[entity.MerchantOrder], err error) {
+	db := gorm.G[entity.MerchantOrder](s.db).Order("updated_at desc")
 	if req.Id > 0 {
 		db = db.Where("id = ?", req.Id)
 	}

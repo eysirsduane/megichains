@@ -65,12 +65,13 @@ type TimeAts struct {
 }
 
 type ChainListenReq struct {
-	MerchantKey     string
+	MerchantAccount string
 	MerchantOrderNo string           `json:"merchant_order_no"`
 	Chain           global.ChainName `json:"chain"`
 	Currency        string           `json:"currency"`
 	Receiver        string           `json:"receiver"`
 	Seconds         int64            `json:"seconds"`
+	NotifyUrl       string           `json:"notify_url"`
 }
 
 type ChainAddressCreateReq struct {

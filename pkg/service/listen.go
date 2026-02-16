@@ -1,18 +1,22 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"math/rand/v2"
 	"megichains/pkg/biz"
 	"megichains/pkg/converter"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
 	"megichains/pkg/service/clients"
+	"net/http"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/bwmarrin/snowflake"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -81,9 +85,12 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 	defer s.Receivers.Delete(key)
 	defer s.clearClients()
 
-	order := &entity.MerchOrder{
-		OrderNo:         strings.ReplaceAll(uuid.NewString(), "-", ""),
-		MerchantAccount: req.MerchantKey,
+	node, _ := snowflake.NewNode(1)
+	sid := node.Generate()
+
+	order := &entity.MerchantOrder{
+		OrderNo:         sid.String(),
+		MerchantAccount: req.MerchantAccount,
 		MerchantOrderNo: req.MerchantOrderNo,
 		Chain:           string(req.Chain),
 		Typo:            string(global.OrderTypoIn),
@@ -96,7 +103,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 	err := s.orderservice.Save(order)
 	if err != nil {
 		err = biz.OrderSaveFailed
-		logx.Errorf("chain listen order save failed, moid:%v, receiver:%v, err:%v", req.MerchantOrderNo, req.Receiver, err)
+		logx.Errorf("chain listen order save failed, mono:%v, receiver:%v, err:%v", req.MerchantOrderNo, req.Receiver, err)
 		return
 	}
 
@@ -144,22 +151,99 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		return
 	}
 
-	err = global.NotifyMerchant(s.cfg.EPay.NotifyUrl, order.MerchantOrderNo, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount)
+	log := &entity.MerchantOrderNotifyLog{
+		MerchantOrderId: order.Id,
+		NotifyUrl:       req.NotifyUrl,
+	}
+	err = s.orderservice.LogSave(log)
 	if err != nil {
-		logx.Errorf("chain listen notify failed, chain:%v, moid:%v, txid:%v, err:%v", req.Chain, req.MerchantOrderNo, order.TransactionId, err)
+		logx.Errorf("chain listen order notify log save failed, mono:%v, txid:%v, err:%v", req.MerchantOrderNo, order.TransactionId, err)
+		err = biz.OrderNotifyLogSaveFailed
+		return
+	}
+
+	err = s.NotifyMerchant(log, req.NotifyUrl, order.OrderNo, order.MerchantOrderNo, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount, order.ReceivedSun)
+	if err != nil {
+		logx.Errorf("chain listen notify failed, chain:%v, ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.Chain, req.MerchantOrderNo, order.TransactionId, err)
 		order.NotifyStatus = string(global.NotifyStatusFailed)
-		order.Description = fmt.Sprintf("chain notify failed. moid:%v, txid:%v, err:%v", req.MerchantOrderNo, order.TransactionId, err)
+		order.Description = fmt.Sprintf("chain order notify failed. ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
+
+		log.Description = fmt.Sprintf("chain order notify failed. ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
 	} else {
 		order.NotifyStatus = string(global.NotifyStatusSuccess)
+
+	}
+
+	err = s.orderservice.LogSave(log)
+	if err != nil {
+		logx.Errorf("chain listen order notify log update failed, ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
+		err = biz.OrderNotifyLogSaveFailed
 	}
 
 	err = s.orderservice.Save(order)
 	if err != nil {
-		logx.Errorf("chain listen order update failed, moid:%v, txid:%v, err:%v", req.MerchantOrderNo, order.TransactionId, err)
+		logx.Errorf("chain listen order update failed, ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
 		err = biz.OrderSaveFailed
 	}
 
 	logx.Infof("监听事务结束, chain:%v, clen:%v, from:%v", req.Chain, s.clilen, req.Receiver)
+}
+
+func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderNotifyLog, url, ono, mono, status, txid, from, to, currency string, amount float64, sun int64) (err error) {
+	req := global.OrderNotifyReq{
+		OrderNo:         ono,
+		MerchantOrderNo: mono,
+		Status:          status,
+		TxId:            txid,
+		From:            from,
+		To:              to,
+		Currency:        currency,
+		Amount:          amount,
+		Sun:             sun,
+	}
+
+	rbytes := global.ObjToBytes(req)
+	log.RequestBody = global.BytesToString(rbytes)
+
+	request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(rbytes))
+	if err != nil {
+		return
+	}
+	request.Header.Add("Content-Type", "application/json")
+	request.Header.Add("Merchant-Account", "")
+	request.Header.Add("Sign", "")
+
+	log.RequestHeader = global.ObjToJsonString(request.Header)
+
+	client := &http.Client{}
+	resp, err := client.Do(request)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	bbytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+
+	log.ResponseHeader = global.ObjToJsonString(resp.Header)
+	log.ResponseBody = global.BytesToString(bbytes)
+
+	if resp.StatusCode != http.StatusOK {
+		err = fmt.Errorf("order notify response status is not ok, req:%+v, status:%v", req, resp.StatusCode)
+
+		log.Description = err.Error()
+		return
+	}
+	if log.RequestBody != "success" {
+		err = fmt.Errorf("order notify response body is not success, req:%+v, body:%v", req, log.ResponseBody)
+
+		log.Description = err.Error()
+		return
+	}
+
+	return
 }
 
 func (s *ListenService) newEvmClient(chain global.ChainName) (client *ethclient.Client, err error) {
@@ -383,7 +467,7 @@ func (s *ListenService) clearClients() {
 	emu.Unlock()
 }
 
-func (s *ListenService) listenEvm(order *entity.MerchOrder, chain global.ChainName, currency global.CurrencyTypo, receiver string, seconds int64, item *clients.EvmClientItem) {
+func (s *ListenService) listenEvm(order *entity.MerchantOrder, chain global.ChainName, currency global.CurrencyTypo, receiver string, seconds int64, item *clients.EvmClientItem) {
 	contracts := make([]common.Address, 0, 1)
 	caddr, err := s.getContractAddress(currency, string(chain))
 	if err != nil {
@@ -445,7 +529,7 @@ func (s *ListenService) listenEvm(order *entity.MerchOrder, chain global.ChainNa
 
 }
 
-func (s *ListenService) listenTron(order *entity.MerchOrder, chain global.ChainName, currency global.CurrencyTypo, receiver string, seconds int64, item *clients.TronClientItem) {
+func (s *ListenService) listenTron(order *entity.MerchantOrder, chain global.ChainName, currency global.CurrencyTypo, receiver string, seconds int64, item *clients.TronClientItem) {
 	caddr, err := s.getContractAddress(currency, string(chain))
 	if err != nil {
 		logx.Errorf("Tron contract address get failed, chain:%v, currency:%v, err:%v", chain, currency, err)
@@ -485,7 +569,7 @@ func (s *ListenService) listenTron(order *entity.MerchOrder, chain global.ChainN
 	}
 }
 
-func (s *ListenService) listenSolana(order *entity.MerchOrder, chain global.ChainName, currency global.CurrencyTypo, receiver string, seconds int64, item *clients.SolanaClientItem) {
+func (s *ListenService) listenSolana(order *entity.MerchantOrder, chain global.ChainName, currency global.CurrencyTypo, receiver string, seconds int64, item *clients.SolanaClientItem) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(seconds)*time.Second)
 	defer cancel()
 

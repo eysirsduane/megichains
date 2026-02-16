@@ -1,15 +1,11 @@
 package global
 
 import (
-	"bytes"
 	"encoding/json"
-	"fmt"
 	"math"
-	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/zeromicro/go-zero/core/logx"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -104,34 +100,14 @@ func ObjToBytes(obj any) (bytes []byte) {
 	return
 }
 
-func NotifyMerchant(url, merchOrderId, status, txid, fromHex, toHex, currency string, receivedAmount float64) (err error) {
-	req := EPayNotifyReq{
-		MerchOrderId: merchOrderId,
-		Status:       status,
-		TxId:         txid,
-		FromHex:      fromHex,
-		ToHex:        toHex,
-		Amount:       receivedAmount,
-		Currency:     currency,
-	}
+func ObjToJsonString(obj any) (str string) {
+	bytes := ObjToBytes(obj)
+	str = string(bytes)
 
-	byts, err := json.Marshal(req)
-	if err != nil {
-		logx.Errorf("notify epay marshal req failed, req:%+v, err:%v", req, err)
-		return
-	}
+	return
+}
 
-	resp, err := http.Post(url, "application/json", bytes.NewReader(byts))
-	if err != nil {
-		logx.Errorf("notify epay post req failed, req:%+v, err:%v", req, err)
-		return
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		err = fmt.Errorf("notify epay response status is not ok, req:%+v, status:%v", req, resp.StatusCode)
-		return
-	}
-
+func BytesToString(bytes []byte) (str string) {
+	str = string(bytes)
 	return
 }

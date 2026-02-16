@@ -30,7 +30,7 @@ Bot:
   Token: "8365546663:AAHzYZpB0KvwSguCNzLLYsR9DbtvMjrJSEg"
   Service: "@eysirs2233"
 
-EPay:
+Megi:
   NotifyUrl: "https://127.0.0.1:8093/payApi/PayApi/Notice/10108/merch_order_id"
 
 Tron:

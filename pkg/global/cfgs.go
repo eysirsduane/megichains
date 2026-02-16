@@ -6,7 +6,7 @@ type BackendesConfig struct {
 	rest.RestConf
 	Auth              *Auth
 	DB                *DB
-	EPay              *EPay
+	Megi              *Megi
 	Tron              *Tron
 	Eth               *Eth
 	Bsc               *Bsc
@@ -33,7 +33,7 @@ type DB struct {
 	Timezone string
 }
 
-type EPay struct {
+type Megi struct {
 	NotifyUrl string
 }
 

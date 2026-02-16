@@ -1,6 +1,6 @@
 package entity
 
-type MerchOrder struct {
+type MerchantOrder struct {
 	Id              int64  `gorm:"primaryKey;autoIncrement"`
 	OrderNo         string `gorm:"size:63;uniqueIndex"`
 	MerchantAccount string `gorm:"uniqueIndex:idx_mchaccount_merchorderno_index"`
@@ -20,6 +20,23 @@ type MerchOrder struct {
 
 	FromAddress string `gorm:"size:255"`
 	ToAddress   string `gorm:"size:255"`
+
+	Description string `gorm:"size:2047"`
+
+	TimeAts `gorm:"embedded"`
+}
+
+type MerchantOrderNotifyLog struct {
+	Id              int64 `gorm:"primaryKey;autoIncrement"`
+	MerchantOrderId int64 `gorm:"uniqueIndex"`
+
+	NotifyUrl string `gorm:"size:1023"`
+
+	RequestHeader string
+	RequestBody   string
+
+	ResponseHeader string
+	ResponseBody   string
 
 	Description string `gorm:"size:2047"`
 

@@ -5,7 +5,7 @@ type Request {
 }
 
 type Response {
-	Code    int           `json:"msg"`
+	Code    int           `json:"code"`
 	Msg     string        `json:"msg"`
 	Records []interface{} `json:"records"`
 }
@@ -90,7 +90,7 @@ type BscLogListResp {
 type BscLogItem {}
 
 type ChainListenReq {
-	MerchantKey     string `header:"Merchant-Account"`
+	MerchantAccount string `header:"Merchant-Account"`
 	MerchantOrderNo string `json:"merchant_order_no"`
 	Chain           string `json:"chain"`
 	Currency        string `json:"currency"`
@@ -122,6 +122,9 @@ service gateway {
 
 	@handler LoginHandler
 	post /auth/login (LoginReq) returns (LoginResp)
+
+	@handler ChainListensHandler
+	post /chain/listens returns (Response)
 }
 
 @server (
@@ -161,8 +164,5 @@ service gateway {
 service gateway {
 	@handler ChainListenHandler
 	post /chain/listen (ChainListenReq) returns (ChainListenResp)
-
-	@handler ChainListensHandler
-	post /chain/listens returns (Response)
 }
 

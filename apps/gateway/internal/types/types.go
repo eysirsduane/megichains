@@ -21,7 +21,7 @@ type ChainAddressCreateReq struct {
 }
 
 type ChainListenReq struct {
-	MerchantKey     string `header:"Merchant-Account"`
+	MerchantAccount string `header:"Merchant-Account"`
 	MerchantOrderNo string `json:"merchant_order_no"`
 	Chain           string `json:"chain"`
 	Currency        string `json:"currency"`
@@ -82,7 +82,7 @@ type Request struct {
 }
 
 type Response struct {
-	Code    int           `json:"msg"`
+	Code    int           `json:"code"`
 	Msg     string        `json:"msg"`
 	Records []interface{} `json:"records"`
 }

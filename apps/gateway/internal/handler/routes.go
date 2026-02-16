@@ -46,11 +46,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Path:    "/chain/listen",
 					Handler: chain.ChainListenHandler(serverCtx),
 				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/chain/listens",
-					Handler: chain.ChainListensHandler(serverCtx),
-				},
 			}...,
 		),
 		rest.WithPrefix("/v1"),
@@ -67,6 +62,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPost,
 				Path:    "/auth/register",
 				Handler: open.RegisterHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/chain/listens",
+				Handler: open.ChainListensHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/v1"),

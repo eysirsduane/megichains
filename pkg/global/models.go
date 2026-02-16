@@ -11,19 +11,16 @@ type ListenReq struct {
 	Seconds      int64  `json:"seconds"`
 }
 
-type EPayNotifyReq struct {
-	MerchOrderId string  `json:"merch_order_id"`
-	Status       string  `json:"status"`
-	TxId         string  `json:"txid"`
-	FromHex      string  `json:"from_hex"`
-	ToHex        string  `json:"to_hex"`
-	Amount       float64 `json:"amount"`
-	Currency     string  `json:"currency"`
-}
-
-type EPayOrderAddress struct {
-	Address  string
-	Currency string
+type OrderNotifyReq struct {
+	OrderNo         string  `json:"order_no"`
+	MerchantOrderNo string  `json:"merchant_order_no"`
+	Status          string  `json:"status"`
+	Currency        string  `json:"currency"`
+	TxId            string  `json:"txid"`
+	From            string  `json:"from"`
+	To              string  `json:"to"`
+	Amount          float64 `json:"amount"`
+	Sun             int64   `json:"sun"`
 }
 
 type CollectCalc struct {

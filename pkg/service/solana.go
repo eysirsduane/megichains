@@ -19,7 +19,7 @@ func NewSolanaService(db *gorm.DB) *SolanaService {
 	return &SolanaService{db: db}
 }
 
-func (s *SolanaService) Save(order *entity.MerchOrder) (err error) {
+func (s *SolanaService) Save(order *entity.MerchantOrder) (err error) {
 	err = s.db.Create(order).Error
 	if err != nil {
 		logx.Errorf("db solana service save transaction failed, err:%v", err)

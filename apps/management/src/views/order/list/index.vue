@@ -134,7 +134,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       }
     },
     { prop: 'received_amount', label: $t('page.order.common.received_amount'), width: 160 },
-    { prop: 'merchant_account', label: $t('page.order.common.merchant_account'), width: 200 },
+    { prop: 'merchant_account', label: $t('page.order.common.merchant_account'), width: 160 },
     // { prop: 'received_sun', label: $t('page.order.common.received_sun'), width: 180 },
     { prop: 'from_address', label: $t('page.order.common.from_address'), width: 400 },
     { prop: 'to_address', label: $t('page.order.common.to_address'), width: 400 },

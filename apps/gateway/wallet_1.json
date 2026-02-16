@@ -1,3 +1,23 @@
 {
-  "PrivateKey": "0bOE/bj9u0CQg/eqT90yNKM0Qz7w/rtumLtdRk2KdEY35P8AlV84iIQFn0rZ0pukLCXzGdqWmoUfLQOldxjZKg=="
+  "Content-Type": [
+    "application/json"
+  ],
+  "Merchant-Account": [
+    ""
+  ],
+  "Sign": [
+    "612a4a116d194cba8466f4d34f3713279804452e31a1aac2d80ac2a034fbfc7b"
+  ]
+}
+
+{
+  "order_no": "2023378191313276928",
+  "merchant_order_no": "121234567",
+  "status": "成功",
+  "currency": "USDT",
+  "txid": "5kBJiipRZsV99dCSNbGYBjo48GdVo4LLCF1mSAnFt3yqTwvdUeG8iWPGgWCdx2xBppAW6AUBUzStpNF2zAXZ9Pvn",
+  "from": "9gzkywhjpa3vP9XhvPVp1WtmnfYPdbYN7hKcfvUrmJqT",
+  "to": "3EQtq5wZs85TvDg52SiFjoCEv1DfpihtWu6J999BUMQU",
+  "amount": 111,
+  "sun": 111000000
 }

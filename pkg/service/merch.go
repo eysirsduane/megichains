@@ -16,7 +16,7 @@ func NewMerchService(db *gorm.DB) *MerchService {
 
 func (s *MerchService) Get(account string) (merch *entity.Merchant, err error) {
 	merch = &entity.Merchant{}
-	err = s.db.Model(&entity.Merchant{}).Where("merchant_account = ?", account).Error
+	err = s.db.Model(&entity.Merchant{}).Where("merchant_account = ?", account).First(merch).Error
 
 	return
 }

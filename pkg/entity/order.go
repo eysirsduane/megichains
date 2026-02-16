@@ -28,7 +28,7 @@ type MerchantOrder struct {
 
 type MerchantOrderNotifyLog struct {
 	Id              int64 `gorm:"primaryKey;autoIncrement"`
-	MerchantOrderId int64 `gorm:"uniqueIndex"`
+	MerchantOrderId int64 `gorm:""`
 
 	NotifyUrl string `gorm:"size:1023"`
 

@@ -34,14 +34,13 @@ func (m *TronClientItem) Listen(ctx context.Context, chain global.ChainName, ich
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
+	min := time.Now().UnixMilli()
 	for {
 		select {
 		case <-ctx.Done():
 			logx.Infof("TRON chain 订阅超时, 已退出单笔订阅, currency:%v, to:%v", currency, receiver)
 			return
 		case <-ticker.C:
-			min := time.Now().UnixMilli()
-
 			url := fmt.Sprintf("%v/v1/accounts/%s/transactions/trc20?limit=200&contract_address=%v&only_confirmed=true&min_timestamp=%v", httpurl, receiver, caddr, min)
 			resp, err := http.Get(url)
 			if err != nil {

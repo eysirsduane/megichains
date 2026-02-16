@@ -289,7 +289,10 @@ const local: App.I18n.Schema = {
     fund: '资金管理',
     fund_statistics: '余额统计',
     fund_collect: '资金归集',
-    fund_collectlog: '归集日志'
+    fund_collectlog: '归集日志',
+    merchant: '商户管理',
+    merchant_list: '商户列表',
+    merchant_place: '测试下单'
   },
   page: {
     login: {

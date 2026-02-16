@@ -47,7 +47,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'about',
       i18nKey: 'route.about',
       icon: 'fluent:book-information-24-regular',
-      order: 10
+      order: 20
     }
   },
   {
@@ -58,7 +58,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'address',
       i18nKey: 'route.address',
       icon: 'ant-design:exception-outlined',
-      order: 3,
+      order: 6,
       keepAlive: true
     },
     children: [
@@ -258,7 +258,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'fund',
       i18nKey: 'route.fund',
-      order: 3,
+      order: 10,
       icon: 'simple-icons:apacheecharts',
       keepAlive: true
     },
@@ -399,6 +399,36 @@ export const generatedRoutes: GeneratedRoute[] = [
     ]
   },
   {
+    name: 'merchant',
+    path: '/merchant',
+    component: 'layout.base',
+    meta: {
+      title: 'merchant',
+      i18nKey: 'route.merchant',
+      order: 3
+    },
+    children: [
+      {
+        name: 'merchant_list',
+        path: '/merchant/list',
+        component: 'view.merchant_list',
+        meta: {
+          title: 'merchant_list',
+          i18nKey: 'route.merchant_list'
+        }
+      },
+      {
+        name: 'merchant_place',
+        path: '/merchant/place',
+        component: 'view.merchant_place',
+        meta: {
+          title: 'merchant_place',
+          i18nKey: 'route.merchant_place'
+        }
+      }
+    ]
+  },
+  {
     name: 'multi-menu',
     path: '/multi-menu',
     component: 'layout.base',
@@ -468,7 +498,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'order',
       i18nKey: 'route.order',
-      order: 2,
+      order: 5,
       icon: 'cbi:scene-dynamic'
     },
     children: [

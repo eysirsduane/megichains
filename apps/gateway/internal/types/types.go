@@ -21,11 +21,12 @@ type ChainAddressCreateReq struct {
 }
 
 type ChainListenReq struct {
-	MerchOrderId string `json:"merch_order_id"`
-	Chain        string `json:"chain"`
-	Currency     string `json:"currency"`
-	Receiver     string `json:"receiver"`
-	Seconds      int64  `json:"seconds"`
+	MerchantKey     string `header:"Merchant-Account"`
+	MerchantOrderNo string `json:"merchant_order_no"`
+	Chain           string `json:"chain"`
+	Currency        string `json:"currency"`
+	Receiver        string `json:"receiver"`
+	Seconds         int64  `json:"seconds"`
 }
 
 type ChainListenResp struct {

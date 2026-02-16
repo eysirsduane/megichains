@@ -6,7 +6,8 @@ declare namespace Api {
    */
   namespace Order {
     type Order = Common.CommonRecord<{
-      merch_order_id: string;
+      merchant_account: string;
+      merchant_order_no: string;
       transaction_id: string;
       typo: Api.Common.OrderTypos;
       currency: Api.Common.CurrencyTypos;
@@ -23,7 +24,8 @@ declare namespace Api {
     type OrderSearchParams = CommonType.RecordNullable<
       Pick<
         Api.Order.Order,
-        | 'merch_order_id'
+        | 'merchant_account'
+        | 'merchant_order_no'
         | 'chain'
         | 'transaction_id'
         | 'typo'
@@ -42,7 +44,9 @@ declare namespace Api {
 
     type OrderDetail = Common.CommonRecord<{
       log_id: number;
-      merch_order_id: string;
+      order_no: string;
+      merchant_account: string;
+      merchant_order_no: string;
       transaction_id: string;
       typo: Api.Common.OrderTypos;
       status: Api.Common.OrderStatus;

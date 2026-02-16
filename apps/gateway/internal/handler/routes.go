@@ -38,18 +38,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodPost,
-				Path:    "/chain/listen",
-				Handler: chain.ChainListenHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/chain/listens",
-				Handler: chain.ChainListensHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ApiAccessPermissionMiddleware.Handle},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/chain/listen",
+					Handler: chain.ChainListenHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/chain/listens",
+					Handler: chain.ChainListensHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithPrefix("/v1"),
 	)
 

@@ -98,6 +98,12 @@ func CheckPassword(hash, pwd string) (ok bool) {
 	return err == nil
 }
 
+func ObjToBytes(obj any) (bytes []byte) {
+	bytes, _ = json.Marshal(obj)
+
+	return
+}
+
 func NotifyMerchant(url, merchOrderId, status, txid, fromHex, toHex, currency string, receivedAmount float64) (err error) {
 	req := EPayNotifyReq{
 		MerchOrderId: merchOrderId,

@@ -90,11 +90,12 @@ type BscLogListResp {
 type BscLogItem {}
 
 type ChainListenReq {
-	MerchOrderId string `json:"merch_order_id"`
-	Chain        string `json:"chain"`
-	Currency     string `json:"currency"`
-	Receiver     string `json:"receiver"`
-	Seconds      int64  `json:"seconds"`
+	MerchantKey     string `header:"Merchant-Account"`
+	MerchantOrderNo string `json:"merchant_order_no"`
+	Chain           string `json:"chain"`
+	Currency        string `json:"currency"`
+	Receiver        string `json:"receiver"`
+	Seconds         int64  `json:"seconds"`
 }
 
 type ChainListenResp {}
@@ -154,7 +155,8 @@ service gateway {
 	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
 	group: chain
 	// 定义路由前缀为 "/v1"
-	prefix: /v1
+	prefix:     /v1
+	middleware: ApiAccessPermissionMiddleware
 )
 service gateway {
 	@handler ChainListenHandler

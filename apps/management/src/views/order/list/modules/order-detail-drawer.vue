@@ -16,7 +16,9 @@ const targetId = defineModel<number>('targetId', {
 
 type Model = Pick<
   Api.Order.OrderDetail,
-  | 'merch_order_id'
+  | 'order_no'
+  | 'merchant_account'
+  | 'merchant_order_no'
   | 'transaction_id'
   | 'log_id'
   | 'chain'
@@ -36,7 +38,9 @@ const model = ref(createDefaultModel());
 
 function createDefaultModel(): Model {
   return {
-    merch_order_id: '',
+    order_no: '',
+    merchant_account: '',
+    merchant_order_no: '',
     log_id: 0,
     transaction_id: '',
     chain: '',
@@ -81,8 +85,14 @@ watch(visible, async () => {
 <template>
   <ElDrawer v-model="visible" :title="$t('page.order.detail.title')" :size="560">
     <ElForm :model="model" label-position="top">
-      <ElFormItem :label="$t('page.order.common.merch_order_id')" prop="transaction_id">
-        <ElInput v-model="model.merch_order_id" />
+      <ElFormItem :label="$t('page.order.common.order_no')" prop="order_no">
+        <ElInput v-model="model.order_no" />
+      </ElFormItem>
+      <ElFormItem :label="$t('page.order.common.merchant_account')" prop="merchant_account">
+        <ElInput v-model="model.merchant_account" />
+      </ElFormItem>
+      <ElFormItem :label="$t('page.order.common.merchant_order_no')" prop="merchant_order_no">
+        <ElInput v-model="model.merchant_order_no" />
       </ElFormItem>
       <ElFormItem :label="$t('page.order.common.log_id')" prop="order_id">
         <ElInput v-model="model.log_id" />

@@ -1,9 +1,12 @@
 package entity
 
 type MerchOrder struct {
-	Id            int64  `gorm:"primaryKey;autoIncrement"`
+	Id              int64  `gorm:"primaryKey;autoIncrement"`
+	OrderNo         string `gorm:"size:63;uniqueIndex"`
+	MerchantAccount string `gorm:"uniqueIndex:idx_mchaccount_merchorderno_index"`
+	MerchantOrderNo string `gorm:"size:63;uniqueIndex:idx_mchaccount_merchorderno_index"`
+
 	LogId         int64  `gorm:""`
-	MerchOrderId  string `gorm:"size:63;uniqueIndex"`
 	TransactionId string `gorm:"size:255"`
 	Chain         string `gorm:"size:15;"`
 

@@ -20,7 +20,8 @@ function getInitSearchParams(): Api.Order.OrderSearchParams {
     size: 20,
     start: 0,
     end: 0,
-    merch_order_id: '',
+    merchant_account: '',
+    merchant_order_no: '',
     chain: '',
     transaction_id: '',
     typo: '',
@@ -48,7 +49,8 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   columns: () => [
     { prop: 'selection', type: 'selection', width: 48 },
     { prop: 'id', type: 'id', label: $t('common.id') },
-    { prop: 'merch_order_id', label: $t('page.order.common.merch_order_id'), width: 320 },
+    { prop: 'order_no', label: $t('page.order.common.order_no'), width: 320 },
+    { prop: 'merchant_order_no', label: $t('page.order.common.merchant_order_no'), width: 320 },
     { prop: 'chain', label: $t('page.order.common.chain') },
     {
       prop: 'typo',
@@ -77,7 +79,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
         const tagMap: Record<Api.Common.OrderStatus, UI.ThemeColor> = {
           '': 'info',
           已创建: 'info',
-          超时: 'danger',
+          超时: 'warning',
           失败: 'danger',
           成功: 'success'
         };
@@ -119,7 +121,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       formatter: row => {
         const tagMap: Record<Api.Common.CurrencyTypos, UI.ThemeColor> = {
           '': 'info',
-          USDT: 'info',
+          USDT: 'primary',
           USDC: 'success'
         };
 
@@ -132,6 +134,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       }
     },
     { prop: 'received_amount', label: $t('page.order.common.received_amount'), width: 160 },
+    { prop: 'merchant_account', label: $t('page.order.common.merchant_account'), width: 320 },
     // { prop: 'received_sun', label: $t('page.order.common.received_sun'), width: 180 },
     { prop: 'from_address', label: $t('page.order.common.from_address'), width: 400 },
     { prop: 'to_address', label: $t('page.order.common.to_address'), width: 400 },

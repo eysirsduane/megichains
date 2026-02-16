@@ -573,7 +573,11 @@ const local: App.I18n.Schema = {
         block_timestamp: '区块交易时间',
         removed: '被移除',
         lamport: '收到金额(LAM)',
-        notify_status: '通知状态'
+        notify_status: '通知状态',
+        order_no: '订单号',
+        merchant_key: '商户key',
+        merchant_account: '商户账号',
+        merchant_order_no: '商户订单号'
       },
       detail: {
         title: '订单明细'

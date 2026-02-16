@@ -82,19 +82,21 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 	defer s.clearClients()
 
 	order := &entity.MerchOrder{
-		MerchOrderId: req.MerchOrderId,
-		Chain:        string(req.Chain),
-		Typo:         string(global.OrderTypoIn),
-		Status:       string(global.OrderStatusFailed),
-		NotifyStatus: string(global.NotifyStatusUnknown),
-		Currency:     string(req.Currency),
-		ToAddress:    req.Receiver,
-		Description:  "",
+		OrderNo:         strings.ReplaceAll(uuid.NewString(), "-", ""),
+		MerchantAccount: req.MerchantKey,
+		MerchantOrderNo: req.MerchantOrderNo,
+		Chain:           string(req.Chain),
+		Typo:            string(global.OrderTypoIn),
+		Status:          string(global.OrderStatusFailed),
+		NotifyStatus:    string(global.NotifyStatusUnknown),
+		Currency:        string(req.Currency),
+		ToAddress:       req.Receiver,
+		Description:     "",
 	}
 	err := s.orderservice.Save(order)
 	if err != nil {
 		err = biz.OrderSaveFailed
-		logx.Errorf("chain listen order save failed, moid:%v, receiver:%v, err:%v", req.MerchOrderId, req.Receiver, err)
+		logx.Errorf("chain listen order save failed, moid:%v, receiver:%v, err:%v", req.MerchantOrderNo, req.Receiver, err)
 		return
 	}
 
@@ -113,7 +115,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		item.RunningQueryCount++
 		emu.Unlock()
 
-		s.listenEvm(order, req.Chain, global.CurrencyTypo(req.Currency), req.MerchOrderId, req.Receiver, req.Seconds, item)
+		s.listenEvm(order, req.Chain, global.CurrencyTypo(req.Currency), req.Receiver, req.Seconds, item)
 	case global.ChainNameTron:
 		tmu.Lock()
 		c, err1 := s.getClientItem(req.Chain)
@@ -124,7 +126,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		item := c.(*clients.TronClientItem)
 		tmu.Unlock()
 
-		s.listenTron(order, req.Chain, global.CurrencyTypo(req.Currency), req.MerchOrderId, req.Receiver, req.Seconds, item)
+		s.listenTron(order, req.Chain, global.CurrencyTypo(req.Currency), req.Receiver, req.Seconds, item)
 	case global.ChainNameSolana:
 		emu.Lock()
 		c, err1 := s.getClientItem(req.Chain)
@@ -136,24 +138,24 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		item.RunningQueryCount++
 		emu.Unlock()
 
-		s.listenSolana(order, req.Chain, global.CurrencyTypo(req.Currency), req.MerchOrderId, req.Receiver, req.Seconds, item)
+		s.listenSolana(order, req.Chain, global.CurrencyTypo(req.Currency), req.Receiver, req.Seconds, item)
 	default:
 		logx.Errorf("=== 监听了未知的链 ===")
 		return
 	}
 
-	err = global.NotifyMerchant(s.cfg.EPay.NotifyUrl, order.MerchOrderId, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount)
+	err = global.NotifyMerchant(s.cfg.EPay.NotifyUrl, order.MerchantOrderNo, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount)
 	if err != nil {
-		logx.Errorf("chain listen notify failed, chain:%v, moid:%v, txid:%v, err:%v", req.Chain, req.MerchOrderId, order.TransactionId, err)
+		logx.Errorf("chain listen notify failed, chain:%v, moid:%v, txid:%v, err:%v", req.Chain, req.MerchantOrderNo, order.TransactionId, err)
 		order.NotifyStatus = string(global.NotifyStatusFailed)
-		order.Description = fmt.Sprintf("chain notify failed. moid:%v, txid:%v, err:%v", req.MerchOrderId, order.TransactionId, err)
+		order.Description = fmt.Sprintf("chain notify failed. moid:%v, txid:%v, err:%v", req.MerchantOrderNo, order.TransactionId, err)
 	} else {
 		order.NotifyStatus = string(global.NotifyStatusSuccess)
 	}
 
 	err = s.orderservice.Save(order)
 	if err != nil {
-		logx.Errorf("chain listen order update failed, moid:%v, txid:%v, err:%v", req.MerchOrderId, order.TransactionId, err)
+		logx.Errorf("chain listen order update failed, moid:%v, txid:%v, err:%v", req.MerchantOrderNo, order.TransactionId, err)
 		err = biz.OrderSaveFailed
 	}
 
@@ -381,7 +383,7 @@ func (s *ListenService) clearClients() {
 	emu.Unlock()
 }
 
-func (s *ListenService) listenEvm(order *entity.MerchOrder, chain global.ChainName, currency global.CurrencyTypo, moid, receiver string, seconds int64, item *clients.EvmClientItem) {
+func (s *ListenService) listenEvm(order *entity.MerchOrder, chain global.ChainName, currency global.CurrencyTypo, receiver string, seconds int64, item *clients.EvmClientItem) {
 	contracts := make([]common.Address, 0, 1)
 	caddr, err := s.getContractAddress(currency, string(chain))
 	if err != nil {
@@ -417,6 +419,8 @@ func (s *ListenService) listenEvm(order *entity.MerchOrder, chain global.ChainNa
 	ichan := make(chan *entity.EvmLog, 1)
 	go item.Listen(ctx, chain, ichan, currency, sub, logs, receiver)
 
+	order.Status = string(global.OrderStatusTimeout)
+
 	for log := range ichan {
 		log.Chain = string(chain)
 		err = s.evmservice.LogSave(log)
@@ -429,7 +433,6 @@ func (s *ListenService) listenEvm(order *entity.MerchOrder, chain global.ChainNa
 		logx.Infof("🎉🎉🎉 EVM 收到转账, [%v]:[%v]:[%v], from:%v, to:%v", chain, log.Currency, global.GetFloat64String(log.Amount), log.FromHex, log.ToHex)
 
 		order.LogId = log.Id
-		order.MerchOrderId = moid
 		order.TransactionId = log.TxHash
 		order.FromAddress = log.FromHex
 		order.ReceivedAmount = log.Amount
@@ -440,10 +443,9 @@ func (s *ListenService) listenEvm(order *entity.MerchOrder, chain global.ChainNa
 		s.chainservie.EvmFunds(receiver, chain)
 	}
 
-	order.Status = string(global.OrderStatusTimeout)
 }
 
-func (s *ListenService) listenTron(order *entity.MerchOrder, chain global.ChainName, currency global.CurrencyTypo, moid, receiver string, seconds int64, item *clients.TronClientItem) {
+func (s *ListenService) listenTron(order *entity.MerchOrder, chain global.ChainName, currency global.CurrencyTypo, receiver string, seconds int64, item *clients.TronClientItem) {
 	caddr, err := s.getContractAddress(currency, string(chain))
 	if err != nil {
 		logx.Errorf("Tron contract address get failed, chain:%v, currency:%v, err:%v", chain, currency, err)
@@ -457,6 +459,8 @@ func (s *ListenService) listenTron(order *entity.MerchOrder, chain global.ChainN
 	ichan := make(chan *entity.TronTransaction, 1)
 	go item.Listen(ctx, chain, ichan, currency, s.cfg.Tron.HttpNetwork, caddr, receiver)
 
+	order.Status = string(global.OrderStatusTimeout)
+
 	for trans := range ichan {
 		trans.Chain = string(chain)
 		err = s.tronservice.TransSave(trans)
@@ -469,7 +473,6 @@ func (s *ListenService) listenTron(order *entity.MerchOrder, chain global.ChainN
 		logx.Infof("🎉🎉🎉 TRON 收到转账, [%v]:[%v]:[%v], from:%v, to:%v", chain, trans.Currency, global.GetFloat64String(trans.Amount), trans.FromBase58, trans.ToBase58)
 
 		order.LogId = trans.Id
-		order.MerchOrderId = moid
 		order.TransactionId = trans.TransactionId
 		order.Chain = string(chain)
 		order.FromAddress = trans.FromBase58
@@ -480,11 +483,9 @@ func (s *ListenService) listenTron(order *entity.MerchOrder, chain global.ChainN
 		s.chainservie.initChainClient(global.ChainNameTron)
 		s.chainservie.TronFunds(receiver, global.ChainNameTron)
 	}
-
-	order.Status = string(global.OrderStatusTimeout)
 }
 
-func (s *ListenService) listenSolana(order *entity.MerchOrder, chain global.ChainName, currency global.CurrencyTypo, moid, receiver string, seconds int64, item *clients.SolanaClientItem) {
+func (s *ListenService) listenSolana(order *entity.MerchOrder, chain global.ChainName, currency global.CurrencyTypo, receiver string, seconds int64, item *clients.SolanaClientItem) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(seconds)*time.Second)
 	defer cancel()
 
@@ -517,6 +518,8 @@ func (s *ListenService) listenSolana(order *entity.MerchOrder, chain global.Chai
 	ichan := make(chan *entity.SolanaTransaction, 1)
 	go item.Listen(ctx, chain, ichan, currency, sub, receiver)
 
+	order.Status = string(global.OrderStatusTimeout)
+
 	for trans := range ichan {
 		trans.Chain = string(chain)
 		err = s.solanaservice.TransSave(trans)
@@ -529,7 +532,6 @@ func (s *ListenService) listenSolana(order *entity.MerchOrder, chain global.Chai
 		logx.Infof("🎉🎉🎉 SOLANA 收到转账, [%v]:[%v]:[%v], from:%v, to:%v", chain, trans.Currency, global.GetFloat64String(trans.Amount), trans.FromBase58, trans.ToBase58)
 
 		order.LogId = trans.Id
-		order.MerchOrderId = moid
 		order.TransactionId = trans.TransactionId
 		order.Chain = string(chain)
 		order.FromAddress = trans.FromBase58
@@ -542,8 +544,6 @@ func (s *ListenService) listenSolana(order *entity.MerchOrder, chain global.Chai
 
 		return
 	}
-
-	order.Status = string(global.OrderStatusTimeout)
 }
 
 func (s *ListenService) ListenMany() {
@@ -571,11 +571,11 @@ func (s *ListenService) ListenMany() {
 			}
 
 			go s.Listen(&converter.ChainListenReq{
-				MerchOrderId: uuid.NewString(),
-				Chain:        global.ChainName(addr.Chain),
-				Currency:     currency,
-				Receiver:     addr.Address,
-				Seconds:      600,
+				MerchantOrderNo: uuid.NewString(),
+				Chain:           global.ChainName(addr.Chain),
+				Currency:        currency,
+				Receiver:        addr.Address,
+				Seconds:         600,
 			})
 
 			time.Sleep(time.Millisecond * 500)

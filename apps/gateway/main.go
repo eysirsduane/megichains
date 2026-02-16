@@ -13,6 +13,7 @@ import (
 	"megichains/pkg/service"
 
 	"megichains/apps/gateway/internal/handler"
+	"megichains/apps/gateway/internal/middleware"
 	"megichains/apps/gateway/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -41,6 +42,8 @@ func main() {
 	server := rest.MustNewServer(cfg.RestConf)
 	defer server.Stop()
 
+	apimiidle := middleware.NewApiAccessPermissionMiddleware(db)
+
 	userservice := service.NewUserService(db)
 	excfgservice := service.NewRangeConfigService(db)
 	evmservice := service.NewEvmService(db)
@@ -51,7 +54,7 @@ func main() {
 	solanaservice := service.NewSolanaService(db)
 	listenservice := service.NewListenService(&cfg, db, addrservice, orderservice, chainservice, evmservice, tronservice, solanaservice)
 	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
-	ctx := svc.NewServiceContext(cfg, excfgservice, userservice, authservice, addrservice, listenservice)
+	ctx := svc.NewServiceContext(cfg, apimiidle, excfgservice, userservice, authservice, addrservice, listenservice)
 	handler.RegisterHandlers(server, ctx)
 
 	httpx.SetOkHandler(biz.OkHandler)

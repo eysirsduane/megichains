@@ -748,6 +748,10 @@ declare namespace App {
             removed: string;
             lamport: string;
             notify_status: string;
+            order_no: string;
+            merchant_key: string;
+            merchant_account: string;
+            merchant_order_no: string;
           };
           detail: {
             title: string;

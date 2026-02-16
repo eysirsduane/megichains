@@ -259,35 +259,37 @@ type OrderGetReq struct {
 }
 
 type OrderItem struct {
-	Id             int64   `json:"id"`
-	MerchOrderId   string  `json:"merch_order_id"`
-	LogId          int64   `json:"log_id"`
-	TransactionId  string  `json:"transaction_id"`
-	Chain          string  `json:"chain"`
-	Typo           string  `json:"typo"`
-	Status         string  `json:"status"`
-	NotifyStatus   string  `json:"notify_status"`
-	Currency       string  `json:"currency"`
-	ReceivedAmount float64 `json:"received_amount"`
-	ReceivedSun    int64   `json:"received_sun"`
-	FromAddress    string  `json:"from_address"`
-	ToAddress      string  `json:"to_address"`
-	Description    string  `json:"description"`
+	Id              int64   `json:"id"`
+	OrderNo         string  `json:"order_no"`
+	MerchantAccount string  `json:"merchant_account"`
+	MerchantOrderNo string  `json:"merchant_order_no"`
+	LogId           int64   `json:"log_id"`
+	TransactionId   string  `json:"transaction_id"`
+	Chain           string  `json:"chain"`
+	Typo            string  `json:"typo"`
+	Status          string  `json:"status"`
+	NotifyStatus    string  `json:"notify_status"`
+	Currency        string  `json:"currency"`
+	ReceivedAmount  float64 `json:"received_amount"`
+	ReceivedSun     int64   `json:"received_sun"`
+	FromAddress     string  `json:"from_address"`
+	ToAddress       string  `json:"to_address"`
+	Description     string  `json:"description"`
 	TimeAts
 }
 
 type OrderListReq struct {
 	Pages
 	StartEnd
-	Id            int64  `form:"id,optional"`
-	MerchOrderId  string `form:"merch_order_id,optional"`
-	TransactionId string `form:"transaction_id,optional"`
-	Chain         string `form:"chain,optional"`
-	Typo          string `form:"typo,optional"`
-	Status        string `form:"status,optional"`
-	Currency      string `form:"currency,optional"`
-	FromAddress   string `form:"from_address,optional"`
-	ToAddress     string `form:"to_address,optional"`
+	Id              int64  `form:"id,optional"`
+	MerchantOrderNo string `form:"merchant_order_no,optional"`
+	TransactionId   string `form:"transaction_id,optional"`
+	Chain           string `form:"chain,optional"`
+	Typo            string `form:"typo,optional"`
+	Status          string `form:"status,optional"`
+	Currency        string `form:"currency,optional"`
+	FromAddress     string `form:"from_address,optional"`
+	ToAddress       string `form:"to_address,optional"`
 }
 
 type OrderListResp struct {

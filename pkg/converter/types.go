@@ -65,11 +65,12 @@ type TimeAts struct {
 }
 
 type ChainListenReq struct {
-	MerchOrderId string           `json:"merch_order_id"`
-	Chain        global.ChainName `json:"chain"`
-	Currency     string           `json:"currency"`
-	Receiver     string           `json:"receiver"`
-	Seconds      int64            `json:"seconds"`
+	MerchantKey     string
+	MerchantOrderNo string           `json:"merchant_order_no"`
+	Chain           global.ChainName `json:"chain"`
+	Currency        string           `json:"currency"`
+	Receiver        string           `json:"receiver"`
+	Seconds         int64            `json:"seconds"`
 }
 
 type ChainAddressCreateReq struct {
@@ -81,31 +82,33 @@ type ChainAddressCreateReq struct {
 type OrderListReq struct {
 	Pages
 	StartEnd
-	Id            int64  `form:"id,optional"`
-	MerchOrderId  int64  `form:"merch_order_id,optional"`
-	TransactionId string `form:"transaction_id,optional"`
-	Chain         string `form:"chain,optional"`
-	Typo          string `form:"typo,optional"`
-	Status        string `form:"status,optional"`
-	Currency      string `form:"currency,optional"`
-	FromAddress   string `form:"from_address,optional"`
-	ToAddress     string `form:"to_address,optional"`
+	Id              int64 `form:"id,optional"`
+	MerchantKey     string
+	MerchantOrderNo int64  `form:"merchant_order_no,optional"`
+	TransactionId   string `form:"transaction_id,optional"`
+	Chain           string `form:"chain,optional"`
+	Typo            string `form:"typo,optional"`
+	Status          string `form:"status,optional"`
+	Currency        string `form:"currency,optional"`
+	FromAddress     string `form:"from_address,optional"`
+	ToAddress       string `form:"to_address,optional"`
 }
 
 type OrderItem struct {
-	Id             int64   `json:"id"`
-	MerchOrderId   string  `json:"merch_order_id"`
-	TransactionId  string  `json:"transaction_id"`
-	Chain          string  `json:"chain"`
-	Typo           string  `json:"typo"`
-	Status         string  `json:"status"`
-	NotifyStatus   string  `json:"notify_status"`
-	Currency       string  `json:"currency"`
-	ReceivedAmount float64 `json:"received_amount"`
-	ReceivedSun    int64   `json:"received_sun"`
-	FromAddress    string  `json:"from_address"`
-	ToAddress      string  `json:"to_address"`
-	Description    string  `json:"description"`
+	Id              int64 `json:"id"`
+	MerchantKey     string
+	MerchantOrderNo string  `json:"merchant_order_no"`
+	TransactionId   string  `json:"transaction_id"`
+	Chain           string  `json:"chain"`
+	Typo            string  `json:"typo"`
+	Status          string  `json:"status"`
+	NotifyStatus    string  `json:"notify_status"`
+	Currency        string  `json:"currency"`
+	ReceivedAmount  float64 `json:"received_amount"`
+	ReceivedSun     int64   `json:"received_sun"`
+	FromAddress     string  `json:"from_address"`
+	ToAddress       string  `json:"to_address"`
+	Description     string  `json:"description"`
 	TimeAts
 }
 

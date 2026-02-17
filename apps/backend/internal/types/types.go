@@ -279,11 +279,12 @@ type MerchantListResp struct {
 
 type MerchantOrderPlaceReq struct {
 	MerchantAccount string `json:"merchant_account"`
+	Mode            string `json:"mode"`
 	Chain           string `json:"chain"`
 	Currency        string `json:"currency"`
 	Receiver        string `json:"receiver"`
 	Seconds         int64  `json:"seconds"`
-	NotifyUrl       string `json:"notify_url,optional"`
+	NotifyUrl       string `json:"notify_url"`
 }
 
 type OrderGetReq struct {
@@ -403,9 +404,9 @@ type StartEnd struct {
 }
 
 type TimeAts struct {
-	UpdatedAt uint64 `json:"updated_at,optional"`
-	DeletedAt uint64 `json:"deleted_at,optional"`
-	CreatedAt uint64 `json:"created_at,optional"`
+	UpdatedAt uint64 `json:"updated_at"`
+	DeletedAt uint64 `json:"deleted_at"`
+	CreatedAt uint64 `json:"created_at"`
 }
 
 type TronAccountCreateReq struct {

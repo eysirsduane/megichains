@@ -67,6 +67,7 @@ type TimeAts struct {
 type ChainListenReq struct {
 	MerchantAccount string           `json:"merchant_account"`
 	MerchantOrderNo string           `json:"merchant_order_no"`
+	Mode            string           `json:"mode"`
 	Chain           global.ChainName `json:"chain"`
 	Currency        string           `json:"currency"`
 	Receiver        string           `json:"receiver"`

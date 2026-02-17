@@ -107,3 +107,8 @@ var (
 	AddressFundCollectSaveFailed               = NewSpecificError(931, "地址资金归集保存失败")
 	AddressFundCollectLogGetFailed             = NewSpecificError(932, "地址资金归集日志详情获取失败")
 )
+
+var (
+	MerchantSaveFailed   = NewSpecificError(9001, "商户信息保存失败")
+	MerchantCreateFailed = NewSpecificError(8005, "商户信息创建失败")
+)

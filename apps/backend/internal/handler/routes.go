@@ -10,6 +10,7 @@ import (
 	auth "megichains/apps/backend/internal/handler/auth"
 	evm "megichains/apps/backend/internal/handler/evm"
 	fund "megichains/apps/backend/internal/handler/fund"
+	merchant "megichains/apps/backend/internal/handler/merchant"
 	open "megichains/apps/backend/internal/handler/open"
 	order "megichains/apps/backend/internal/handler/order"
 	solana "megichains/apps/backend/internal/handler/solana"
@@ -132,6 +133,28 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/fund/statistics",
 				Handler: fund.AddressFundStatisticsHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/v1"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/merchant/detail/:id",
+				Handler: merchant.MerchantDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/merchant/list",
+				Handler: merchant.MerchantListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/merchant/save",
+				Handler: merchant.MerchantSaveHandler(serverCtx),
 			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),

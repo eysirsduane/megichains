@@ -57,6 +57,7 @@ func main() {
 	excfgservice := service.NewRangeConfigService(db)
 	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
 	userservice := service.NewUserService(db)
+	merchservice := service.NewMerchService(db)
 	addrservice := service.NewAddressService(db)
 	orderservice := service.NewMerchOrderService(db)
 	chainservice := service.NewChainService(&cfg, db)
@@ -64,7 +65,7 @@ func main() {
 	evmservice := service.NewEvmService(db)
 	fundservice := service.NewFundService(db)
 	solanaservice := service.NewSolanaService(db)
-	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, addrservice, orderservice, chainservice, tronservice, evmservice, fundservice, solanaservice)
+	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, merchservice, addrservice, orderservice, chainservice, tronservice, evmservice, fundservice, solanaservice)
 	handler.RegisterHandlers(server, ctx)
 
 	httpx.SetOkHandler(biz.OkHandler)

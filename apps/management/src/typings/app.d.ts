@@ -815,6 +815,12 @@ declare namespace App {
             title: string;
           };
         };
+        merch: {
+          common: {
+            merchant_account: string;
+            name: string;
+          };
+        };
       };
       form: {
         required: string;

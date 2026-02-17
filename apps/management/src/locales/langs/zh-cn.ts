@@ -643,6 +643,12 @@ const local: App.I18n.Schema = {
       collectlog: {
         title: '归集日志列表'
       }
+    },
+    merch: {
+      common: {
+        merchant_account: '商户账号',
+        name: '商户名'
+      }
     }
   },
   form: {

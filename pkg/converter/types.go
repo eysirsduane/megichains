@@ -414,3 +414,22 @@ type SolanaTransItem struct {
 	Mint          string  `json:"mint"`
 	BlockTime     uint64  `json:"block_time"`
 }
+
+type MerchantItem struct {
+	Id              int64
+	MerchantAccount string
+	Name            string
+	Description     string `json:"description"`
+	TimeAts
+}
+
+type MerchantListReq struct {
+	Pages
+	Id              int64  `form:"id,optional"`
+	MerchantAccount string `form:"merchant_account,optional"`
+}
+
+type MerchantListResp struct {
+	Records []*MerchantItem `json:"records"`
+	PagesBody
+}

@@ -254,6 +254,29 @@ type LoginResp struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
+type MerchantDetailReq struct {
+	Id int64 `path:"id"`
+}
+
+type MerchantItem struct {
+	Id              int64  `json:"id"`
+	MerchantAccount string `json:"merchant_account"`
+	Name            string `json:"name"`
+	Description     string `json:"description"`
+	TimeAts
+}
+
+type MerchantListReq struct {
+	Pages
+	Id              int64  `form:"id,optional"`
+	MerchantAccount string `form:"merchant_account,optional"`
+}
+
+type MerchantListResp struct {
+	Records []*MerchantItem `json:"records"`
+	PagesBody
+}
+
 type OrderGetReq struct {
 	Id int64 `form:"id"`
 }

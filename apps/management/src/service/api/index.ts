@@ -7,3 +7,4 @@ export * from './evm';
 export * from './addr';
 export * from './fund';
 export * from './solana';
+export * from './merch';

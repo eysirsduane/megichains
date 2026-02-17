@@ -23,7 +23,7 @@ func (s *MerchOrderService) Save(order *entity.MerchantOrder) (err error) {
 	return s.db.Save(order).Error
 }
 
-func (s *MerchOrderService) LogSave(log *entity.MerchantOrderNotifyLog) (err error) {
+func (s *MerchOrderService) NotifyLogSave(log *entity.MerchantOrderNotifyLog) (err error) {
 	return s.db.Save(log).Error
 }
 

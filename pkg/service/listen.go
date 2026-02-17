@@ -155,11 +155,11 @@ func (s *ListenService) Listen(omode global.OrderMode, req *converter.ChainListe
 		return
 	}
 
-	log := &entity.MerchantOrderNotifyLog{
+	notify := &entity.MerchantOrderNotifyLog{
 		MerchantOrderId: order.Id,
 		NotifyUrl:       req.NotifyUrl,
 	}
-	err = s.orderservice.LogSave(log)
+	err = s.orderservice.NotifyLogSave(notify)
 	if err != nil {
 		logx.Errorf("chain listen order notify log save failed, mono:%v, txid:%v, err:%v", req.MerchantOrderNo, order.TransactionId, err)
 		err = biz.OrderNotifyLogSaveFailed
@@ -172,19 +172,19 @@ func (s *ListenService) Listen(omode global.OrderMode, req *converter.ChainListe
 		return
 	}
 
-	err = s.NotifyMerchant(log, merch, req.NotifyUrl, order.OrderNo, order.MerchantOrderNo, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount, order.ReceivedSun)
+	err = s.NotifyMerchant(notify, merch, req.NotifyUrl, order.OrderNo, order.MerchantOrderNo, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount, order.ReceivedSun)
 	if err != nil {
 		logx.Errorf("chain listen notify failed, chain:%v, ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.Chain, req.MerchantOrderNo, order.TransactionId, err)
 		order.NotifyStatus = string(global.NotifyStatusFailed)
 		order.Description = fmt.Sprintf("chain order notify failed. ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
 
-		log.Description = fmt.Sprintf("chain order notify failed. ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
+		notify.Description = fmt.Sprintf("chain order notify failed. ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
 	} else {
 		order.NotifyStatus = string(global.NotifyStatusSuccess)
 
 	}
 
-	err = s.orderservice.LogSave(log)
+	err = s.orderservice.NotifyLogSave(notify)
 	if err != nil {
 		logx.Errorf("chain listen order notify log update failed, ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
 		err = biz.OrderNotifyLogSaveFailed

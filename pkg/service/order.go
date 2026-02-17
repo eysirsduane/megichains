@@ -50,11 +50,20 @@ func (s *MerchOrderService) Find(ctx context.Context, req *converter.OrderListRe
 	if req.Typo != "" {
 		db = db.Where("typo = ?", req.Typo)
 	}
+	if req.Mode != "" {
+		db = db.Where("mode = ?", req.Mode)
+	}
 	if req.Status != "" {
 		db = db.Where("status = ?", req.Status)
 	}
 	if req.Currency != "" {
 		db = db.Where("currency = ?", req.Currency)
+	}
+	if req.OrderNo != "" {
+		db = db.Where("order_no = ?", req.OrderNo)
+	}
+	if req.MerchantOrderNo != "" {
+		db = db.Where("merchant_order_no = ?", req.MerchantOrderNo)
 	}
 	if req.TransactionId != "" {
 		db = db.Where("transaction_id = ?", req.TransactionId)

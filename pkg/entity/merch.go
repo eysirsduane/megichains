@@ -6,6 +6,7 @@ type Merchant struct {
 
 	Name      string `gorm:"size:31"`
 	SecretKey string `gorm:"size:63"`
+	Typo      string `gorm:''`
 
 	Description string `gorm:"size:2047"`
 

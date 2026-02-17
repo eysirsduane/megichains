@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { chainTyposOptions, currencyTyposOptions, orderStatusOptions } from '@/constants/business';
+import { chainTyposOptions, currencyTyposOptions, orderModesOptions, orderStatusOptions } from '@/constants/business';
 import { useForm } from '@/hooks/common/form';
 import { translateOptions } from '@/utils/common';
 import { $t } from '@/locales';
@@ -80,11 +80,6 @@ const shortcuts = [
         <ElForm ref="formRef" :model="model" label-position="right" :label-width="80">
           <ElRow :gutter="24">
             <ElCol :lg="6" :md="8" :sm="12">
-              <ElFormItem :label="$t('page.order.common.merch_order_id')" prop="merch_order_id">
-                <ElInput v-model="model.merch_order_id" :placeholder="$t('page.order.common.merch_order_id')" />
-              </ElFormItem>
-            </ElCol>
-            <ElCol :lg="6" :md="8" :sm="12">
               <ElFormItem :label="$t('page.order.common.chain')" prop="chain">
                 <ElSelect
                   v-model="model.chain"
@@ -120,6 +115,7 @@ const shortcuts = [
                 </ElSelect>
               </ElFormItem>
             </ElCol>
+
             <ElCol :lg="6" :md="8" :sm="12">
               <ElFormItem :label="$t('page.order.common.status')" prop="status">
                 <ElSelect
@@ -136,6 +132,34 @@ const shortcuts = [
                     :value="item.value"
                   ></ElOption>
                 </ElSelect>
+              </ElFormItem>
+            </ElCol>
+            <ElCol :lg="6" :md="8" :sm="12">
+              <ElFormItem :label="$t('page.order.common.mode')" prop="mode">
+                <ElSelect
+                  v-model="model.mode"
+                  clearable
+                  :empty-values="['', undefined]"
+                  value-on-clear=""
+                  :placeholder="$t('page.order.common.mode')"
+                >
+                  <ElOption
+                    v-for="(item, idx) in translateOptions(orderModesOptions)"
+                    :key="idx"
+                    :label="item.label"
+                    :value="item.value"
+                  ></ElOption>
+                </ElSelect>
+              </ElFormItem>
+            </ElCol>
+            <ElCol :lg="6" :md="8" :sm="12">
+              <ElFormItem :label="$t('page.order.common.order_no')" prop="order_no">
+                <ElInput v-model="model.order_no" :placeholder="$t('page.order.common.order_no')" />
+              </ElFormItem>
+            </ElCol>
+            <ElCol :lg="6" :md="8" :sm="12">
+              <ElFormItem :label="$t('page.order.common.merchant_order_no')" prop="merchant_order_no">
+                <ElInput v-model="model.merchant_order_no" :placeholder="$t('page.order.common.merchant_order_no')" />
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
@@ -162,6 +186,8 @@ const shortcuts = [
                 />
               </ElFormItem>
             </ElCol>
+            <ElCol :lg="6" :md="8" :sm="12"></ElCol>
+            <ElCol :lg="6" :md="8" :sm="12"></ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
               <ElSpace class="w-full justify-end" alignment="end">
                 <ElButton @click="reset">

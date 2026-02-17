@@ -26,6 +26,12 @@ export const orderTyposRecord: Record<Api.Common.OrderTypos, App.I18n.I18nKey> =
   输入: 'common.payin'
 };
 
+export const orderModesRecord: Record<Api.Common.OrderModes, App.I18n.I18nKey> = {
+  '': 'common.all',
+  正式: 'common.prod',
+  测试: 'common.test'
+};
+
 export const orderStatusRecord: Record<Api.Common.OrderStatus, App.I18n.I18nKey> = {
   '': 'common.all',
   已创建: 'common.created',
@@ -77,6 +83,7 @@ export const addressGroupStatusRecord: Record<Api.Common.AddressGroupStatus, App
 };
 
 export const orderTypoOptions = transformRecordToOption(orderTyposRecord);
+export const orderModesOptions = transformRecordToOption(orderModesRecord);
 export const orderStatusOptions = transformRecordToOption(orderStatusRecord);
 export const currencyTyposOptions = transformRecordToOption(currencyTyposRecord);
 export const chainTyposOptions = transformRecordToOption(chainTyposRecord);

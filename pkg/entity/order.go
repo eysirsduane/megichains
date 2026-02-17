@@ -11,6 +11,7 @@ type MerchantOrder struct {
 	Chain         string `gorm:"size:15;"`
 
 	Typo         string `gorm:"size:15"`
+	Mode         string `gorm:"size:15"`
 	Status       string `gorm:"size:15"`
 	NotifyStatus string `gorm:"size:15"`
 	Currency     string `gorm:"size:15"`

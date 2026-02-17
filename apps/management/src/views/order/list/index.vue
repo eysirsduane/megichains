@@ -2,7 +2,13 @@
 import { reactive, ref } from 'vue';
 import { ElButton } from 'element-plus';
 import { useBoolean } from '@sa/hooks';
-import { currencyTyposRecord, notifyStatusRecord, orderStatusRecord, orderTyposRecord } from '@/constants/business';
+import {
+  currencyTyposRecord,
+  notifyStatusRecord,
+  orderModesRecord,
+  orderStatusRecord,
+  orderTyposRecord
+} from '@/constants/business';
 import { findOrderList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
@@ -21,10 +27,12 @@ function getInitSearchParams(): Api.Order.OrderSearchParams {
     start: 0,
     end: 0,
     merchant_account: '',
+    order_no: '',
     merchant_order_no: '',
     chain: '',
     transaction_id: '',
     typo: '',
+    mode: '',
     currency: '',
     from_address: '',
     to_address: '',
@@ -66,6 +74,26 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
 
         return (
           <el-tag effect="dark" round type={tagMap[row.typo]}>
+            {label}
+          </el-tag>
+        );
+      }
+    },
+    {
+      prop: 'mode',
+      label: $t('page.order.common.mode'),
+      width: 100,
+      formatter: row => {
+        const tagMap: Record<Api.Common.OrderModes, UI.ThemeColor> = {
+          '': 'info',
+          正式: 'success',
+          测试: 'warning'
+        };
+
+        const label = $t(orderModesRecord[row.mode]);
+
+        return (
+          <el-tag effect="dark" round type={tagMap[row.mode]}>
             {label}
           </el-tag>
         );

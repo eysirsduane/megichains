@@ -58,6 +58,7 @@ declare namespace Api {
 
     type EnableStatus = '1' | '2';
     type OrderTypos = '' | '输入';
+    type OrderModes = '' | '正式' | '测试';
     type CurrencyTypos = '' | 'USDT' | 'USDC';
     type ChainTypos = '' | 'TRON' | 'ETH' | 'BSC' | 'SOLANA';
     type ChainBigTypos = '' | 'TRON' | 'EVM' | 'SOLANA';

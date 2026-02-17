@@ -98,7 +98,9 @@ const local: App.I18n.Schema = {
     count: '数量',
     group: '分组',
     timeout: '超时',
-    unknown: '未知'
+    unknown: '未知',
+    prod: '正式',
+    test: '测试'
   },
   request: {
     logout: '请求失败后登出用户',
@@ -580,7 +582,8 @@ const local: App.I18n.Schema = {
         order_no: '订单号',
         merchant_key: '商户key',
         merchant_account: '商户账号',
-        merchant_order_no: '商户订单号'
+        merchant_order_no: '商户单号',
+        mode: '形式'
       },
       detail: {
         title: '订单明细'

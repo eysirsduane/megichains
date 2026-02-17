@@ -85,10 +85,12 @@ type OrderListReq struct {
 	StartEnd
 	Id              int64 `form:"id,optional"`
 	MerchantKey     string
-	MerchantOrderNo int64  `form:"merchant_order_no,optional"`
+	OrderNo         string
+	MerchantOrderNo string `form:"merchant_order_no,optional"`
 	TransactionId   string `form:"transaction_id,optional"`
 	Chain           string `form:"chain,optional"`
 	Typo            string `form:"typo,optional"`
+	Mode            string
 	Status          string `form:"status,optional"`
 	Currency        string `form:"currency,optional"`
 	FromAddress     string `form:"from_address,optional"`
@@ -102,6 +104,7 @@ type OrderItem struct {
 	TransactionId   string  `json:"transaction_id"`
 	Chain           string  `json:"chain"`
 	Typo            string  `json:"typo"`
+	Mode            string  `form:"mode"`
 	Status          string  `json:"status"`
 	NotifyStatus    string  `json:"notify_status"`
 	Currency        string  `json:"currency"`

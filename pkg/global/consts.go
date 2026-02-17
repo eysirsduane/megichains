@@ -27,6 +27,13 @@ const (
 	OrderTypoOut OrderTypo = "输出"
 )
 
+type OrderMode string
+
+const (
+	OrderModeTest OrderMode = "测试"
+	OrderModeProd OrderMode = "正式"
+)
+
 const (
 	TronTransactionTypoTransfer                 string = "Transfer"
 	TronTransactionTypoTransferContract         string = "TransferContract"
@@ -109,4 +116,11 @@ const (
 	CollectLogStatusSuccess    CollectLogStatus = "成功"
 	CollectLogStatusTimeout    CollectLogStatus = "超时"
 	CollectLogStatusFailed     CollectLogStatus = "失败"
+)
+
+type MerchantTypo string
+
+const (
+	MerchantTypoTest MerchantTypo = "测试"
+	MerchantTypoProd MerchantTypo = "正式"
 )

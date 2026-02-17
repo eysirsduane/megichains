@@ -82,7 +82,7 @@ func (s *ListenService) updateAddressLastUsed(addr string) {
 	}
 }
 
-func (s *ListenService) Listen(req *converter.ChainListenReq) {
+func (s *ListenService) Listen(omode global.OrderMode, req *converter.ChainListenReq) {
 	key := global.GetOrderAddressKey(string(req.Chain), req.Receiver, req.Currency)
 	s.Receivers.Store(key, true)
 	defer s.Receivers.Delete(key)
@@ -97,6 +97,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		MerchantOrderNo: req.MerchantOrderNo,
 		Chain:           string(req.Chain),
 		Typo:            string(global.OrderTypoIn),
+		Mode:            string(omode),
 		Status:          string(global.OrderStatusCreated),
 		NotifyStatus:    string(global.NotifyStatusUnknown),
 		Currency:        string(req.Currency),
@@ -665,7 +666,7 @@ func (s *ListenService) ListenMany() {
 				addr.Chain = cnames[random]
 			}
 
-			go s.Listen(&converter.ChainListenReq{
+			go s.Listen(global.OrderModeTest, &converter.ChainListenReq{
 				MerchantOrderNo: uuid.NewString(),
 				Chain:           global.ChainName(addr.Chain),
 				Currency:        currency,

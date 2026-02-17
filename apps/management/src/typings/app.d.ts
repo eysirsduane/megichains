@@ -392,6 +392,8 @@ declare namespace App {
         group: string;
         timeout: string;
         unknown: string;
+        prod: string;
+        test: string;
       };
       request: {
         logout: string;
@@ -752,6 +754,7 @@ declare namespace App {
             merchant_key: string;
             merchant_account: string;
             merchant_order_no: string;
+            mode: string;
           };
           detail: {
             title: string;

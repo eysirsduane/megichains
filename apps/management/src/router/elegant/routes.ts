@@ -46,7 +46,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'about',
       i18nKey: 'route.about',
-      icon: 'fluent:book-information-24-regular',
+      icon: 'logos:zeroheight-icon',
       order: 20
     }
   },
@@ -57,7 +57,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'address',
       i18nKey: 'route.address',
-      icon: 'ant-design:exception-outlined',
+      icon: 'logos:appcenter-icon',
       order: 6,
       keepAlive: true
     },
@@ -259,7 +259,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'fund',
       i18nKey: 'route.fund',
       order: 10,
-      icon: 'simple-icons:apacheecharts',
+      icon: 'logos:matomo-icon',
       keepAlive: true
     },
     children: [
@@ -271,7 +271,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'fund_collect',
           i18nKey: 'route.fund_collect',
           order: 2,
-          keepAlive: true
+          keepAlive: true,
+          icon: 'carbon:network-overlay',
         }
       },
       {
@@ -282,7 +283,8 @@ export const generatedRoutes: GeneratedRoute[] = [
           title: 'fund_collectlog',
           i18nKey: 'route.fund_collectlog',
           order: 3,
-          keepAlive: true
+          keepAlive: true,
+          icon: 'mdi:file-document-edit-outline'
         }
       },
       {
@@ -405,7 +407,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'merchant',
       i18nKey: 'route.merchant',
-      order: 3
+      order: 3,
+      icon:'logos:turbopack-icon'
     },
     children: [
       {
@@ -414,7 +417,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.merchant_list',
         meta: {
           title: 'merchant_list',
-          i18nKey: 'route.merchant_list'
+          i18nKey: 'route.merchant_list',
+          icon:'cbi:scene-dynamic'
         }
       },
       {
@@ -423,7 +427,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.merchant_place',
         meta: {
           title: 'merchant_place',
-          i18nKey: 'route.merchant_place'
+          i18nKey: 'route.merchant_place',
+          icon:'icon-park-outline:table'
         }
       }
     ]
@@ -499,7 +504,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'order',
       i18nKey: 'route.order',
       order: 5,
-      icon: 'cbi:scene-dynamic'
+      icon: 'logos:descript-icon'
     },
     children: [
       {
@@ -509,7 +514,6 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'order_evm',
           i18nKey: 'route.order_evm',
-          icon: 'carbon:network-overlay',
           order: 2,
           keepAlive: true
         }
@@ -544,7 +548,6 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'order_tron',
           i18nKey: 'route.order_tron',
-          icon: 'carbon:network-overlay',
           order: 3,
           keepAlive: true
         }

@@ -115,7 +115,6 @@ const shortcuts = [
                 </ElSelect>
               </ElFormItem>
             </ElCol>
-
             <ElCol :lg="6" :md="8" :sm="12">
               <ElFormItem :label="$t('page.order.common.status')" prop="status">
                 <ElSelect
@@ -154,22 +153,26 @@ const shortcuts = [
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
               <ElFormItem :label="$t('page.order.common.order_no')" prop="order_no">
-                <ElInput v-model="model.order_no" :placeholder="$t('page.order.common.order_no')" />
+                <ElInput v-model="model.order_no" clearable :placeholder="$t('page.order.common.order_no')" />
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
               <ElFormItem :label="$t('page.order.common.merchant_order_no')" prop="merchant_order_no">
-                <ElInput v-model="model.merchant_order_no" :placeholder="$t('page.order.common.merchant_order_no')" />
+                <ElInput
+                  v-model="model.merchant_order_no"
+                  clearable
+                  :placeholder="$t('page.order.common.merchant_order_no')"
+                />
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
               <ElFormItem :label="$t('page.order.common.from_address')" prop="from_address">
-                <ElInput v-model="model.from_address" :placeholder="$t('page.order.common.from_address')" />
+                <ElInput v-model="model.from_address" clearable :placeholder="$t('page.order.common.from_address')" />
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">
               <ElFormItem :label="$t('page.order.common.to_address')" prop="to_address">
-                <ElInput v-model="model.to_address" :placeholder="$t('page.order.common.to_address')" />
+                <ElInput v-model="model.to_address" clearable :placeholder="$t('page.order.common.to_address')" />
               </ElFormItem>
             </ElCol>
             <ElCol :lg="6" :md="8" :sm="12">

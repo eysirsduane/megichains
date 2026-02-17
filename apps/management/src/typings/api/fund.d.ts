@@ -31,7 +31,7 @@ declare namespace Api {
       address_group_id: number;
       address_group_name: string;
       chain: string;
-      currency: Api.Common.CurrencyTypos;
+      currency: Api.Common.CurrencyTypo;
       status: Api.Common.CollectStatus;
       to_address?: string;
       amount_min: number;
@@ -48,7 +48,7 @@ declare namespace Api {
     type AddressFundCollectLog = Common.CommonRecord<{
       collect_id: number;
       chain: string;
-      currency: Api.Common.CurrencyTypos;
+      currency: Api.Common.CurrencyTypo;
       status: Api.Common.CollectLogStatus;
       from_address: string;
       receiver_address: string;

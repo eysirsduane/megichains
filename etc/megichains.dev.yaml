@@ -34,6 +34,9 @@ Bot:
 Megi:
   NotifyUrl: "http://localhost:8080/api/v1/epay/notify"
 
+Gateway:
+  ListenApi: "http://localhost:7002/v1/chain/listen"
+
 BSC:
   ChainId: 97
   WssNetwork: wss://bnb-testnet.g.alchemy.com/v2/

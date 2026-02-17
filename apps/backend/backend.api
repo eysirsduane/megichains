@@ -448,6 +448,15 @@ type MerchantDetailReq {
 	Id int64 `path:"id"`
 }
 
+type MerchantOrderPlaceReq {
+	MerchantAccount string `json:"merchant_account"`
+	Chain           string `json:"chain"`
+	Currency        string `json:"currency"`
+	Receiver        string `json:"receiver"`
+	Seconds         int64  `json:"seconds"`
+	NotifyUrl       string `json:"notify_url,optional"`
+}
+
 @server (
 	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
 	// goctl 生成代码时会将当前 service 代码块下的接口
@@ -509,6 +518,9 @@ service backend {
 
 	@handler MerchantSaveHandler
 	post /merchant/save (MerchantItem) returns (Response)
+
+	@handler MerchantOrderPlaceHandler
+	post /merchant/order/place (MerchantOrderPlaceReq) returns (Response)
 }
 
 @server (

@@ -100,7 +100,8 @@ const local: App.I18n.Schema = {
     timeout: '超时',
     unknown: '未知',
     prod: '正式',
-    test: '测试'
+    test: '测试',
+    seconds: '秒数'
   },
   request: {
     logout: '请求失败后登出用户',

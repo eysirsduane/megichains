@@ -17,13 +17,14 @@ type ServiceContext struct {
 	AddressService *service.AddressService
 	OrderService   *service.MerchOrderService
 	ChainService   *service.ChainService
+	ListenService  *service.ListenService
 	TronService    *service.TronService
 	EvmService     *service.EvmService
 	FundService    *service.FundService
 	SolanaService  *service.SolanaService
 }
 
-func NewServiceContext(c global.BackendesConfig, excfg *service.RangeConfigService, auth *service.AuthService, user *service.UserService, merch *service.MerchService, addr *service.AddressService, order *service.MerchOrderService, chain *service.ChainService, tron *service.TronService, evm *service.EvmService, fund *service.FundService, solana *service.SolanaService) *ServiceContext {
+func NewServiceContext(c global.BackendesConfig, excfg *service.RangeConfigService, auth *service.AuthService, user *service.UserService, merch *service.MerchService, addr *service.AddressService, order *service.MerchOrderService, chain *service.ChainService, listen *service.ListenService, tron *service.TronService, evm *service.EvmService, fund *service.FundService, solana *service.SolanaService) *ServiceContext {
 	return &ServiceContext{
 		Config:         c,
 		ExcfgService:   excfg,
@@ -33,6 +34,7 @@ func NewServiceContext(c global.BackendesConfig, excfg *service.RangeConfigServi
 		AddressService: addr,
 		OrderService:   order,
 		ChainService:   chain,
+		ListenService:  listen,
 		TronService:    tron,
 		EvmService:     evm,
 		FundService:    fund,

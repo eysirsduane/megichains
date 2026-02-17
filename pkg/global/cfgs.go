@@ -6,6 +6,7 @@ type BackendesConfig struct {
 	rest.RestConf
 	Auth              *Auth
 	DB                *DB
+	Gateway           *Gateway
 	Megi              *Megi
 	Tron              *Tron
 	Eth               *Eth
@@ -35,6 +36,10 @@ type DB struct {
 
 type Megi struct {
 	NotifyUrl string
+}
+
+type Gateway struct {
+	ListenApi string
 }
 
 type Eth struct {

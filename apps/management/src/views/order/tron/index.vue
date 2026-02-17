@@ -46,7 +46,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       label: $t('page.order.common.currency'),
       width: 100,
       formatter: row => {
-        const tagMap: Record<Api.Common.CurrencyTypos, UI.ThemeColor> = {
+        const tagMap: Record<Api.Common.CurrencyTypo, UI.ThemeColor> = {
           '': 'info',
           USDT: 'info',
           USDC: 'success'

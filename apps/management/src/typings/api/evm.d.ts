@@ -7,7 +7,7 @@ declare namespace Api {
   namespace Evm {
     type Log = Common.CommonRecord<{
       chain: string;
-      currency: Api.Common.CurrencyTypos;
+      currency: Api.Common.CurrencyTypo;
       tx_hash: string;
       amount: number;
       sun: number;

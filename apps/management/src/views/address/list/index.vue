@@ -52,7 +52,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       label: $t('page.address.common.typo'),
       width: 80,
       formatter: row => {
-        const tagMap: Record<Api.Common.AddressTypos, UI.ThemeColor> = {
+        const tagMap: Record<Api.Common.AddressTypo, UI.ThemeColor> = {
           '': 'info',
           IN: 'success',
           OUT: 'warning',

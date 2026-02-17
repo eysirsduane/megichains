@@ -277,6 +277,15 @@ type MerchantListResp struct {
 	PagesBody
 }
 
+type MerchantOrderPlaceReq struct {
+	MerchantAccount string `json:"merchant_account"`
+	Chain           string `json:"chain"`
+	Currency        string `json:"currency"`
+	Receiver        string `json:"receiver"`
+	Seconds         int64  `json:"seconds"`
+	NotifyUrl       string `json:"notify_url,optional"`
+}
+
 type OrderGetReq struct {
 	Id int64 `form:"id"`
 }

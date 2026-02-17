@@ -7,7 +7,7 @@ declare namespace Api {
   namespace Tron {
     type Trans = Common.CommonRecord<{
       chain: string;
-      currency: Api.Common.CurrencyTypos;
+      currency: Api.Common.CurrencyTypo;
       transaction_id: string;
       amount: number;
       sun: number;

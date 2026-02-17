@@ -57,16 +57,16 @@ declare namespace Api {
     } & T;
 
     type EnableStatus = '1' | '2';
-    type OrderTypos = '' | '输入';
-    type OrderModes = '' | '正式' | '测试';
-    type CurrencyTypos = '' | 'USDT' | 'USDC';
-    type ChainTypos = '' | 'TRON' | 'ETH' | 'BSC' | 'SOLANA';
-    type ChainBigTypos = '' | 'TRON' | 'EVM' | 'SOLANA';
+    type OrderTypo = '' | '输入';
+    type OrderMode = '' | '正式' | '测试';
+    type CurrencyTypo = '' | 'USDT' | 'USDC';
+    type ChainTypo = '' | 'TRON' | 'ETH' | 'BSC' | 'SOLANA';
+    type ChainBigTypo = '' | 'TRON' | 'EVM' | 'SOLANA';
     type OrderStatus = '' | '已创建' | '超时' | '失败' | '成功';
     type NotifyStatus = '' | '未知' | '失败' | '成功';
     type CollectStatus = '' | '已创建' | '处理中' | '部分成功' | '成功' | '失败';
     type CollectLogStatus = '' | '已创建' | '成功' | '失败';
-    type AddressTypos = '' | 'IN' | 'OUT' | 'COLLECT';
+    type AddressTypo = '' | 'IN' | 'OUT' | 'COLLECT';
     type AddressStatus = '' | '禁用' | '空闲' | '占用';
     type AddressGroupStatus = '' | '禁用' | '开放';
     type TronContractAddresses = '' | 'TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj' | 'TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf';

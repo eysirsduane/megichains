@@ -1,11 +1,12 @@
 <script setup lang="tsx">
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
+import { useBoolean } from '@sa/hooks';
 import { currencyTyposRecord } from '@/constants/business';
 import { getTronTransList } from '@/service/api';
 import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
-import TransSearch from './modules/trans-search.vue';
+import MerchantPlaceDrawer from './modules/merchant-place-drawer.vue';
 
 defineOptions({ name: 'TransSearch' });
 
@@ -46,7 +47,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       label: $t('page.order.common.currency'),
       width: 100,
       formatter: row => {
-        const tagMap: Record<Api.Common.CurrencyTypos, UI.ThemeColor> = {
+        const tagMap: Record<Api.Common.CurrencyTypo, UI.ThemeColor> = {
           '': 'info',
           USDT: 'info',
           USDC: 'success'
@@ -103,14 +104,17 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   ]
 });
 
-function resetSearchParams() {
-  Object.assign(searchParams, getInitSearchParams());
+const targetId = ref(0);
+const { bool: drawerVisible, setTrue: openDrawer } = useBoolean();
+
+function add() {
+  targetId.value = 0;
+  openDrawer();
 }
 </script>
 
 <template>
   <div class="min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <TransSearch v-model:model="searchParams" @reset="resetSearchParams" @search="getDataByPage" />
     <ElCard class="card-wrapper sm:flex-1-hidden" body-class="ht50">
       <template #header>
         <div class="flex items-center justify-between">
@@ -118,8 +122,9 @@ function resetSearchParams() {
           <TableHeaderOperation
             v-model:columns="columnChecks"
             :disabled-delete="true"
-            :disabled-add="true"
+            :disabled-add="false"
             :loading="loading"
+            @add="add"
             @refresh="getData"
           />
         </div>
@@ -146,6 +151,7 @@ function resetSearchParams() {
           @size-change="mobilePagination['size-change']"
         />
       </div>
+      <MerchantPlaceDrawer v-model:visible="drawerVisible" @saved="getDataByPage" />
     </ElCard>
   </div>
 </template>

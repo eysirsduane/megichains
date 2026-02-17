@@ -50,7 +50,11 @@ func (l *ChainListenLogic) ChainListen(req *types.ChainListenReq) (resp *types.C
 	conv := &converter.ChainListenReq{}
 	copier.Copy(conv, req)
 
-	go l.svcCtx.ListenService.Listen(global.OrderModeProd, conv)
+	if req.Mode != string(global.OrderModeTest) {
+		req.Mode = string(global.OrderModeProd)
+	}
+
+	go l.svcCtx.ListenService.Listen(global.OrderMode(req.Mode), conv)
 
 	return
 }

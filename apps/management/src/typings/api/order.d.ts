@@ -10,9 +10,9 @@ declare namespace Api {
       order_no: string;
       merchant_order_no: string;
       transaction_id: string;
-      typo: Api.Common.OrderTypos;
-      mode: Api.Common.OrderModes;
-      currency: Api.Common.CurrencyTypos;
+      typo: Api.Common.OrderTypo;
+      mode: Api.Common.OrderMode;
+      currency: Api.Common.CurrencyTypo;
       status: Api.Common.OrderStatus;
       notify_status: Api.Common.NotifyStatus;
       chain: string;
@@ -52,7 +52,7 @@ declare namespace Api {
       merchant_account: string;
       merchant_order_no: string;
       transaction_id: string;
-      typo: Api.Common.OrderTypos;
+      typo: Api.Common.OrderTypo;
       status: Api.Common.OrderStatus;
       currency: string;
       chain: string;

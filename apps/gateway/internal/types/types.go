@@ -25,6 +25,7 @@ type ChainListenReq struct {
 	MerchantOrderNo string `json:"merchant_order_no"`
 	Chain           string `json:"chain"`
 	Currency        string `json:"currency"`
+	Mode            string `json:"mode,optional"`
 	Receiver        string `json:"receiver"`
 	Seconds         int64  `json:"seconds"`
 }

@@ -394,6 +394,7 @@ declare namespace App {
         unknown: string;
         prod: string;
         test: string;
+        seconds: string;
       };
       request: {
         logout: string;

@@ -8,7 +8,7 @@ declare namespace Api {
     type Address = Common.CommonRecord<{
       group_id: number;
       chain: string;
-      typo: Api.Common.AddressTypos;
+      typo: Api.Common.AddressTypo;
       status: Api.Common.AddressStatus;
       address: string;
       tron_usdt: number;

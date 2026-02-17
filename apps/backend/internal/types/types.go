@@ -391,9 +391,9 @@ type StartEnd struct {
 }
 
 type TimeAts struct {
-	UpdatedAt uint64 `json:"updated_at"`
-	DeletedAt uint64 `json:"deleted_at"`
-	CreatedAt uint64 `json:"created_at"`
+	UpdatedAt uint64 `json:"updated_at,optional"`
+	DeletedAt uint64 `json:"deleted_at,optional"`
+	CreatedAt uint64 `json:"created_at,optional"`
 }
 
 type TronAccountCreateReq struct {

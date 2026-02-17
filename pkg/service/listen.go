@@ -165,7 +165,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		return
 	}
 
-	merch, err := s.merchservice.Get(req.MerchantAccount)
+	merch, err := s.merchservice.GetByAccount(req.MerchantAccount)
 	if err != nil {
 		order.Description = fmt.Sprintf("chain listen order notify not found merchant, account:%v", req.MerchantAccount)
 		return

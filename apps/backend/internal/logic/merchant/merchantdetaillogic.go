@@ -29,7 +29,7 @@ func NewMerchantDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Me
 
 func (l *MerchantDetailLogic) MerchantDetail(req *types.MerchantDetailReq) (resp *types.MerchantItem, err error) {
 	// todo: add your logic here and delete this line
-	res, err := l.svcCtx.MerchService.GetById(req.Id)
+	res, err := l.svcCtx.MerchService.Get(req.Id)
 	if err != nil {
 		logx.Errorf("find merchant list failed, err:%v", err)
 		return

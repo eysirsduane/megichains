@@ -1,6 +1,8 @@
 package global
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"strconv"
 	"time"
@@ -75,5 +77,12 @@ func GetFloat64String(f float64) (s string) {
 
 func GetOrderAddressKey(chain, receiver, currency string) (key string) {
 	key = fmt.Sprintf("%v-%v-%v", chain, receiver, currency)
+	return
+}
+
+func GenerateRandomString() (s string) {
+	b := make([]byte, 32) // 24字节≈32字符
+	rand.Read(b)
+	s = base64.RawURLEncoding.EncodeToString(b)
 	return
 }

@@ -2,10 +2,12 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"megichains/pkg/biz"
 	"megichains/pkg/converter"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
+	"time"
 
 	"github.com/jinzhu/copier"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -20,15 +22,16 @@ func NewMerchService(db *gorm.DB) *MerchService {
 	return &MerchService{db: db}
 }
 
-func (s *MerchService) Get(account string) (merch *entity.Merchant, err error) {
+func (s *MerchService) Get(id int64) (merch *entity.Merchant, err error) {
 	merch = &entity.Merchant{}
-	err = s.db.Model(&entity.Merchant{}).Where("merchant_account = ?", account).First(merch).Error
+	err = s.db.First(merch, id).Error
 
 	return
 }
-func (s *MerchService) GetById(id int64) (merch *entity.Merchant, err error) {
+
+func (s *MerchService) GetByAccount(account string) (merch *entity.Merchant, err error) {
 	merch = &entity.Merchant{}
-	err = s.db.Model(&entity.Merchant{}).Where("id = ?", id).First(merch).Error
+	err = s.db.Model(&entity.Merchant{}).Where("merchant_account = ?", account).First(merch).Error
 
 	return
 }
@@ -45,6 +48,8 @@ func (s *MerchService) Save(ctx context.Context, req *converter.MerchantItem) (e
 			return
 		}
 	} else {
+		merch.SecretKey = global.GenerateRandomString()
+		merch.MerchantAccount = fmt.Sprintf("M%v", time.Now().UnixMicro())
 		err = gorm.G[entity.Merchant](s.db).Create(ctx, merch)
 		if err != nil {
 			logx.Errorf("merchant create failed, id:%v, err:%v", req.Id, err)

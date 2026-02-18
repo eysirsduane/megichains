@@ -272,7 +272,7 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.fund_collect',
           order: 2,
           keepAlive: true,
-          icon: 'carbon:network-overlay',
+          icon: 'carbon:network-overlay'
         }
       },
       {
@@ -408,7 +408,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'merchant',
       i18nKey: 'route.merchant',
       order: 3,
-      icon:'logos:turbopack-icon'
+      icon: 'logos:turbopack-icon'
     },
     children: [
       {
@@ -418,7 +418,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'merchant_list',
           i18nKey: 'route.merchant_list',
-          icon:'cbi:scene-dynamic'
+          icon: 'cbi:scene-dynamic'
         }
       },
       {
@@ -428,7 +428,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'merchant_place',
           i18nKey: 'route.merchant_place',
-          icon:'icon-park-outline:table'
+          icon: 'icon-park-outline:table'
         }
       }
     ]

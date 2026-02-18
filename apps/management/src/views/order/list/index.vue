@@ -56,8 +56,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   },
   columns: () => [
     { prop: 'selection', type: 'selection', width: 48 },
-    { prop: 'id', type: 'id', label: $t('common.id') },
-    { prop: 'order_no', label: $t('page.order.common.order_no'), width: 200 },
+    { prop: 'order_no', fixed: 'left', label: $t('page.order.common.order_no'), width: 200 },
     { prop: 'merchant_order_no', label: $t('page.order.common.merchant_order_no'), width: 320 },
     { prop: 'chain', label: $t('page.order.common.chain') },
     {
@@ -185,13 +184,13 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     },
     {
       prop: 'operate',
-      fixed: true,
+      fixed: 'right',
       label: $t('common.operate'),
       align: 'center',
       width: 80,
       formatter: row => (
         <div class="flex-center">
-          <ElButton plain type="primary" size="small" onClick={() => bill(row.id)}>
+          <ElButton type="primary" plain size="small" onClick={() => bill(row.id)}>
             {$t('page.order.common.detail')}
           </ElButton>
         </div>

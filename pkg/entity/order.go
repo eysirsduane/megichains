@@ -27,17 +27,24 @@ type MerchantOrder struct {
 	TimeAts `gorm:"embedded"`
 }
 
+type MerchantOrderRequestLog struct {
+	Id              int64 `gorm:"primaryKey;autoIncrement"`
+	MerchantOrderId int64 `gorm:""`
+
+	Request  string
+	Response string
+
+	Description string `gorm:"size:2047"`
+
+	TimeAts `gorm:"embedded"`
+}
+
 type MerchantOrderNotifyLog struct {
 	Id              int64 `gorm:"primaryKey;autoIncrement"`
 	MerchantOrderId int64 `gorm:""`
 
-	NotifyUrl string `gorm:"size:1023"`
-
-	RequestHeader string
-	RequestBody   string
-
-	ResponseHeader string
-	ResponseBody   string
+	Request  string
+	Response string
 
 	Description string `gorm:"size:2047"`
 

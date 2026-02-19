@@ -111,3 +111,8 @@ func BytesToString(bytes []byte) (str string) {
 	str = string(bytes)
 	return
 }
+
+func BytesToObj(bytes []byte, obj any) (err error) {
+	err = json.Unmarshal(bytes, obj)
+	return
+}

@@ -83,10 +83,10 @@ const (
 type OrderStatus string
 
 const (
-	OrderStatusCreated OrderStatus = "已创建"
-	OrderStatusTimeout OrderStatus = "超时"
-	OrderStatusFailed  OrderStatus = "失败"
-	OrderStatusSuccess OrderStatus = "成功"
+	OrderStatusCreated OrderStatus = "CREATED"
+	OrderStatusTimeout OrderStatus = "TIMEOUT"
+	OrderStatusFailed  OrderStatus = "FAILED"
+	OrderStatusSuccess OrderStatus = "SUCCESS"
 )
 
 type NotifyStatus string

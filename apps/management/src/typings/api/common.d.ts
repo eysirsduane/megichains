@@ -62,7 +62,7 @@ declare namespace Api {
     type CurrencyTypo = '' | 'USDT' | 'USDC';
     type ChainTypo = '' | 'TRON' | 'ETH' | 'BSC' | 'SOLANA';
     type ChainBigTypo = '' | 'TRON' | 'EVM' | 'SOLANA';
-    type OrderStatus = '' | '已创建' | '超时' | '失败' | '成功';
+    type OrderStatus = '' | 'CREATED' | 'TIMEOUT' | 'FAILED' | 'SUCCESS';
     type NotifyStatus = '' | '未知' | '失败' | '成功';
     type CollectStatus = '' | '已创建' | '处理中' | '部分成功' | '成功' | '失败';
     type CollectLogStatus = '' | '已创建' | '成功' | '失败';

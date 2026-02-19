@@ -101,7 +101,11 @@ const local: App.I18n.Schema = {
     unknown: '未知',
     prod: '正式',
     test: '测试',
-    seconds: '秒数'
+    seconds: '秒数',
+    interaction: '交互',
+    detail: '明细',
+    merchant_request: '商户请求',
+    merchant_response: '商户响应'
   },
   request: {
     logout: '请求失败后登出用户',

@@ -6,11 +6,14 @@ package middleware
 import (
 	"bytes"
 	"io"
+	"megichains/pkg/converter"
 	"megichains/pkg/crypt"
 	"megichains/pkg/entity"
 	"megichains/pkg/global"
 	"net/http"
+	"time"
 
+	"github.com/bwmarrin/snowflake"
 	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/gorm"
 )
@@ -66,7 +69,7 @@ func (m *ApiAccessPermissionMiddleware) Handle(next http.HandlerFunc) http.Handl
 			return
 		}
 
-		logx.Infof("api access permission check, mchaccount:%v, request body:%v, csign:%v", maccount, string(bbytes), csign)
+		logx.Infof("api access permission check request, mchaccount:%v, header:%v, body:%v, csign:%v", maccount, r.Header, string(bbytes), csign)
 
 		ok := crypt.VerifySignature(csign, bbytes, merch.SecretKey)
 		if !ok {
@@ -80,8 +83,83 @@ func (m *ApiAccessPermissionMiddleware) Handle(next http.HandlerFunc) http.Handl
 			return
 		}
 
+		req := &converter.ChainListenReq{}
+		err = global.BytesToObj(bbytes, req)
+		if err != nil {
+			logx.Errorf("api access permission middleware parse request body failed, err:%v", err)
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+
+			resp.Message = "request body invalid"
+
+			w.Write(global.ObjToBytes(resp))
+			return
+		}
+
+		node, _ := snowflake.NewNode(1)
+		sid := node.Generate()
+
+		if req.Mode != string(global.OrderModeTest) {
+			req.Mode = string(global.OrderModeProd)
+		}
+		order := &entity.MerchantOrder{
+			OrderNo:         sid.String(),
+			MerchantAccount: maccount,
+			MerchantOrderNo: req.MerchantOrderNo,
+			Chain:           string(req.Chain),
+			Typo:            string(global.OrderTypoIn),
+			Mode:            req.Mode,
+			Status:          string(global.OrderStatusCreated),
+			NotifyStatus:    string(global.NotifyStatusUnknown),
+			Currency:        string(req.Currency),
+			ToAddress:       req.Receiver,
+			Description:     "",
+		}
+		err = m.db.Create(order).Error
+		if err != nil {
+			logx.Errorf("order create failed, mono:%v, receiver:%v, err:%v", req.MerchantOrderNo, req.Receiver, err)
+			return
+		}
+
+		reqmap := make(map[string]any)
+		reqmap["url"] = r.URL.String()
+		reqmap["method"] = r.Method
+		reqmap["ip"] = r.RemoteAddr
+		reqmap["time"] = time.Now().Format("2006-01-02 15:04:05")
+		reqmap["header"] = r.Header
+		reqmap["query"] = r.URL.Query()
+		reqmap["body"] = string(bbytes)
+
 		r.Body = io.NopCloser(bytes.NewBuffer(bbytes))
 
-		next(w, r)
+		recorder := &ResponseRecorder{ResponseWriter: w}
+
+		next(recorder, r)
+
+		rlog := &entity.MerchantOrderRequestLog{
+			MerchantOrderId: order.Id,
+			Request:         global.ObjToJsonString(reqmap),
+			Response:        recorder.body.String(),
+			Description:     "",
+		}
+
+		logx.Infof("api access permission check response, mchaccount:%v, header:%+v, body:%v", maccount, w.Header(), recorder.body.String())
+
+		err = m.db.Create(rlog).Error
+		if err != nil {
+			logx.Errorf("api access permission middleware create request log failed, err:%v", err)
+			return
+		}
 	}
+}
+
+type ResponseRecorder struct {
+	http.ResponseWriter
+	body bytes.Buffer
+}
+
+func (r *ResponseRecorder) Write(b []byte) (int, error) {
+	r.body.Write(b)
+	return r.ResponseWriter.Write(b)
 }

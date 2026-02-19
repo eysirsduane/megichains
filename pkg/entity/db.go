@@ -19,7 +19,7 @@ func NewGormDB(cfg *global.BackendesConfig) (db *gorm.DB, err error) {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&RangeConfig{}, &User{}, &Merchant{}, &MerchantOrder{}, &MerchantOrderNotifyLog{}, &Address{}, &AddressGroup{}, &AddressBalance{}, &AddressFundCollect{}, &AddressFundCollectLog{}, &EvmLog{}, &TronTransaction{}, &SolanaTransaction{})
+	err = db.AutoMigrate(&RangeConfig{}, &User{}, &Merchant{}, &MerchantOrder{}, &MerchantOrderRequestLog{}, &MerchantOrderNotifyLog{}, &Address{}, &AddressGroup{}, &AddressBalance{}, &AddressFundCollect{}, &AddressFundCollectLog{}, &EvmLog{}, &TronTransaction{}, &SolanaTransaction{})
 	if err != nil {
 		panic(err)
 	}

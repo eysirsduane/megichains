@@ -33,9 +33,9 @@ func (s *MerchOrderService) Get(id int64) (order *entity.MerchantOrder, err erro
 	return
 }
 
-func (s *MerchOrderService) GetByMerchId(moid string) (order *entity.MerchantOrder, err error) {
+func (s *MerchOrderService) GetByMerchant(acc, mono string) (order *entity.MerchantOrder, err error) {
 	order = &entity.MerchantOrder{}
-	err = s.db.Model(&entity.MerchantOrder{}).Where("merch_order_id = ?", moid).First(order).Error
+	err = s.db.Model(&entity.MerchantOrder{}).Where("merchant_account = ? AND merchant_order_no = ?", acc, mono).First(order).Error
 	return
 }
 

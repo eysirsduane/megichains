@@ -34,10 +34,10 @@ export const orderModesRecord: Record<Api.Common.OrderMode, App.I18n.I18nKey> = 
 
 export const orderStatusRecord: Record<Api.Common.OrderStatus, App.I18n.I18nKey> = {
   '': 'common.all',
-  已创建: 'common.created',
-  超时: 'common.timeout',
-  失败: 'common.failed',
-  成功: 'common.success'
+  CREATED: 'common.created',
+  TIMEOUT: 'common.timeout',
+  FAILED: 'common.failed',
+  SUCCESS: 'common.success'
 };
 
 export const notifyStatusRecord: Record<Api.Common.NotifyStatus, App.I18n.I18nKey> = {

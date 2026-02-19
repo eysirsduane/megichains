@@ -14,6 +14,7 @@ import { defaultSearchform, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
 import OrderDetailDrawer from './modules/order-detail-drawer.vue';
+import OrderInteractionDrawer from './modules/order-interaction-drawer.vue';
 import OrderSearch from './modules/order-search.vue';
 
 defineOptions({ name: 'OrderListView' });
@@ -105,10 +106,10 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       formatter: row => {
         const tagMap: Record<Api.Common.OrderStatus, UI.ThemeColor> = {
           '': 'info',
-          已创建: 'info',
-          超时: 'warning',
-          失败: 'danger',
-          成功: 'success'
+          CREATED: 'info',
+          TIMEOUT: 'warning',
+          FAILED: 'danger',
+          SUCCESS: 'success'
         };
 
         const label = $t(orderStatusRecord[row.status]);
@@ -187,11 +188,14 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
       fixed: 'right',
       label: $t('common.operate'),
       align: 'center',
-      width: 80,
+      width: 140,
       formatter: row => (
         <div class="flex-center">
           <ElButton type="primary" plain size="small" onClick={() => bill(row.id)}>
-            {$t('page.order.common.detail')}
+            {$t('common.detail')}
+          </ElButton>
+          <ElButton type="primary" plain size="small" onClick={() => intercation(row.id)}>
+            {$t('common.interaction')}
           </ElButton>
         </div>
       )
@@ -200,12 +204,18 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
 });
 
 const { bool: drawerVisible, setTrue: openDrawer } = useBoolean();
+const { bool: interactionDrawerVisible, setTrue: openInteractionDrawer } = useBoolean();
 
 const targetId = ref(0);
 
 function bill(id: number) {
   targetId.value = id;
   openDrawer();
+}
+
+function intercation(id: number) {
+  targetId.value = id;
+  openInteractionDrawer();
 }
 
 function resetSearchParams() {
@@ -252,6 +262,7 @@ function resetSearchParams() {
         />
       </div>
       <OrderDetailDrawer v-model:visible="drawerVisible" :target-id="targetId" />
+      <OrderInteractionDrawer v-model:visible="interactionDrawerVisible" :target-id="targetId" />
     </ElCard>
   </div>
 </template>

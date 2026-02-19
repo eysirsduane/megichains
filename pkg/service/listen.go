@@ -17,7 +17,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bwmarrin/snowflake"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -82,29 +81,13 @@ func (s *ListenService) updateAddressLastUsed(addr string) {
 	}
 }
 
-func (s *ListenService) Listen(omode global.OrderMode, req *converter.ChainListenReq) {
+func (s *ListenService) Listen(req *converter.ChainListenReq) {
 	key := global.GetOrderAddressKey(string(req.Chain), req.Receiver, req.Currency)
 	s.Receivers.Store(key, true)
 	defer s.Receivers.Delete(key)
 	defer s.clearClients()
 
-	node, _ := snowflake.NewNode(1)
-	sid := node.Generate()
-
-	order := &entity.MerchantOrder{
-		OrderNo:         sid.String(),
-		MerchantAccount: req.MerchantAccount,
-		MerchantOrderNo: req.MerchantOrderNo,
-		Chain:           string(req.Chain),
-		Typo:            string(global.OrderTypoIn),
-		Mode:            string(omode),
-		Status:          string(global.OrderStatusCreated),
-		NotifyStatus:    string(global.NotifyStatusUnknown),
-		Currency:        string(req.Currency),
-		ToAddress:       req.Receiver,
-		Description:     "",
-	}
-	err := s.orderservice.Save(order)
+	order, err := s.orderservice.GetByMerchant(req.MerchantAccount, req.MerchantOrderNo)
 	if err != nil {
 		err = biz.OrderSaveFailed
 		logx.Errorf("chain listen order save failed, mono:%v, receiver:%v, err:%v", req.MerchantOrderNo, req.Receiver, err)
@@ -157,7 +140,6 @@ func (s *ListenService) Listen(omode global.OrderMode, req *converter.ChainListe
 
 	notify := &entity.MerchantOrderNotifyLog{
 		MerchantOrderId: order.Id,
-		NotifyUrl:       req.NotifyUrl,
 	}
 	err = s.orderservice.NotifyLogSave(notify)
 	if err != nil {
@@ -213,19 +195,27 @@ func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderNotifyLog, merch
 	}
 
 	rbytes := global.ObjToBytes(req)
-	log.RequestBody = global.BytesToString(rbytes)
+	rbstring := global.BytesToString(rbytes)
 
 	request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(rbytes))
 	if err != nil {
 		return
 	}
 
-	sign := crypt.HmacSHA256(log.RequestBody, merch.SecretKey)
+	sign := crypt.HmacSHA256(rbstring, merch.SecretKey)
 	request.Header.Add("Content-Type", "application/json")
 	request.Header.Add("Merchant-Account", merch.MerchantAccount)
 	request.Header.Add("Sign", sign)
 
-	log.RequestHeader = global.ObjToJsonString(request.Header)
+	reqmap := make(map[string]any)
+	reqmap["url"] = request.URL.String()
+	reqmap["method"] = request.Method
+	reqmap["ip"] = request.RemoteAddr
+	reqmap["time"] = time.Now().Format("2006-01-02 15:04:05")
+	reqmap["header"] = request.Header
+	reqmap["query"] = request.URL.Query()
+	reqmap["body"] = rbstring
+	log.Request = global.ObjToJsonString(reqmap)
 
 	client := &http.Client{}
 	resp, err := client.Do(request)
@@ -239,8 +229,10 @@ func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderNotifyLog, merch
 		return
 	}
 
-	log.ResponseHeader = global.ObjToJsonString(resp.Header)
-	log.ResponseBody = global.BytesToString(bbytes)
+	respmap := make(map[string]string)
+	respmap["header"] = global.ObjToJsonString(resp.Header)
+	respmap["body"] = global.BytesToString(bbytes)
+	log.Response = global.ObjToJsonString(respmap)
 
 	if resp.StatusCode != http.StatusOK {
 		err = fmt.Errorf("order notify response status is not ok, req:%+v, status:%v", req, resp.StatusCode)
@@ -248,8 +240,8 @@ func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderNotifyLog, merch
 		log.Description = err.Error()
 		return
 	}
-	if log.RequestBody != "success" {
-		err = fmt.Errorf("order notify response body is not success, req:%+v, body:%v", req, log.ResponseBody)
+	if respmap["body"] != "success" {
+		err = fmt.Errorf("order notify response body is not success, req:%+v, body:%v", req, respmap["body"])
 
 		log.Description = err.Error()
 		return
@@ -666,10 +658,11 @@ func (s *ListenService) ListenMany() {
 				addr.Chain = cnames[random]
 			}
 
-			go s.Listen(global.OrderModeTest, &converter.ChainListenReq{
+			go s.Listen(&converter.ChainListenReq{
 				MerchantOrderNo: uuid.NewString(),
 				Chain:           global.ChainName(addr.Chain),
 				Currency:        currency,
+				Mode:            string(global.OrderModeTest),
 				Receiver:        addr.Address,
 				Seconds:         600,
 			})

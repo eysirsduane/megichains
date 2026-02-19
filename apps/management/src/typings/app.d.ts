@@ -395,6 +395,10 @@ declare namespace App {
         prod: string;
         test: string;
         seconds: string;
+        interaction: string;
+        detail: string;
+        merchant_request: string;
+        merchant_response: string;
       };
       request: {
         logout: string;

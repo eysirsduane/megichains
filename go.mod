@@ -5,6 +5,7 @@ go 1.25.5
 require (
 	github.com/btcsuite/btcd/btcec/v2 v2.3.6
 	github.com/btcsuite/btcutil v1.0.2
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/ethereum/go-ethereum v1.16.7
 	github.com/gagliardetto/solana-go v1.14.0
 	github.com/golang-jwt/jwt/v5 v5.3.0
@@ -32,7 +33,6 @@ require (
 	github.com/blendle/zapdriver v1.3.1 // indirect
 	github.com/btcsuite/btcd/btcutil v1.1.6 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
-	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/consensys/gnark-crypto v0.18.0 // indirect

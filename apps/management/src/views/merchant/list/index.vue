@@ -61,7 +61,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     },
     {
       prop: 'operate',
-      fixed: true,
+      fixed: 'right',
       label: $t('common.operate'),
       align: 'center',
       width: 80,

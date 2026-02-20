@@ -11,7 +11,7 @@ import (
 
 type ServiceContext struct {
 	Config                        global.BackendesConfig
-	ApiAccessPermissionMiddleware *middleware.ApiAccessPermissionMiddleware
+	ApiAccessPermissionMiddleware *middleware.ListenMiddleware
 	ExcfgService                  *service.RangeConfigService
 	UserService                   *service.UserService
 	AuthService                   *service.AuthService
@@ -19,7 +19,7 @@ type ServiceContext struct {
 	ListenService                 *service.ListenService
 }
 
-func NewServiceContext(c global.BackendesConfig, apimiddle *middleware.ApiAccessPermissionMiddleware, excfg *service.RangeConfigService, user *service.UserService, auth *service.AuthService, addrservice *service.AddressService, listen *service.ListenService) *ServiceContext {
+func NewServiceContext(c global.BackendesConfig, apimiddle *middleware.ListenMiddleware, excfg *service.RangeConfigService, user *service.UserService, auth *service.AuthService, addrservice *service.AddressService, listen *service.ListenService) *ServiceContext {
 	return &ServiceContext{
 		Config:                        c,
 		ApiAccessPermissionMiddleware: apimiddle,

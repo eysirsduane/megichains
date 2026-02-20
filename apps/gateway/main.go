@@ -42,7 +42,7 @@ func main() {
 	server := rest.MustNewServer(cfg.RestConf)
 	defer server.Stop()
 
-	apimiidle := middleware.NewApiAccessPermissionMiddleware(db)
+	apimiidle := middleware.NewListenMiddleware(db)
 
 	userservice := service.NewUserService(db)
 	excfgservice := service.NewRangeConfigService(db)

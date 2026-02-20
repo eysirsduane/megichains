@@ -18,15 +18,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type ApiAccessPermissionMiddleware struct {
+type ListenMiddleware struct {
 	db *gorm.DB
 }
 
-func NewApiAccessPermissionMiddleware(db *gorm.DB) *ApiAccessPermissionMiddleware {
-	return &ApiAccessPermissionMiddleware{db: db}
+func NewListenMiddleware(db *gorm.DB) *ListenMiddleware {
+	return &ListenMiddleware{db: db}
 }
 
-func (m *ApiAccessPermissionMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
+func (m *ListenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		resp := &CommonResp{Code: 1}
 
@@ -58,7 +58,7 @@ func (m *ApiAccessPermissionMiddleware) Handle(next http.HandlerFunc) http.Handl
 
 		bbytes, err := io.ReadAll(r.Body)
 		if err != nil {
-			logx.Errorf("api access permission middleware read body failed, err:%v", err)
+			logx.Errorf("listen middleware middleware read body failed, err:%v", err)
 
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
@@ -69,7 +69,7 @@ func (m *ApiAccessPermissionMiddleware) Handle(next http.HandlerFunc) http.Handl
 			return
 		}
 
-		logx.Infof("api access permission check request, mchaccount:%v, header:%v, body:%v, csign:%v", maccount, r.Header, string(bbytes), csign)
+		logx.Infof("listen middleware check request, mchaccount:%v, header:%v, body:%v, csign:%v", maccount, r.Header, string(bbytes), csign)
 
 		ok := crypt.VerifySignature(csign, bbytes, merch.SecretKey)
 		if !ok {
@@ -86,7 +86,7 @@ func (m *ApiAccessPermissionMiddleware) Handle(next http.HandlerFunc) http.Handl
 		req := &converter.ChainListenReq{}
 		err = global.BytesToObj(bbytes, req)
 		if err != nil {
-			logx.Errorf("api access permission middleware parse request body failed, err:%v", err)
+			logx.Errorf("listen middleware middleware parse request body failed, err:%v", err)
 
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
@@ -119,23 +119,30 @@ func (m *ApiAccessPermissionMiddleware) Handle(next http.HandlerFunc) http.Handl
 		err = m.db.Create(order).Error
 		if err != nil {
 			logx.Errorf("order create failed, mono:%v, receiver:%v, err:%v", req.MerchantOrderNo, req.Receiver, err)
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+
+			resp.Message = "order invalid"
+
+			w.Write(global.ObjToBytes(resp))
+
 			return
 		}
+
+		r.Body = io.NopCloser(bytes.NewBuffer(bbytes))
+		recorder := &ResponseRecorder{ResponseWriter: w}
+
+		next(recorder, r)
 
 		reqmap := make(map[string]any)
 		reqmap["url"] = r.URL.String()
 		reqmap["method"] = r.Method
 		reqmap["ip"] = r.RemoteAddr
-		reqmap["time"] = time.Now().Format("2006-01-02 15:04:05")
+		reqmap["time"] = time.Now().Format(global.DateTimeFormat)
 		reqmap["header"] = r.Header
 		reqmap["query"] = r.URL.Query()
 		reqmap["body"] = string(bbytes)
-
-		r.Body = io.NopCloser(bytes.NewBuffer(bbytes))
-
-		recorder := &ResponseRecorder{ResponseWriter: w}
-
-		next(recorder, r)
 
 		rlog := &entity.MerchantOrderRequestLog{
 			MerchantOrderId: order.Id,
@@ -144,11 +151,11 @@ func (m *ApiAccessPermissionMiddleware) Handle(next http.HandlerFunc) http.Handl
 			Description:     "",
 		}
 
-		logx.Infof("api access permission check response, mchaccount:%v, header:%+v, body:%v", maccount, w.Header(), recorder.body.String())
+		logx.Infof("listen middleware check response, mchaccount:%v, header:%+v, body:%v", maccount, w.Header(), recorder.body.String())
 
 		err = m.db.Create(rlog).Error
 		if err != nil {
-			logx.Errorf("api access permission middleware create request log failed, err:%v", err)
+			logx.Errorf("listen middleware middleware create request log failed, err:%v", err)
 			return
 		}
 	}

@@ -106,6 +106,7 @@ var (
 	AddressFundCollectInitClientFailed         = NewSpecificError(930, "地址资金归集初始化客户端失败")
 	AddressFundCollectSaveFailed               = NewSpecificError(931, "地址资金归集保存失败")
 	AddressFundCollectLogGetFailed             = NewSpecificError(932, "地址资金归集日志详情获取失败")
+	AddressFundCollectGetAccountBalanceFailed  = NewSpecificError(933, "地址资金归集获取账户余额失败")
 )
 
 var (

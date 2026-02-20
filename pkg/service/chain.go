@@ -262,39 +262,24 @@ func (s *ChainService) TronFunds(addr string, chain global.ChainName) {
 }
 
 func (s *ChainService) GetTRC20Balance(addr, contract string) (balance int64, err error) {
-	userHex, _ := s.Base58ToHex(addr)
-	contractHex, _ := s.Base58ToHex(contract)
-
-	param := "000000000000000000000000" + userHex[2:]
-
-	resp, err := s.post("/wallet/triggersmartcontract", map[string]any{
-		"owner_address":     userHex,
-		"contract_address":  contractHex,
-		"function_selector": "balanceOf(address)",
-		"parameter":         param,
-	})
-	if err != nil {
+	cli, ok := s.cli.(*client.Client)
+	if !ok {
+		err = biz.ConvertClientFailed
 		return
 	}
 
-	var r struct {
-		ConstantResult []string `json:"constant_result"`
+	owner := ttypes.MustNewAddressFromBase58(addr)
+	caddr := ttypes.MustNewAddressFromBase58(contract)
+
+	b, err := cli.TRC20(caddr).BalanceOf(context.Background(), owner)
+	if err != nil {
+		logx.Errorf("get trc20 balance failed, owner:%v, contract:%v, err:%v", addr, contract, err)
+		err = biz.AddressFundCollectGetAccountBalanceFailed
+		return
 	}
-	json.Unmarshal(resp, &r)
 
-	if len(r.ConstantResult) == 0 {
-		return 0, nil
-	}
-
-	b, _ := new(big.Int).SetString(r.ConstantResult[0], 16)
-	balance = b.Int64()
-
-	// c, err := client.NewClient(s.cfg.Tron.GrpcNetwork)
-	// if err != nil {
-	// 	logx.Errorf("tron collect client new clinet failed, collect:%v, err:%v", collect.Id, err)
-	// 	err = biz.AddressFundCollectInitClientFailed
-	// 	return
-	// }
+	f, _ := b.Float64()
+	balance = global.Sun(f, global.AmountTypo6e) 
 
 	return
 }

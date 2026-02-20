@@ -78,13 +78,13 @@ func (m *TronClientItem) Listen(ctx context.Context, chain global.ChainName, ich
 							amount := global.Amount(sun, global.AmountTypo6e)
 
 							trans := &entity.TronTransaction{}
-							trans.Currency = tx.TokenInfo.Symbol
+							trans.Currency = string(currency)
 							trans.TransactionId = tx.TransactionId
 							trans.Amount = amount
 							trans.Sun = sun
 							trans.FromBase58 = tx.From
 							trans.ToBase58 = tx.To
-							trans.Contract = tx.TokenInfo.Address
+							trans.Contract = caddr
 							trans.BlockTimestamp = tx.BlockTimestamp
 
 							min = int64(tx.BlockTimestamp)

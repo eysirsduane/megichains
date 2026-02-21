@@ -121,6 +121,11 @@ export const request = createFlatRequest(
       }
 
       showErrorMsg(request.state, message);
+
+      if (error.status === 401) {
+        const authStore = useAuthStore();
+        authStore.resetStore();
+      }
     }
   }
 );

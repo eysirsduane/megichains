@@ -279,7 +279,7 @@ func (s *ChainService) GetTRC20Balance(addr, contract string) (balance int64, er
 	}
 
 	f, _ := b.Float64()
-	balance = global.Sun(f, global.AmountTypo6e) 
+	balance = global.Sun(f, global.AmountTypo6e)
 
 	return
 }
@@ -824,15 +824,22 @@ func (s *ChainService) sendTronTransaction(log *entity.AddressFundCollectLog, ch
 		return
 	}
 
-	signer, err := signer.NewPrivateKeySigner(prikey)
+	sig, err := signer.NewPrivateKeySigner(prikey)
 	if err != nil {
 		return
 	}
 
-	result, err := cli.SignAndBroadcast(ctx, ustx, client.DefaultBroadcastOptions(), signer)
+	result, err := cli.SignAndBroadcast(ctx, ustx, client.DefaultBroadcastOptions(), sig)
 	if err != nil {
 		return
 	}
+
+	// 使用签名服务器后的代码逻辑，暂时保留
+	// signer.SignTx(sig, ustx)
+	// ret, err := lowlevel.Call(cli, ctx, "broadcast transaction", func(cl api.WalletClient, ctx context.Context) (*api.Return, error) {
+	// 	return cl.BroadcastTransaction(ctx, ustx.GetTransaction())
+	// })
+	// cli.waitForTransaction(ctx, result.TxID)
 
 	log.TransactionId = result.TxID
 

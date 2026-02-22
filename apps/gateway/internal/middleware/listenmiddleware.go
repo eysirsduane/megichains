@@ -36,7 +36,7 @@ func (m *ListenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
 
-			resp.Message = "header keys not enough"
+			resp.Message = "header invalid"
 
 			w.Write(global.ObjToBytes(resp))
 
@@ -49,7 +49,7 @@ func (m *ListenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
 
-			resp.Message = "merchant not found"
+			resp.Message = "merchant invalid"
 
 			w.Write(global.ObjToBytes(resp))
 
@@ -58,7 +58,7 @@ func (m *ListenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 
 		bbytes, err := io.ReadAll(r.Body)
 		if err != nil {
-			logx.Errorf("listen middleware middleware read body failed, err:%v", err)
+			logx.Errorf("listen middleware read body failed, err:%v", err)
 
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
@@ -86,7 +86,7 @@ func (m *ListenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		req := &converter.ChainListenReq{}
 		err = global.BytesToObj(bbytes, req)
 		if err != nil {
-			logx.Errorf("listen middleware middleware parse request body failed, err:%v", err)
+			logx.Errorf("listen middleware parse request body failed, err:%v", err)
 
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
@@ -118,7 +118,7 @@ func (m *ListenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		}
 		err = m.db.Create(order).Error
 		if err != nil {
-			logx.Errorf("order create failed, mono:%v, receiver:%v, err:%v", req.MerchantOrderNo, req.Receiver, err)
+			logx.Errorf("listen middleware order create failed, mono:%v, receiver:%v, err:%v", req.MerchantOrderNo, req.Receiver, err)
 
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
@@ -144,7 +144,7 @@ func (m *ListenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		reqmap["query"] = r.URL.Query()
 		reqmap["body"] = string(bbytes)
 
-		rlog := &entity.MerchantOrderRequestLog{
+		plog := &entity.MerchantOrderPlaceLog{
 			MerchantOrderId: order.Id,
 			Request:         global.ObjToJsonString(reqmap),
 			Response:        recorder.body.String(),
@@ -153,9 +153,9 @@ func (m *ListenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 
 		logx.Infof("listen middleware check response, mchaccount:%v, header:%+v, body:%v", maccount, w.Header(), recorder.body.String())
 
-		err = m.db.Create(rlog).Error
+		err = m.db.Create(plog).Error
 		if err != nil {
-			logx.Errorf("listen middleware middleware create request log failed, err:%v", err)
+			logx.Errorf("listen middleware create place log failed, err:%v", err)
 			return
 		}
 	}

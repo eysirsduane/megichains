@@ -31,6 +31,9 @@ type ChainListenReq struct {
 }
 
 type ChainListenResp struct {
+	OrderNo         string `json:"order_no"`
+	MerchantOrderNo string `json:"merchant_order_no"`
+	CreatedAt       uint64 `json:"created_at"`
 }
 
 type Contacts struct {

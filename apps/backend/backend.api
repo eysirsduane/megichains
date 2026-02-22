@@ -458,6 +458,15 @@ type MerchantOrderPlaceReq {
 	NotifyUrl       string `json:"notify_url"`
 }
 
+type OrderInteractionReq{
+	Id int64 `json:"id"`
+	MerchantOrderId int64 `json:"merchant_order_id"`
+	Request string `json:"request"`
+	Response string `json:"response"`
+
+	TimeAts
+}
+
 @server (
 	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
 	// goctl 生成代码时会将当前 service 代码块下的接口
@@ -541,6 +550,9 @@ service backend {
 
 	@handler OrderDetailHandler
 	get /order/detail (OrderGetReq) returns (OrderItem)
+
+	@handler OrderInteractionHandler
+	get /order/interaction/:id (OrderInteractionReq) returns (OrderInteractionResp)
 }
 
 @server (

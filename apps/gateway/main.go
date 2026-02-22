@@ -55,7 +55,7 @@ func main() {
 	solanaservice := service.NewSolanaService(db)
 	listenservice := service.NewListenService(&cfg, db, merchservice, addrservice, orderservice, chainservice, evmservice, tronservice, solanaservice)
 	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
-	ctx := svc.NewServiceContext(cfg, apimiidle, excfgservice, userservice, authservice, addrservice, listenservice)
+	ctx := svc.NewServiceContext(cfg, apimiidle, excfgservice, userservice, authservice, addrservice, listenservice, orderservice)
 	handler.RegisterHandlers(server, ctx)
 
 	httpx.SetOkHandler(biz.OkHandler)

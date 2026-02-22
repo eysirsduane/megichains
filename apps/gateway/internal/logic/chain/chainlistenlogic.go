@@ -52,5 +52,16 @@ func (l *ChainListenLogic) ChainListen(req *types.ChainListenReq) (resp *types.C
 
 	go l.svcCtx.ListenService.Listen(conv)
 
+	order, err := l.svcCtx.OrderService.GetByMerchant(req.MerchantAccount, req.MerchantOrderNo)
+	if err != nil {
+		return
+	}
+
+	resp = &types.ChainListenResp{
+		OrderNo:         order.OrderNo,
+		MerchantOrderNo: order.MerchantOrderNo,
+		CreatedAt:       order.CreatedAt,
+	}
+
 	return
 }

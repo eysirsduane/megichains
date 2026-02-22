@@ -27,7 +27,7 @@ type MerchantOrder struct {
 	TimeAts `gorm:"embedded"`
 }
 
-type MerchantOrderRequestLog struct {
+type MerchantOrderPlaceLog struct {
 	Id              int64 `gorm:"primaryKey;autoIncrement"`
 	MerchantOrderId int64 `gorm:""`
 

@@ -133,8 +133,6 @@ func (m *ListenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		r.Body = io.NopCloser(bytes.NewBuffer(bbytes))
 		recorder := &ResponseRecorder{ResponseWriter: w}
 
-		next(recorder, r)
-
 		reqmap := make(map[string]any)
 		reqmap["url"] = r.URL.String()
 		reqmap["method"] = r.Method
@@ -144,18 +142,24 @@ func (m *ListenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		reqmap["query"] = r.URL.Query()
 		reqmap["body"] = string(bbytes)
 
-		plog := &entity.MerchantOrderPlaceLog{
-			MerchantOrderId: order.Id,
-			Request:         global.ObjToJsonString(reqmap),
-			Response:        recorder.body.String(),
-			Description:     "",
+		ilog := &entity.MerchantOrderInteractionLog{
+			MerchantOrderId:       order.Id,
+			PlaceRequest:          global.ObjToJsonString(reqmap),
+			PlaceRequestTimestamp: uint64(time.Now().Unix()),
+
+			Description: "",
 		}
+
+		next(w, r)
 
 		logx.Infof("listen middleware check response, mchaccount:%v, header:%+v, body:%v", maccount, w.Header(), recorder.body.String())
 
-		err = m.db.Create(plog).Error
+		ilog.PlaceResponse = recorder.body.String()
+		ilog.PlaceResponseTimestamp = uint64(time.Now().Unix())
+
+		err = m.db.Create(ilog).Error
 		if err != nil {
-			logx.Errorf("listen middleware create place log failed, err:%v", err)
+			logx.Errorf("listen middleware create interaction log failed, err:%v", err)
 			return
 		}
 	}

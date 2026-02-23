@@ -138,13 +138,13 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		return
 	}
 
-	notify := &entity.MerchantOrderNotifyLog{
+	interaction := &entity.MerchantOrderInteractionLog{
 		MerchantOrderId: order.Id,
 	}
-	err = s.orderservice.NotifyLogSave(notify)
+	err = s.orderservice.InteractionLogSave(interaction)
 	if err != nil {
-		logx.Errorf("chain listen order notify log save failed, mono:%v, txid:%v, err:%v", req.MerchantOrderNo, order.TransactionId, err)
-		err = biz.OrderNotifyLogSaveFailed
+		logx.Errorf("chain listen order interaction log save failed, mono:%v, txid:%v, err:%v", req.MerchantOrderNo, order.TransactionId, err)
+		err = biz.OrderInteractionLogSaveFailed
 		return
 	}
 
@@ -154,22 +154,20 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		return
 	}
 
-	err = s.NotifyMerchant(notify, merch, req.NotifyUrl, order.OrderNo, order.MerchantOrderNo, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount, order.ReceivedSun)
+	err = s.NotifyMerchant(interaction, merch, req.NotifyUrl, order.OrderNo, order.MerchantOrderNo, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount, order.ReceivedSun)
 	if err != nil {
 		logx.Errorf("chain listen notify failed, chain:%v, ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.Chain, req.MerchantOrderNo, order.TransactionId, err)
 		order.NotifyStatus = string(global.NotifyStatusFailed)
 		order.Description = fmt.Sprintf("chain order notify failed. ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
-
-		notify.Description = fmt.Sprintf("chain order notify failed. ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
 	} else {
 		order.NotifyStatus = string(global.NotifyStatusSuccess)
 
 	}
 
-	err = s.orderservice.NotifyLogSave(notify)
+	err = s.orderservice.InteractionLogSave(interaction)
 	if err != nil {
-		logx.Errorf("chain listen order notify log update failed, ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
-		err = biz.OrderNotifyLogSaveFailed
+		logx.Errorf("chain listen order interaction log update failed, ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
+		err = biz.OrderInteractionLogSaveFailed
 	}
 
 	err = s.orderservice.Save(order)
@@ -181,7 +179,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 	logx.Infof("监听事务结束, chain:%v, clen:%v, from:%v", req.Chain, s.clilen, req.Receiver)
 }
 
-func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderNotifyLog, merch *entity.Merchant, url, ono, mono, status, txid, from, to, currency string, amount float64, sun int64) (err error) {
+func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderInteractionLog, merch *entity.Merchant, url, ono, mono, status, txid, from, to, currency string, amount float64, sun int64) (err error) {
 	req := global.OrderNotifyReq{
 		OrderNo:         ono,
 		MerchantOrderNo: mono,
@@ -215,7 +213,8 @@ func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderNotifyLog, merch
 	reqmap["header"] = request.Header
 	reqmap["query"] = request.URL.Query()
 	reqmap["body"] = rbstring
-	log.Request = global.ObjToJsonString(reqmap)
+	log.NotifyRequest = global.ObjToJsonString(reqmap)
+	log.NotifyRequestTimestamp = uint64(time.Now().Unix())
 
 	client := &http.Client{}
 	resp, err := client.Do(request)
@@ -232,7 +231,8 @@ func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderNotifyLog, merch
 	respmap := make(map[string]string)
 	respmap["header"] = global.ObjToJsonString(resp.Header)
 	respmap["body"] = global.BytesToString(bbytes)
-	log.Response = global.ObjToJsonString(respmap)
+	log.NotifyResponse = global.ObjToJsonString(respmap)
+	log.NotifyResponseTimestamp = uint64(time.Now().Unix())
 
 	if resp.StatusCode != http.StatusOK {
 		err = fmt.Errorf("order notify response status is not ok, req:%+v, status:%v", req, resp.StatusCode)

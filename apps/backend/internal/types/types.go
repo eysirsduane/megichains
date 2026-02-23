@@ -291,6 +291,24 @@ type OrderGetReq struct {
 	Id int64 `form:"id"`
 }
 
+type OrderInteractionReq struct {
+	MerchantOrderId int64 `path:"merchant_order_id"`
+}
+
+type OrderInteractionResp struct {
+	Id                      int64  `json:"id"`
+	MerchantOrderId         int64  `path:"merchant_order_id"`
+	PlaceRequest            string `json:"place_request"`
+	PlaceRequestTimestamp   uint64 `json:"place_request_timestamp"`
+	PlaceResponse           string `json:"place_response"`
+	PlaceResponseTimestamp  uint64 `json:"place_response_timestamp"`
+	NotifyRequest           string `json:"notify_request"`
+	NotifyRequestTimestamp  uint64 `json:"notify_request_timestamp"`
+	NotifyResponse          string `json:"notify_response"`
+	NotifyResponseTimestamp uint64 `json:"notify_response_timestamp"`
+	TimeAts
+}
+
 type OrderItem struct {
 	Id              int64   `json:"id"`
 	OrderNo         string  `json:"order_no"`

@@ -191,6 +191,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodGet,
+				Path:    "/order/interaction/:id",
+				Handler: order.OrderInteractionHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
 				Path:    "/order/list",
 				Handler: order.OrderListHandler(serverCtx),
 			},

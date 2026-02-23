@@ -458,12 +458,21 @@ type MerchantOrderPlaceReq {
 	NotifyUrl       string `json:"notify_url"`
 }
 
-type OrderInteractionReq{
-	Id int64 `json:"id"`
-	MerchantOrderId int64 `json:"merchant_order_id"`
-	Request string `json:"request"`
-	Response string `json:"response"`
+type OrderInteractionReq {
+	MerchantOrderId int64 `path:"merchant_order_id"`
+}
 
+type OrderInteractionResp {
+	Id                      int64  `json:"id"`
+	MerchantOrderId         int64  `path:"merchant_order_id"`
+	PlaceRequest            string `json:"place_request"`
+	PlaceRequestTimestamp   uint64 `json:"place_request_timestamp"`
+	PlaceResponse           string `json:"place_response"`
+	PlaceResponseTimestamp  uint64 `json:"place_response_timestamp"`
+	NotifyRequest           string `json:"notify_request"`
+	NotifyRequestTimestamp  uint64 `json:"notify_request_timestamp"`
+	NotifyResponse          string `json:"notify_response"`
+	NotifyResponseTimestamp uint64 `json:"notify_response_timestamp"`
 	TimeAts
 }
 

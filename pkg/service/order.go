@@ -23,7 +23,7 @@ func (s *MerchOrderService) Save(order *entity.MerchantOrder) (err error) {
 	return s.db.Save(order).Error
 }
 
-func (s *MerchOrderService) NotifyLogSave(log *entity.MerchantOrderNotifyLog) (err error) {
+func (s *MerchOrderService) InteractionLogSave(log *entity.MerchantOrderInteractionLog) (err error) {
 	return s.db.Save(log).Error
 }
 
@@ -95,6 +95,30 @@ func (s *MerchOrderService) Find(ctx context.Context, req *converter.OrderListRe
 	}
 
 	resp = converter.ConvertToPagingRecordsResp(orders, req.Current, req.Size, total)
+
+	return
+}
+
+func (s *MerchOrderService) Interaction(ctx context.Context, req *converter.OrderInteractionReq) (resp *converter.OrderInteractionResp, err error) {
+	interaction, err := gorm.G[*entity.MerchantOrderInteractionLog](s.db).Where("merchant_order_id = ?", req.MerchantOrderId).Last(ctx)
+	if err != nil {
+		logx.Errorf("order interaction log get failed, err:%v", err)
+		err = biz.OrderFindInteractionFailed
+		return
+	}
+
+	resp = &converter.OrderInteractionResp{
+		MerchantOrderId:         req.MerchantOrderId,
+		PlaceRequest:            interaction.PlaceRequest,
+		PlaceRequestTimestamp:   interaction.PlaceRequestTimestamp,
+		PlaceResponse:           interaction.PlaceResponse,
+		PlaceResponseTimestamp:  interaction.PlaceResponseTimestamp,
+		NotifyRequest:           interaction.NotifyRequest,
+		NotifyRequestTimestamp:  interaction.NotifyRequestTimestamp,
+		NotifyResponse:          interaction.NotifyResponse,
+		NotifyResponseTimestamp: interaction.NotifyResponseTimestamp,
+		TimeAts:                 converter.TimeAts(interaction.TimeAts),
+	}
 
 	return
 }

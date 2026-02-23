@@ -5,7 +5,9 @@ type Request {
 }
 
 type Response {
-	Msg string `json:"msg"`
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data"`
 }
 
 type LoginReq {
@@ -448,7 +450,7 @@ type MerchantDetailReq {
 	Id int64 `path:"id"`
 }
 
-type MerchantOrderPlaceReq {
+type OrderTestPlaceReq {
 	MerchantAccount string `json:"merchant_account"`
 	Mode            string `json:"mode"`
 	Chain           string `json:"chain"`
@@ -537,9 +539,6 @@ service backend {
 
 	@handler MerchantSaveHandler
 	post /merchant/save (MerchantItem) returns (Response)
-
-	@handler MerchantOrderPlaceHandler
-	post /merchant/order/place (MerchantOrderPlaceReq) returns (Response)
 }
 
 @server (
@@ -562,6 +561,9 @@ service backend {
 
 	@handler OrderInteractionHandler
 	get /order/interaction/:id (OrderInteractionReq) returns (OrderInteractionResp)
+
+	@handler OrderTestPlaceHandler
+	post /order/test/place (OrderTestPlaceReq) returns (Response)
 }
 
 @server (

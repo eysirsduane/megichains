@@ -38,16 +38,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	server.AddRoutes(
-		// rest.WithMiddlewares(
-			// []rest.Middleware{serverCtx.ListenMiddleware.Handle},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.ListenMiddleware.Handle},
 			[]rest.Route{
 				{
 					Method:  http.MethodPost,
 					Path:    "/chain/listen",
 					Handler: chain.ChainListenHandler(serverCtx),
 				},
-			},
-		// ),
+			}...,
+		),
 		rest.WithPrefix("/v1"),
 	)
 

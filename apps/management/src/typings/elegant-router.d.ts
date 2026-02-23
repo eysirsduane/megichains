@@ -66,7 +66,6 @@ declare module "@elegant-router/types" {
     "manage_user-detail": "/manage/user-detail/:id";
     "merchant": "/merchant";
     "merchant_list": "/merchant/list";
-    "merchant_place": "/merchant/place";
     "multi-menu": "/multi-menu";
     "multi-menu_first": "/multi-menu/first";
     "multi-menu_first_child": "/multi-menu/first/child";
@@ -211,7 +210,6 @@ declare module "@elegant-router/types" {
     | "manage_user-detail"
     | "manage_user"
     | "merchant_list"
-    | "merchant_place"
     | "multi-menu_first_child"
     | "multi-menu_second_child_home"
     | "order_evm"

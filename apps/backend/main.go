@@ -70,7 +70,7 @@ func main() {
 	handler.RegisterHandlers(server, ctx)
 
 	httpx.SetOkHandler(biz.OkHandler)
-	httpx.SetErrorHandlerCtx(biz.ErrHandler(cfg.Name))
+	httpx.SetErrorHandlerCtx(biz.ErrHandler)
 
 	starting := fmt.Sprintf("Starting http server %s at %s:%d ...", cfg.Name, cfg.Host, cfg.RestConf.Port)
 	fmt.Println(starting)

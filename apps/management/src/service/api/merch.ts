@@ -22,11 +22,3 @@ export function saveMerchantDetail(params?: Api.Merch.MerchantDetail) {
     data: params
   });
 }
-
-export function postMerchantPlace(params?: Api.Merch.MerchantPlace) {
-  return request<null>({
-    url: `/merchant/order/place`,
-    method: 'post',
-    data: params
-  });
-}

@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { chainTyposOptions, currencyTyposOptions } from '@/constants/business';
-import { findMerchantList, postMerchantPlace } from '@/service/api';
+import { findMerchantList, postOrderTestPlace } from '@/service/api';
 import { translateOptions } from '@/utils/common';
 import { $t } from '@/locales';
 
-defineOptions({ name: 'AddressGroupEditDrawer' });
+defineOptions({ name: 'OrderTestPlaceDrawer' });
 
 const visible = defineModel<boolean>('visible', {
   default: false
 });
 
 type Model = Pick<
-  Api.Merch.MerchantPlace,
+  Api.Order.OrderTestPlace,
   'merchant_account' | 'chain' | 'currency' | 'mode' | 'receiver' | 'seconds' | 'notify_url'
 >;
 
@@ -41,7 +41,7 @@ interface Emits {
 const emit = defineEmits<Emits>();
 
 async function save() {
-  const { data, error } = await postMerchantPlace(model.value);
+  const { data, error } = await postOrderTestPlace(model.value);
   if (!error) {
     window.$message?.success($t('common.saveSuccess'));
     closeDrawer();

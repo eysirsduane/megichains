@@ -53,13 +53,11 @@ func OkHandler(_ context.Context, v any) any {
 	return Success(v)
 }
 
-func ErrHandler(name string) func(ctx context.Context, err error) (int, any) {
-	return func(ctx context.Context, err error) (int, any) {
-		switch e := err.(type) {
-		case *SpecificError:
-			return http.StatusOK, SpecificFail(e)
-		default:
-			return http.StatusOK, Fail(CodeServerError.Code, err.Error())
-		}
+func ErrHandler(_ context.Context, err error) (int, any) {
+	switch e := err.(type) {
+	case *SpecificError:
+		return http.StatusOK, SpecificFail(e)
+	default:
+		return http.StatusOK, Fail(CodeServerError.Code, err.Error())
 	}
 }

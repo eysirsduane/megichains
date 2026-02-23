@@ -277,16 +277,6 @@ type MerchantListResp struct {
 	PagesBody
 }
 
-type MerchantOrderPlaceReq struct {
-	MerchantAccount string `json:"merchant_account"`
-	Mode            string `json:"mode"`
-	Chain           string `json:"chain"`
-	Currency        string `json:"currency"`
-	Receiver        string `json:"receiver"`
-	Seconds         int64  `json:"seconds"`
-	NotifyUrl       string `json:"notify_url"`
-}
-
 type OrderGetReq struct {
 	Id int64 `form:"id"`
 }
@@ -351,6 +341,16 @@ type OrderListResp struct {
 	PagesBody
 }
 
+type OrderTestPlaceReq struct {
+	MerchantAccount string `json:"merchant_account"`
+	Mode            string `json:"mode"`
+	Chain           string `json:"chain"`
+	Currency        string `json:"currency"`
+	Receiver        string `json:"receiver"`
+	Seconds         int64  `json:"seconds"`
+	NotifyUrl       string `json:"notify_url"`
+}
+
 type Pages struct {
 	Current int `form:"current"`
 	Size    int `form:"size"`
@@ -385,7 +385,9 @@ type Request struct {
 }
 
 type Response struct {
-	Msg string `json:"msg"`
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data"`
 }
 
 type SolanaTransItem struct {

@@ -420,16 +420,6 @@ export const generatedRoutes: GeneratedRoute[] = [
           i18nKey: 'route.merchant_list',
           icon: 'cbi:scene-dynamic'
         }
-      },
-      {
-        name: 'merchant_place',
-        path: '/merchant/place',
-        component: 'view.merchant_place',
-        meta: {
-          title: 'merchant_place',
-          i18nKey: 'route.merchant_place',
-          icon: 'icon-park-outline:table'
-        }
       }
     ]
   },

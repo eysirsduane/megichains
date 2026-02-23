@@ -62,5 +62,15 @@ declare namespace Api {
       to_address: string;
       description: string;
     }>;
+
+    type OrderTestPlace = {
+      merchant_account: string;
+      chain: Api.Common.ChainTypo;
+      currency: Api.Common.CurrencyTypo;
+      mode: Api.Common.OrderMode;
+      receiver: string;
+      seconds: number;
+      notify_url: string;
+    };
   }
 }

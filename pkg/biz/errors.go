@@ -50,6 +50,8 @@ var (
 	OrderNotifyLogSaveFailed      = NewSpecificError(5004, "订单通知日志保存失败")
 	OrderFindInteractionFailed    = NewSpecificError(5005, "订单交互日志查询失败")
 	OrderInteractionLogSaveFailed = NewSpecificError(5006, "订单交互日志保存失败")
+	OrderTestPlaceFailed          = NewSpecificError(5007, "订单测试下单失败")
+	OrderAlreadyExistsSameListen  = NewSpecificError(5008, "已存在相同的监听订单")
 )
 
 var (

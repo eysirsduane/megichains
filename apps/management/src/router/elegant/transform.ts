@@ -212,7 +212,6 @@ const routeMap: RouteMap = {
   "manage_user-detail": "/manage/user-detail/:id",
   "merchant": "/merchant",
   "merchant_list": "/merchant/list",
-  "merchant_place": "/merchant/place",
   "multi-menu": "/multi-menu",
   "multi-menu_first": "/multi-menu/first",
   "multi-menu_first_child": "/multi-menu/first/child",

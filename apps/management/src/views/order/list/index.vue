@@ -16,6 +16,7 @@ import { getHumannessDateTime } from '@/locales/dayjs';
 import OrderDetailDrawer from './modules/order-detail-drawer.vue';
 import OrderInteractionDrawer from './modules/order-interaction-drawer.vue';
 import OrderSearch from './modules/order-search.vue';
+import OrderTestPlaceDrawer from './modules/order-test-place-drawer.vue';
 
 defineOptions({ name: 'OrderListView' });
 
@@ -204,7 +205,8 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
 });
 
 const { bool: drawerVisible, setTrue: openDrawer } = useBoolean();
-const { bool: interactionDrawerVisible, setTrue: openInteractionDrawer } = useBoolean();
+const { bool: drawerInteractionVisible, setTrue: openInteractionDrawer } = useBoolean();
+const { bool: drawerOrderTestPlaceVisible, setTrue: openDrawerOrderTestPlace } = useBoolean();
 
 const targetId = ref(0);
 
@@ -216,6 +218,10 @@ function bill(id: number) {
 function intercation(id: number) {
   targetId.value = id;
   openInteractionDrawer();
+}
+
+function place() {
+  openDrawerOrderTestPlace();
 }
 
 function resetSearchParams() {
@@ -233,9 +239,9 @@ function resetSearchParams() {
           <TableHeaderOperation
             v-model:columns="columnChecks"
             :disabled-delete="true"
-            :disabled-add="true"
             :loading="loading"
             @refresh="getData"
+            @add="place"
           />
         </div>
       </template>
@@ -262,7 +268,8 @@ function resetSearchParams() {
         />
       </div>
       <OrderDetailDrawer v-model:visible="drawerVisible" :target-id="targetId" />
-      <OrderInteractionDrawer v-model:visible="interactionDrawerVisible" :target-id="targetId" />
+      <OrderInteractionDrawer v-model:visible="drawerInteractionVisible" :target-id="targetId" />
+      <OrderTestPlaceDrawer v-model:visible="drawerOrderTestPlaceVisible" @saved="getDataByPage" />
     </ElCard>
   </div>
 </template>

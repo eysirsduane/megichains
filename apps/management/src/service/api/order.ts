@@ -14,3 +14,11 @@ export function fetchGetOrderDetail(id: number) {
     method: 'get'
   });
 }
+
+export function postOrderTestPlace(params?: Api.Order.OrderTestPlace) {
+  return request<null>({
+    url: `/order/test/place`,
+    method: 'post',
+    data: params
+  });
+}

@@ -1,7 +1,7 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package merchant
+package order
 
 import (
 	"bytes"
@@ -13,6 +13,7 @@ import (
 
 	"megichains/apps/backend/internal/svc"
 	"megichains/apps/backend/internal/types"
+	"megichains/pkg/biz"
 	"megichains/pkg/converter"
 	"megichains/pkg/crypt"
 	"megichains/pkg/global"
@@ -21,21 +22,21 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type MerchantOrderPlaceLogic struct {
+type OrderTestPlaceLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewMerchantOrderPlaceLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MerchantOrderPlaceLogic {
-	return &MerchantOrderPlaceLogic{
+func NewOrderTestPlaceLogic(ctx context.Context, svcCtx *svc.ServiceContext) *OrderTestPlaceLogic {
+	return &OrderTestPlaceLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *MerchantOrderPlaceLogic) MerchantOrderPlace(req *types.MerchantOrderPlaceReq) (resp *types.Response, err error) {
+func (l *OrderTestPlaceLogic) OrderTestPlace(req *types.OrderTestPlaceReq) (resp *types.Response, err error) {
 	reqc := &converter.ChainListenReq{}
 	copier.Copy(reqc, req)
 
@@ -72,10 +73,20 @@ func (l *MerchantOrderPlaceLogic) MerchantOrderPlace(req *types.MerchantOrderPla
 
 	if response.StatusCode != http.StatusOK {
 		logx.Errorf("merchant order place response is not ok, status:%v", response.StatusCode)
+		err = biz.OrderTestPlaceFailed
 		return
 	}
 
 	logx.Infof("merchant order place response body:%v", string(bbytes))
+
+	resp = &types.Response{}
+	global.BytesToObj(bbytes, resp)
+
+	if resp.Code != 0 {
+		logx.Errorf("merchant order place failed, code:%v, msg:%v", resp.Code, resp.Msg)
+		err = biz.NewSpecificError(int64(resp.Code), resp.Msg)
+		return
+	}
 
 	return
 }

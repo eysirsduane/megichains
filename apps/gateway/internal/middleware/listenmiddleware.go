@@ -145,17 +145,17 @@ func (m *ListenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		ilog := &entity.MerchantOrderInteractionLog{
 			MerchantOrderId:       order.Id,
 			PlaceRequest:          global.ObjToJsonString(reqmap),
-			PlaceRequestTimestamp: uint64(time.Now().Unix()),
+			PlaceRequestTimestamp: uint64(time.Now().UnixMilli()),
 
 			Description: "",
 		}
 
-		next(w, r)
+		next(recorder, r)
 
 		logx.Infof("listen middleware check response, mchaccount:%v, header:%+v, body:%v", maccount, w.Header(), recorder.body.String())
 
 		ilog.PlaceResponse = recorder.body.String()
-		ilog.PlaceResponseTimestamp = uint64(time.Now().Unix())
+		ilog.PlaceResponseTimestamp = uint64(time.Now().UnixMilli())
 
 		err = m.db.Create(ilog).Error
 		if err != nil {

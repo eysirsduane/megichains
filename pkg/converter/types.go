@@ -453,5 +453,6 @@ type OrderInteractionResp struct {
 	NotifyRequestTimestamp  uint64 `json:"notify_request_timestamp"`
 	NotifyResponse          string `json:"notify_response"`
 	NotifyResponseTimestamp uint64 `json:"notify_response_timestamp"`
+	Description             string `json:"description"`
 	TimeAts
 }

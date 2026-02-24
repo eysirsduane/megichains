@@ -287,7 +287,7 @@ type OrderInteractionReq struct {
 
 type OrderInteractionResp struct {
 	Id                      int64  `json:"id"`
-	MerchantOrderId         int64  `path:"merchant_order_id"`
+	MerchantOrderId         int64  `json:"merchant_order_id"`
 	PlaceRequest            string `json:"place_request"`
 	PlaceRequestTimestamp   uint64 `json:"place_request_timestamp"`
 	PlaceResponse           string `json:"place_response"`

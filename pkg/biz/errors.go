@@ -52,14 +52,15 @@ var (
 	OrderInteractionLogSaveFailed = NewSpecificError(5006, "订单交互日志保存失败")
 	OrderTestPlaceFailed          = NewSpecificError(5007, "订单测试下单失败")
 	OrderAlreadyExistsSameListen  = NewSpecificError(5008, "已存在相同的监听订单")
+	OrderInteractionLogGetFailed  = NewSpecificError(5009, "订单交互日志获取失败")
 )
 
 var (
 	EvmOrderSaveFailed   = NewSpecificError(6001, "Evm订单保存失败")
 	EvmLogSaveFailed     = NewSpecificError(6002, "Evm交易保存失败")
-	EvmOrderNotifyFailed = NewSpecificError(6003, "Evm订单保存失败")
-	EvmLogFindFailed     = NewSpecificError(6004, "Evm订单保存失败")
-	EvmLogCountFailed    = NewSpecificError(6005, "Evm订单保存失败")
+	EvmOrderNotifyFailed = NewSpecificError(6003, "Evm订单通知失败")
+	EvmLogFindFailed     = NewSpecificError(6004, "Evm交易查询失败")
+	EvmLogCountFailed    = NewSpecificError(6005, "Evm交易总数统计失败")
 )
 
 var (

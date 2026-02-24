@@ -72,5 +72,19 @@ declare namespace Api {
       seconds: number;
       notify_url: string;
     };
+
+    type OrderInteraction = Common.CommonRecord<{
+      id: number;
+      merchant_order_id: number;
+      place_request: string;
+      place_request_timestamp: number;
+      place_response: string;
+      place_response_timestamp: number;
+      notify_request: string;
+      notify_request_timestamp: number;
+      notify_response: string;
+      notify_response_timestamp: number;
+      description: string;
+    }>;
   }
 }

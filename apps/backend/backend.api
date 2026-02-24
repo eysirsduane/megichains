@@ -466,7 +466,7 @@ type OrderInteractionReq {
 
 type OrderInteractionResp {
 	Id                      int64  `json:"id"`
-	MerchantOrderId         int64  `path:"merchant_order_id"`
+	MerchantOrderId         int64  `json:"merchant_order_id"`
 	PlaceRequest            string `json:"place_request"`
 	PlaceRequestTimestamp   uint64 `json:"place_request_timestamp"`
 	PlaceResponse           string `json:"place_response"`
@@ -560,7 +560,7 @@ service backend {
 	get /order/detail (OrderGetReq) returns (OrderItem)
 
 	@handler OrderInteractionHandler
-	get /order/interaction/:id (OrderInteractionReq) returns (OrderInteractionResp)
+	get /order/interaction/:merchant_order_id (OrderInteractionReq) returns (OrderInteractionResp)
 
 	@handler OrderTestPlaceHandler
 	post /order/test/place (OrderTestPlaceReq) returns (Response)

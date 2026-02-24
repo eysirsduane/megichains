@@ -27,6 +27,12 @@ func (s *MerchOrderService) InteractionLogSave(log *entity.MerchantOrderInteract
 	return s.db.Save(log).Error
 }
 
+func (s *MerchOrderService) InteractionLogGet(moid int64) (log *entity.MerchantOrderInteractionLog, err error) {
+	log = &entity.MerchantOrderInteractionLog{}
+	err = s.db.First(log, "merchant_order_id = ?", moid).Error
+	return
+}
+
 func (s *MerchOrderService) Get(id int64) (order *entity.MerchantOrder, err error) {
 	order = &entity.MerchantOrder{}
 	err = s.db.Model(&entity.MerchantOrder{}).Where("id = ?", id).First(order).Error
@@ -117,6 +123,7 @@ func (s *MerchOrderService) Interaction(ctx context.Context, req *converter.Orde
 		NotifyRequestTimestamp:  interaction.NotifyRequestTimestamp,
 		NotifyResponse:          interaction.NotifyResponse,
 		NotifyResponseTimestamp: interaction.NotifyResponseTimestamp,
+		Description:             interaction.Description,
 		TimeAts:                 converter.TimeAts(interaction.TimeAts),
 	}
 

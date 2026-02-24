@@ -138,12 +138,9 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		return
 	}
 
-	interaction := &entity.MerchantOrderInteractionLog{
-		MerchantOrderId: order.Id,
-	}
-	err = s.orderservice.InteractionLogSave(interaction)
+	ilog, err := s.orderservice.InteractionLogGet(order.Id)
 	if err != nil {
-		logx.Errorf("chain listen order interaction log save failed, mono:%v, txid:%v, err:%v", req.MerchantOrderNo, order.TransactionId, err)
+		logx.Errorf("chain listen order interaction log get failed, mono:%v, txid:%v, err:%v", req.MerchantOrderNo, order.TransactionId, err)
 		err = biz.OrderInteractionLogSaveFailed
 		return
 	}
@@ -154,7 +151,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		return
 	}
 
-	err = s.NotifyMerchant(interaction, merch, req.NotifyUrl, order.OrderNo, order.MerchantOrderNo, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount, order.ReceivedSun)
+	err = s.NotifyMerchant(ilog, merch, req.NotifyUrl, order.OrderNo, order.MerchantOrderNo, order.Status, order.TransactionId, order.FromAddress, order.ToAddress, order.Currency, order.ReceivedAmount, order.ReceivedSun)
 	if err != nil {
 		logx.Errorf("chain listen notify failed, chain:%v, ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.Chain, req.MerchantOrderNo, order.TransactionId, err)
 		order.NotifyStatus = string(global.NotifyStatusFailed)
@@ -164,7 +161,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 
 	}
 
-	err = s.orderservice.InteractionLogSave(interaction)
+	err = s.orderservice.InteractionLogSave(ilog)
 	if err != nil {
 		logx.Errorf("chain listen order interaction log update failed, ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)
 		err = biz.OrderInteractionLogSaveFailed
@@ -179,7 +176,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 	logx.Infof("监听事务结束, chain:%v, clen:%v, from:%v", req.Chain, s.clilen, req.Receiver)
 }
 
-func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderInteractionLog, merch *entity.Merchant, url, ono, mono, status, txid, from, to, currency string, amount float64, sun int64) (err error) {
+func (s *ListenService) NotifyMerchant(ilog *entity.MerchantOrderInteractionLog, merch *entity.Merchant, url, ono, mono, status, txid, from, to, currency string, amount float64, sun int64) (err error) {
 	req := global.OrderNotifyReq{
 		OrderNo:         ono,
 		MerchantOrderNo: mono,
@@ -213,8 +210,8 @@ func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderInteractionLog, 
 	reqmap["header"] = request.Header
 	reqmap["query"] = request.URL.Query()
 	reqmap["body"] = rbstring
-	log.NotifyRequest = global.ObjToJsonString(reqmap)
-	log.NotifyRequestTimestamp = uint64(time.Now().Unix())
+	ilog.NotifyRequest = global.ObjToJsonString(reqmap)
+	ilog.NotifyRequestTimestamp = uint64(time.Now().UnixMilli())
 
 	client := &http.Client{}
 	resp, err := client.Do(request)
@@ -231,19 +228,19 @@ func (s *ListenService) NotifyMerchant(log *entity.MerchantOrderInteractionLog, 
 	respmap := make(map[string]string)
 	respmap["header"] = global.ObjToJsonString(resp.Header)
 	respmap["body"] = global.BytesToString(bbytes)
-	log.NotifyResponse = global.ObjToJsonString(respmap)
-	log.NotifyResponseTimestamp = uint64(time.Now().Unix())
+	ilog.NotifyResponse = global.ObjToJsonString(respmap)
+	ilog.NotifyResponseTimestamp = uint64(time.Now().UnixMilli())
 
 	if resp.StatusCode != http.StatusOK {
 		err = fmt.Errorf("order notify response status is not ok, req:%+v, status:%v", req, resp.StatusCode)
 
-		log.Description = err.Error()
+		ilog.Description = err.Error()
 		return
 	}
 	if respmap["body"] != "success" {
 		err = fmt.Errorf("order notify response body is not success, req:%+v, body:%v", req, respmap["body"])
 
-		log.Description = err.Error()
+		ilog.Description = err.Error()
 		return
 	}
 

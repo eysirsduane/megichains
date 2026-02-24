@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { fetchGetOrderDetail } from '@/service/api';
+import { ref, watch } from 'vue';
+import { getOrderInteraction } from '@/service/api';
 import { $t } from '@/locales';
 import { getHumannessDateTime } from '@/locales/dayjs';
 
-defineOptions({ name: 'ExchangeBillDrawer' });
+defineOptions({ name: 'OrderTestPlaceDrawer' });
 
 const visible = defineModel<boolean>('visible', {
   default: false
@@ -15,60 +15,41 @@ const targetId = defineModel<number>('targetId', {
 });
 
 type Model = Pick<
-  Api.Order.OrderDetail,
-  | 'order_no'
-  | 'merchant_account'
-  | 'merchant_order_no'
-  | 'transaction_id'
-  | 'log_id'
-  | 'chain'
-  | 'typo'
-  | 'status'
-  | 'currency'
-  | 'from_address'
-  | 'to_address'
-  | 'received_amount'
-  | 'received_sun'
-  | 'updated_at'
-  | 'created_at'
+  Api.Order.OrderInteraction,
+  | 'id'
+  | 'merchant_order_id'
+  | 'place_request'
+  | 'place_request_timestamp'
+  | 'place_response'
+  | 'place_response_timestamp'
+  | 'notify_request'
+  | 'notify_request_timestamp'
+  | 'notify_response'
+  | 'notify_response_timestamp'
   | 'description'
+  | 'created_at'
+  | 'updated_at'
 >;
 
 const model = ref(createDefaultModel());
 
 function createDefaultModel(): Model {
   return {
-    order_no: '',
-    merchant_account: '',
-    merchant_order_no: '',
-    log_id: 0,
-    transaction_id: '',
-    chain: '',
-    typo: '',
-    status: '',
-    currency: '',
-    from_address: '',
-    to_address: '',
-    received_amount: 0,
-    received_sun: 0,
+    id: 0,
+    merchant_order_id: 0,
+    place_request: '',
+    place_request_timestamp: 0,
+    place_response: '',
+    place_response_timestamp: 0,
+    notify_request: '',
+    notify_request_timestamp: 0,
+    notify_response: '',
+    notify_response_timestamp: 0,
+    description: '',
     updated_at: 0,
-    created_at: 0,
-    description: ''
+    created_at: 0
   };
 }
-
-async function getOrderDetail(oid: number): Promise<Model> {
-  const { data, error } = await fetchGetOrderDetail(oid);
-  if (!error) {
-    return data;
-  }
-
-  return createDefaultModel();
-}
-
-const timeHuman = computed(() => {
-  return getHumannessDateTime(model.value.created_at);
-});
 
 function closeDrawer() {
   visible.value = false;
@@ -76,62 +57,54 @@ function closeDrawer() {
 
 watch(visible, async () => {
   if (visible.value) {
-    const detail = await getOrderDetail(targetId.value);
-    model.value = detail;
+    if (targetId.value > 0) {
+      const { data, error } = await getOrderInteraction(targetId.value);
+      if (!error) {
+        model.value = data;
+      }
+    }
   }
 });
 </script>
 
 <template>
-  <ElDrawer v-model="visible" :title="$t('page.order.detail.title')" :size="560">
+  <ElDrawer v-model="visible" :title="$t('page.order.common.interaction')" :size="560">
     <ElForm :model="model" label-position="top">
-      <ElFormItem :label="$t('common.merchant_request')" prop="order_no">
-        <ElInput v-model="model.order_no" />
+      <ElFormItem :label="$t('page.order.common.merchant_order_id')" prop="merchant_order_id">
+        <ElInput v-model="model.merchant_order_id" />
       </ElFormItem>
-      <ElFormItem :label="$t('common.merchant_response')" prop="merchant_account">
-        <ElInput v-model="model.merchant_account" />
+      <ElFormItem :label="$t('page.order.common.place_request')" prop="place_request">
+        <ElInput v-model="model.place_request" type="textarea" :rows="7" />
       </ElFormItem>
-      <ElFormItem :label="$t('page.order.common.merchant_order_no')" prop="merchant_order_no">
-        <ElInput v-model="model.merchant_order_no" />
+      <ElFormItem :label="$t('page.order.common.place_request_timestamp')" prop="place_request_timestamp">
+        <ElInput :value="getHumannessDateTime(model.place_request_timestamp)" />
       </ElFormItem>
-      <ElFormItem :label="$t('page.order.common.log_id')" prop="order_id">
-        <ElInput v-model="model.log_id" />
+      <ElFormItem :label="$t('page.order.common.place_response')" prop="place_response">
+        <ElInput v-model="model.place_response" type="textarea" :rows="7" />
       </ElFormItem>
-      <ElFormItem :label="$t('page.order.common.transaction_id')" prop="transaction_id">
-        <ElInput v-model="model.transaction_id" />
+      <ElFormItem :label="$t('page.order.common.place_response_timestamp')" prop="place_response_timestamp">
+        <ElInput :value="getHumannessDateTime(model.place_response_timestamp)" />
       </ElFormItem>
-      <ElFormItem :label="$t('page.order.common.chain')" prop="currency">
-        <ElInput v-model="model.chain" />
+      <ElFormItem :label="$t('page.order.common.notify_request')" prop="notify_request">
+        <ElInput v-model="model.notify_request" type="textarea" :rows="7" />
       </ElFormItem>
-      <ElFormItem :label="$t('page.order.common.typo')" prop="currency">
-        <ElInput v-model="model.typo" />
+      <ElFormItem :label="$t('page.order.common.notify_request_timestamp')" prop="notify_request_timestamp">
+        <ElInput :value="getHumannessDateTime(model.notify_request_timestamp)" />
       </ElFormItem>
-      <ElFormItem :label="$t('page.order.common.status')" prop="currency">
-        <ElInput v-model="model.status" />
+      <ElFormItem :label="$t('page.order.common.notify_response')" prop="notify_response">
+        <ElInput v-model="model.notify_response" type="textarea" :rows="7" />
       </ElFormItem>
-      <ElFormItem :label="$t('page.order.common.currency')" prop="currency">
-        <ElInput v-model="model.currency" />
-      </ElFormItem>
-      <ElFormItem :label="$t('page.order.common.from_address')" prop="from_address">
-        <ElInput v-model="model.from_address" />
-      </ElFormItem>
-      <ElFormItem :label="$t('page.order.common.to_address')" prop="to_address">
-        <ElInput v-model="model.to_address" />
-      </ElFormItem>
-      <ElFormItem :label="$t('page.order.common.received_amount')" prop="exchanged_amount">
-        <ElInput v-model="model.received_amount" />
-      </ElFormItem>
-      <ElFormItem :label="$t('page.order.common.received_sun')" prop="exchanged_sun">
-        <ElInput v-model="model.received_sun" />
-      </ElFormItem>
-      <ElFormItem :label="$t('common.updated_at')" prop="created_at">
-        <ElInput v-model="timeHuman" />
-      </ElFormItem>
-      <ElFormItem :label="$t('common.created_at')" prop="created_at">
-        <ElInput v-model="timeHuman" />
+      <ElFormItem :label="$t('page.order.common.notify_response_timestamp')" prop="notify_response_timestamp">
+        <ElInput :value="getHumannessDateTime(model.notify_response_timestamp)" />
       </ElFormItem>
       <ElFormItem :label="$t('common.description')" prop="description">
         <ElInput v-model="model.description" type="textarea" :rows="7" />
+      </ElFormItem>
+      <ElFormItem :label="$t('common.updated_at')" prop="updated_at">
+        <ElInput :value="getHumannessDateTime(model.updated_at)" />
+      </ElFormItem>
+      <ElFormItem :label="$t('common.created_at')" prop="created_at">
+        <ElInput :value="getHumannessDateTime(model.created_at)" />
       </ElFormItem>
     </ElForm>
     <template #footer>

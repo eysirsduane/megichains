@@ -760,6 +760,16 @@ declare namespace App {
             merchant_account: string;
             merchant_order_no: string;
             mode: string;
+            place_request: string;
+            place_request_timestamp: string;
+            place_response: string;
+            place_response_timestamp: string;
+            notify_request: string;
+            notify_request_timestamp: string;
+            notify_response: string;
+            notify_response_timestamp: string;
+            interaction: string;
+            merchant_order_id: string;
           };
           detail: {
             title: string;

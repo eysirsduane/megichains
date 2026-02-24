@@ -22,3 +22,10 @@ export function postOrderTestPlace(params?: Api.Order.OrderTestPlace) {
     data: params
   });
 }
+
+export function getOrderInteraction(oid: number) {
+  return request<Api.Order.OrderInteraction>({
+    url: `/order/interaction/${oid}`,
+    method: 'get',
+  });
+}

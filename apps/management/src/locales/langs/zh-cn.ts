@@ -298,8 +298,7 @@ const local: App.I18n.Schema = {
     fund_collect: '资金归集',
     fund_collectlog: '归集日志',
     merchant: '商户管理',
-    merchant_list: '商户列表',
-    merchant_place: '测试下单'
+    merchant_list: '商户列表'
   },
   page: {
     login: {
@@ -588,7 +587,17 @@ const local: App.I18n.Schema = {
         merchant_key: '商户key',
         merchant_account: '商户账号',
         merchant_order_no: '商户单号',
-        mode: '形式'
+        mode: '形式',
+        place_request: '下单请求',
+        place_request_timestamp: '下单请求时间',
+        place_response: '下单响应',
+        place_response_timestamp: '下单响应时间',
+        notify_request: '通知请求',
+        notify_request_timestamp: '通知请求时间',
+        notify_response: '通知响应',
+        notify_response_timestamp: '通知响应时间',
+        interaction: '交互详情',
+        merchant_order_id: '订单ID'
       },
       detail: {
         title: '订单明细'

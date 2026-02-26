@@ -1,11 +1,12 @@
 <script setup lang="tsx">
 import { ref } from 'vue';
 import { ElButton, ElPopconfirm, ElTag } from 'element-plus';
-import { enableStatusRecord, userGenderRecord } from '@/constants/business';
-import { fetchGetUserList } from '@/service/api';
+import { userGenderRecord, userStatusRecord } from '@/constants/business';
+import { getUserList } from '@/service/api';
 import { defaultSearchform, useTableOperate, useUIPaginatedTable } from '@/hooks/common/table';
 import { $t } from '@/locales';
-import UserOperateDrawer from './modules/user-operate-drawer.vue';
+import { getHumannessDateTime } from '@/locales/dayjs';
+import UserDetailDrawer from './modules/user-detail-drawer.vue';
 import UserSearch from './modules/user-search.vue';
 
 defineOptions({ name: 'UserManage' });
@@ -15,13 +16,13 @@ const searchParams = ref(getInitSearchParams());
 function getInitSearchParams(): Api.SystemManage.UserSearchParams {
   return {
     current: 1,
-    size: 30,
+    size: 20,
     status: undefined,
     username: undefined,
-    userGender: undefined,
-    nickName: undefined,
-    userPhone: undefined,
-    userEmail: undefined
+    gender: undefined,
+    nickname: undefined,
+    phone: undefined,
+    email: undefined
   };
 }
 
@@ -30,7 +31,7 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
     currentPage: searchParams.value.current,
     pageSize: searchParams.value.size
   },
-  api: () => fetchGetUserList(searchParams.value),
+  api: () => getUserList(searchParams.value),
   transform: response => {
     return defaultSearchform(response);
   },
@@ -41,13 +42,38 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
   columns: () => [
     { prop: 'selection', type: 'selection', width: 48 },
     { prop: 'index', type: 'index', label: $t('common.index'), width: 64 },
-    { prop: 'userName', label: $t('page.manage.user.userName'), minWidth: 100 },
+    { prop: 'display_id', label: $t('page.manage.user.display_id'), width: 120 },
+    { prop: 'username', label: $t('page.manage.user.username'), minWidth: 140 },
     {
-      prop: 'userGender',
-      label: $t('page.manage.user.userGender'),
+      prop: 'status',
+      label: $t('page.manage.user.status'),
+      align: 'center',
+      formatter: row => {
+        if (row.status === undefined) {
+          return '';
+        }
+
+        const tagMap: Record<Api.Common.UserStatus, UI.ThemeColor> = {
+          '': 'info',
+          待审核: 'warning',
+          审核拒绝: 'danger',
+          正常: 'success',
+          冻结: 'info'
+        };
+
+        const label = $t(userStatusRecord[row.status]);
+
+        return <ElTag type={tagMap[row.status]}>{label}</ElTag>;
+      }
+    },
+    { prop: 'avatar', label: $t('page.manage.user.avatar'), minWidth: 100 },
+
+    {
+      prop: 'gender',
+      label: $t('page.manage.user.gender'),
       width: 100,
       formatter: row => {
-        if (row.userGender === undefined) {
+        if (row.gender === undefined) {
           return '';
         }
 
@@ -56,36 +82,38 @@ const { columns, columnChecks, data, getData, getDataByPage, loading, mobilePagi
           2: 'danger'
         };
 
-        const label = $t(userGenderRecord[row.userGender]);
+        const label = $t(userGenderRecord[row.gender]);
 
-        return <ElTag type={tagMap[row.userGender]}>{label}</ElTag>;
+        return <ElTag type={tagMap[row.gender]}>{label}</ElTag>;
       }
     },
-    { prop: 'nickName', label: $t('page.manage.user.nickName'), minWidth: 100 },
-    { prop: 'userPhone', label: $t('page.manage.user.userPhone'), width: 120 },
-    { prop: 'userEmail', label: $t('page.manage.user.userEmail'), minWidth: 200 },
+    { prop: 'nickname', label: $t('page.manage.user.nickname'), minWidth: 100 },
+    { prop: 'email', label: $t('page.manage.user.email'), minWidth: 200 },
+    { prop: 'telegram', label: $t('page.manage.user.telegram'), minWidth: 100 },
+    { prop: 'whatsapp', label: $t('page.manage.user.whatsapp'), minWidth: 100 },
+    { prop: 'wechat', label: $t('page.manage.user.wechat'), minWidth: 100 },
+    { prop: 'other', label: $t('page.manage.user.other'), minWidth: 100 },
     {
-      prop: 'status',
-      label: $t('page.manage.user.userStatus'),
-      align: 'center',
+      prop: 'updated_at',
+      label: $t('common.updated_at'),
+      width: 180,
       formatter: row => {
-        if (row.status === undefined) {
-          return '';
-        }
-
-        const tagMap: Record<Api.Common.EnableStatus, UI.ThemeColor> = {
-          1: 'success',
-          2: 'warning'
-        };
-
-        const label = $t(enableStatusRecord[row.status]);
-
-        return <ElTag type={tagMap[row.status]}>{label}</ElTag>;
+        return getHumannessDateTime(row.updated_at);
+      }
+    },
+    {
+      prop: 'created_at',
+      label: $t('common.created_at'),
+      width: 180,
+      formatter: row => {
+        return getHumannessDateTime(row.created_at);
       }
     },
     {
       prop: 'operate',
       label: $t('common.operate'),
+      fixed: 'right',
+      width: 140,
       align: 'center',
       formatter: row => (
         <div class="flex-center">
@@ -183,7 +211,8 @@ function edit(id: number) {
           @size-change="mobilePagination['size-change']"
         />
       </div>
-      <UserOperateDrawer
+
+      <UserDetailDrawer
         v-model:visible="drawerVisible"
         :operate-type="operateType"
         :row-data="editingData"

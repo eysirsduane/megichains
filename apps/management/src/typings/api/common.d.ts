@@ -70,5 +70,6 @@ declare namespace Api {
     type AddressStatus = '' | '禁用' | '空闲' | '占用';
     type AddressGroupStatus = '' | '禁用' | '开放';
     type TronContractAddresses = '' | 'TXLAQ63Xg1NAzckPwKHvzw7CSEmLMEqcdj' | 'TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf';
+    type UserStatus = '' | '待审核' | '审核拒绝' | '正常' | '冻结';
   }
 }

@@ -52,7 +52,7 @@ const {
     nickName: '',
     userPhone: '',
     userEmail: '',
-    userRoles: [],
+    roles: [],
     status: undefined
   } as UserModel,
   resetAfterSubmiting: true
@@ -80,7 +80,7 @@ const roleOptions = computed<CommonType.Option<string>[]>(() => {
 
   // the mock data does not have the roleCode, so fill it
   // if the real request, remove the following code
-  const userRoleOptions = form.value.userRoles.map(item => ({
+  const userRoleOptions = form.value.roles.map(item => ({
     label: item,
     value: item
   }));
@@ -145,7 +145,7 @@ watch(visible, () => {
       </ElFormItem>
       <ElFormItem :label="$t('page.manage.user.userRole')" prop="roles">
         <ElSelect
-          v-model="form.userRoles"
+          v-model="form.roles"
           multiple
           :loading="loading"
           :placeholder="$t('page.manage.user.form.userRole')"

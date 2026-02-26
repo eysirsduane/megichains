@@ -76,10 +76,24 @@ export const addressStatusRecord: Record<Api.Common.AddressStatus, App.I18n.I18n
   空闲: 'common.vacant',
   占用: 'common.inuse'
 };
+
 export const addressGroupStatusRecord: Record<Api.Common.AddressGroupStatus, App.I18n.I18nKey> = {
   '': 'common.all',
   禁用: 'common.ban',
   开放: 'common.open'
+};
+
+export const userStatusRecord: Record<Api.Common.UserStatus, App.I18n.I18nKey> = {
+  '': 'common.all',
+  待审核: 'common.proved',
+  审核拒绝: 'common.rejected',
+  正常: 'common.normal',
+  冻结: 'common.frozen'
+};
+
+export const userGenderRecord: Record<Api.SystemManage.UserGender, App.I18n.I18nKey> = {
+  '1': 'common.male',
+  '2': 'common.female'
 };
 
 export const orderTypoOptions = transformRecordToOption(orderTyposRecord);
@@ -92,3 +106,4 @@ export const addressTyposOptions = transformRecordToOption(addressTyposRecord);
 export const addressStatusOptions = transformRecordToOption(addressStatusRecord);
 export const addressGroupStatusOptions = transformRecordToOption(addressGroupStatusRecord);
 export const collectLogStatusOptions = transformRecordToOption(collectLogStatusRecord);
+export const userStatusOptions = transformRecordToOption(userStatusRecord);

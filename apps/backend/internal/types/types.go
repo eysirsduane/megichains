@@ -485,3 +485,28 @@ type UserInfoGetResp struct {
 	Id       int64  `json:"id"`
 	Username string `json:"username"`
 }
+
+type UserItem struct {
+	Id        int64  `json:"id"`
+	DispalyId string `json:"display_id"`
+	Username  string `json:"username"`
+	Nickname  string `json:"nickname"`
+	Status    string `json:"status"`
+	Avatar    string `json:"avatar"`
+	Telegram  string `json:"telegram"`
+	WhatsApp  string `json:"whatsapp"`
+	WeChat    string `json:"wechat"`
+	Other     string `json:"other"`
+	TimeAts
+}
+
+type UserListGetReq struct {
+	Pages
+	StartEnd
+	Username string `form:"username,optional"`
+}
+
+type UserListGetResp struct {
+	Records []*UserItem `json:"records"`
+	PagesBody
+}

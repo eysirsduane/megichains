@@ -57,7 +57,7 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'address',
       i18nKey: 'route.address',
-      icon: 'logos:appcenter-icon',
+      icon: 'logos:fastlane',
       order: 6,
       keepAlive: true
     },
@@ -343,9 +343,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     meta: {
       title: 'manage',
       i18nKey: 'route.manage',
-      icon: 'carbon:cloud-service-management',
-      order: 9,
-      roles: ['R_ADMIN']
+      icon: 'logos:heap-icon',
+      order: 11
     },
     children: [
       {
@@ -354,11 +353,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.manage_menu',
         meta: {
           title: 'manage_menu',
-          i18nKey: 'route.manage_menu',
-          icon: 'material-symbols:route',
-          order: 3,
-          roles: ['R_ADMIN'],
-          keepAlive: true
+          i18nKey: 'route.manage_menu'
         }
       },
       {
@@ -367,10 +362,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.manage_role',
         meta: {
           title: 'manage_role',
-          i18nKey: 'route.manage_role',
-          icon: 'carbon:user-role',
-          order: 2,
-          roles: ['R_SUPER']
+          i18nKey: 'route.manage_role'
         }
       },
       {
@@ -380,22 +372,16 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'manage_user',
           i18nKey: 'route.manage_user',
-          icon: 'ic:round-manage-accounts',
-          order: 1,
-          roles: ['R_ADMIN']
+          icon: 'ic:round-manage-accounts'
         }
       },
       {
         name: 'manage_user-detail',
         path: '/manage/user-detail/:id',
         component: 'view.manage_user-detail',
-        props: true,
         meta: {
           title: 'manage_user-detail',
-          i18nKey: 'route.manage_user-detail',
-          hideInMenu: true,
-          roles: ['R_ADMIN'],
-          activeMenu: 'manage_user'
+          i18nKey: 'route.manage_user-detail'
         }
       }
     ]
@@ -494,7 +480,7 @@ export const generatedRoutes: GeneratedRoute[] = [
       title: 'order',
       i18nKey: 'route.order',
       order: 5,
-      icon: 'logos:descript-icon'
+      icon: 'logos:flowxo'
     },
     children: [
       {

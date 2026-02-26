@@ -56,3 +56,31 @@ func (s *UserService) Get(username string) (userinfo *converter.UserInfo, err er
 
 	return
 }
+
+func (s *UserService) Find(req *converter.UserListGetReq) (resp *converter.RespConverter[*converter.UserItem], err error) {
+	db := s.db.Model(&entity.User{}).Where("status = ?", global.UserStatusNormal)
+	if req.Username != "" {
+		db = db.Where("username = ?", req.Username)
+	}
+
+	users := make([]*entity.User, 0)
+	if err = db.Session(&gorm.Session{}).Find(&users).Error; err != nil {
+		logx.Errorf("user service find user list failed, req:%v, err:%v", req, err)
+		err = biz.UserListGetFailed
+		return
+	}
+
+	count := int64(0)
+	if err = db.Session(&gorm.Session{}).Count(&count).Error; err != nil {
+		logx.Errorf("user service find user list count failed, req:%v, err:%v", req, err)
+		err = biz.UserListCountFailed
+		return
+	}
+
+	items := make([]*converter.UserItem, 0)
+	copier.Copy(&items, &users)
+
+	resp = converter.ConvertToPagingRecordsResp[*converter.UserItem](items, req.Current, req.Size, count)
+
+	return
+}

@@ -109,7 +109,7 @@ function getTableValue(col: UI.TableColumn<Api.SystemManage.User>, item: Api.Sys
   }
 
   if (prop === 'userRoles') {
-    return item.userRoles.map(role => role).join(',');
+    return item.roles.map(role => role).join(',');
   }
 
   if (prop === 'status') {

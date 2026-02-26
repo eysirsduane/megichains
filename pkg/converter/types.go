@@ -454,3 +454,31 @@ type OrderInteractionResp struct {
 	Description             string `json:"description"`
 	TimeAts
 }
+
+type UserItem struct {
+	Id        int64  `json:"id"`
+	DisplayId int32  `json:"display_id"`
+	Username  string `json:"username"`
+	Nickname  string `json:"nickname"`
+	Avatar    string `json:"avatar"`
+
+	Status string `json:"status"`
+
+	Telegram string `json:"telegram"`
+	WhatsApp string `json:"whatsapp"`
+	WeChat   string `json:"wechat"`
+	Other    string `json:"other"`
+
+	TimeAts
+}
+
+type UserListGetReq struct {
+	Pages
+	StartEnd
+	Username string `form:"username,optional"`
+}
+
+type UserListGetResp struct {
+	Records []*UserItem `json:"records"`
+	PagesBody
+}

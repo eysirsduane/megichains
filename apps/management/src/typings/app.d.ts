@@ -399,6 +399,12 @@ declare namespace App {
         detail: string;
         merchant_request: string;
         merchant_response: string;
+        proved: string;
+        rejected: string;
+        normal: string;
+        frozen: string;
+        male: string;
+        female: string;
       };
       request: {
         logout: string;
@@ -641,27 +647,29 @@ declare namespace App {
           user: {
             title: string;
             username: string;
-            userGender: string;
-            nickName: string;
-            userPhone: string;
-            userEmail: string;
-            userStatus: string;
-            userRole: string;
+            nickname: string;
+            gender: string;
+            phone: string;
+            email: string;
+            status: string;
+            role: string;
+            display_id: string;
+            avatar: string;
+            telegram: string;
+            whatsapp: string;
+            wechat: string;
+            other: string;
             form: {
               username: string;
-              userGender: string;
-              nickName: string;
-              userPhone: string;
-              userEmail: string;
-              userStatus: string;
-              userRole: string;
+              gender: string;
+              nickname: string;
+              phone: string;
+              email: string;
+              status: string;
+              role: string;
             };
             addUser: string;
             editUser: string;
-            gender: {
-              male: string;
-              female: string;
-            };
           };
           menu: {
             home: string;

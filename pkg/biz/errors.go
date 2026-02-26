@@ -31,6 +31,8 @@ var (
 	GenerateHashPasswordFailed      = NewSpecificError(3004, "生成密码失败")
 	UserCreateFailed                = NewSpecificError(3005, "创建用户失败")
 	UserGetFailed                   = NewSpecificError(3006, "获取用户信息失败")
+	UserListGetFailed               = NewSpecificError(3007, "获取用户列表失败")
+	UserListCountFailed             = NewSpecificError(3008, "统计用户列表失败")
 )
 
 var (

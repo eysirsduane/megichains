@@ -26,6 +26,6 @@ export function postOrderTestPlace(params?: Api.Order.OrderTestPlace) {
 export function getOrderInteraction(oid: number) {
   return request<Api.Order.OrderInteraction>({
     url: `/order/interaction/${oid}`,
-    method: 'get',
+    method: 'get'
   });
 }

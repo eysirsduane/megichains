@@ -15,6 +15,7 @@ import (
 	order "megichains/apps/backend/internal/handler/order"
 	solana "megichains/apps/backend/internal/handler/solana"
 	tron "megichains/apps/backend/internal/handler/tron"
+	user "megichains/apps/backend/internal/handler/user"
 	"megichains/apps/backend/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -250,6 +251,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/tron/trans/list",
 					Handler: tron.TronTransListHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithPrefix("/v1"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckMiddleware.Handle},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/user/list",
+					Handler: user.UserListGetHandler(serverCtx),
 				},
 			}...,
 		),

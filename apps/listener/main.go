@@ -12,9 +12,9 @@ import (
 	"megichains/pkg/global"
 	"megichains/pkg/service"
 
-	"megichains/apps/gateway/internal/handler"
-	"megichains/apps/gateway/internal/middleware"
-	"megichains/apps/gateway/internal/svc"
+	"megichains/apps/listener/internal/handler"
+	"megichains/apps/listener/internal/middleware"
+	"megichains/apps/listener/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -51,7 +51,7 @@ func main() {
 	addrservice := service.NewAddressService(db)
 	orderservice := service.NewMerchOrderService(db)
 	tronservice := service.NewTronService(db)
-	chainservice := service.NewChainService(&cfg, db)
+	chainservice := service.NewChainService(&cfg, db, userservice)
 	solanaservice := service.NewSolanaService(db)
 	listenservice := service.NewListenService(&cfg, db, merchservice, addrservice, orderservice, chainservice, evmservice, tronservice, solanaservice)
 	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)

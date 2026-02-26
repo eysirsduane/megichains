@@ -6,8 +6,8 @@ package chain
 import (
 	"context"
 
-	"megichains/apps/gateway/internal/svc"
-	"megichains/apps/gateway/internal/types"
+	"megichains/apps/listener/internal/svc"
+	"megichains/apps/listener/internal/types"
 	"megichains/pkg/biz"
 	"megichains/pkg/converter"
 	"megichains/pkg/global"

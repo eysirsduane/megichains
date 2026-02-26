@@ -4,7 +4,7 @@
 package svc
 
 import (
-	"megichains/apps/gateway/internal/middleware"
+	"megichains/apps/listener/internal/middleware"
 	"megichains/pkg/global"
 	"megichains/pkg/service"
 )

@@ -322,7 +322,6 @@ type AddressFundCollectListReq struct {
 
 type AddressFundCollectItem struct {
 	Id                  int64   `json:"id"`
-	UserId              string  `json:"user_id"`
 	Username            string  `json:"username"`
 	AddressGroupId      int64   `json:"address_group_id"`
 	AddressGroupName    string  `json:"address_group_name"`
@@ -387,7 +386,6 @@ type AddressFundCollectLogItem struct {
 }
 
 type UserInfo struct {
-	Id       string
 	Username string
 }
 

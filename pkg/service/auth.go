@@ -24,7 +24,7 @@ func NewAuthService(db *gorm.DB, asecret string, aexpire int64, rsecret string, 
 
 func (s *AuthService) Login(username, password string) (atoken, rtoken string, err error) {
 	user := &entity.User{}
-	err = s.db.Model(&entity.User{}).Where("username = ?", username).First(user).Error
+	err = s.db.Model(&entity.User{}).Where("username = ? and status = ?", username, global.UserStatusNormal).First(user).Error
 	if err != nil {
 		logx.Errorf("auth service login canot find username failed, un:%v, err:%v", username, err)
 		err = biz.UserUsernameOrPasswordIncorrect
@@ -37,14 +37,14 @@ func (s *AuthService) Login(username, password string) (atoken, rtoken string, e
 		return
 	}
 
-	atoken, err = global.GenerateToken(user.Id, user.Username, s.asecret, s.aexpire, s.issuer)
+	atoken, err = global.GenerateToken(user.Username, s.asecret, s.aexpire, s.issuer)
 	if err != nil {
 		logx.Errorf("auth service login generate token failed, err:%v", err)
 		err = biz.UserLoginGenerateTokenFailed
 		return
 	}
 
-	rtoken, err = global.GenerateRefreshToken(user.Id, user.Username, s.rsecret, s.rexpire, s.issuer)
+	rtoken, err = global.GenerateRefreshToken(user.Username, s.rsecret, s.rexpire, s.issuer)
 	if err != nil {
 		logx.Errorf("auth service login generate token failed, err:%v", err)
 		err = biz.UserLoginGenerateTokenFailed
@@ -62,13 +62,13 @@ func (s *AuthService) RefreshToken(otoken string, secrect string) (atoken, rtoke
 	}
 
 	// 根据 refresh token 生成新的 token
-	atoken, err = global.GenerateToken(claims.UserID, claims.Username, s.asecret, s.aexpire, s.issuer)
+	atoken, err = global.GenerateToken(claims.Username, s.asecret, s.aexpire, s.issuer)
 	if err != nil {
 		logx.Errorf("auth service refresh token generate new token failed, err:%v", err)
 		return
 	}
 
-	rtoken, err = global.GenerateRefreshToken(claims.UserID, claims.Username, s.rsecret, s.rexpire, s.issuer)
+	rtoken, err = global.GenerateRefreshToken(claims.Username, s.rsecret, s.rexpire, s.issuer)
 	if err != nil {
 		logx.Errorf("auth service refresh token generate new refresh token failed, err:%v", err)
 		return

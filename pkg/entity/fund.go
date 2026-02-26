@@ -2,7 +2,7 @@ package entity
 
 type AddressFundCollect struct {
 	Id             int64  `gorm:"primaryKey;autoIncrement"`
-	UserId         string `gorm:"size:63"`
+	Username       string `gorm:"size:64"`
 	AddressGroupId int64  `gorm:""`
 
 	Chain           string  `gorm:"size:31"`

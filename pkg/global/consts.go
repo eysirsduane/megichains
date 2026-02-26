@@ -10,6 +10,15 @@ const (
 	TimeFormat     = "15:04:05"
 )
 
+type UserStatus string
+
+const (
+	UserStatusProved   UserStatus = "待审核"
+	UserStatusRejected UserStatus = "审核拒绝"
+	UserStatusNormal   UserStatus = "正常"
+	UserStatusFrozen   UserStatus = "冻结"
+)
+
 type AddressTypo string
 
 const (

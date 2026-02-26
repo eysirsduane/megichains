@@ -29,12 +29,12 @@ func NewAddressFundCollectLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *AddressFundCollectLogic) AddressFundCollect(req *types.AddressFundCollectReq) (resp *types.AddressFundCollectResp, err error) {
-	uid := l.ctx.Value("user_id").(string)
+	un := l.ctx.Value("username").(string)
 	
 	reqc := &converter.AddressFundCollectReq{}
 	copier.Copy(reqc, req)
 
-	res, err := l.svcCtx.ChainService.Collect(l.ctx, uid, reqc)
+	res, err := l.svcCtx.ChainService.Collect(l.ctx, un, reqc)
 	if err != nil {
 		logx.Errorf("address fund collect failed, err:%v", err)
 		return

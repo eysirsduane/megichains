@@ -60,7 +60,7 @@ func main() {
 	merchservice := service.NewMerchService(db)
 	addrservice := service.NewAddressService(db)
 	orderservice := service.NewMerchOrderService(db)
-	chainservice := service.NewChainService(&cfg, db)
+	chainservice := service.NewChainService(&cfg, db, userservice)
 	evmservice := service.NewEvmService(db)
 	tronservice := service.NewTronService(db)
 	solanaservice := service.NewSolanaService(db)

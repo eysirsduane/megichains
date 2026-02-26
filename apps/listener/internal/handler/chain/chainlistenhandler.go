@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"megichains/apps/gateway/internal/logic/chain"
-	"megichains/apps/gateway/internal/svc"
-	"megichains/apps/gateway/internal/types"
+	"megichains/apps/listener/internal/logic/chain"
+	"megichains/apps/listener/internal/svc"
+	"megichains/apps/listener/internal/types"
 )
 
 func ChainListenHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

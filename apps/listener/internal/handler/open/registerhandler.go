@@ -1,27 +1,27 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package auth
+package open
 
 import (
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"megichains/apps/gateway/internal/logic/auth"
-	"megichains/apps/gateway/internal/svc"
-	"megichains/apps/gateway/internal/types"
+	"megichains/apps/listener/internal/logic/open"
+	"megichains/apps/listener/internal/svc"
+	"megichains/apps/listener/internal/types"
 )
 
-func UserInfoGetHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func RegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.UserInfoGetReq
+		var req types.RegisterReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := auth.NewUserInfoGetLogic(r.Context(), svcCtx)
-		resp, err := l.UserInfoGet(&req)
+		l := open.NewRegisterLogic(r.Context(), svcCtx)
+		resp, err := l.Register(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

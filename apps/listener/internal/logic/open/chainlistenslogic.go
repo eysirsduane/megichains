@@ -1,13 +1,13 @@
 // Code scaffolded by goctl. Safe to edit.
 // goctl 1.9.2
 
-package chain
+package open
 
 import (
 	"context"
 
-	"megichains/apps/gateway/internal/svc"
-	"megichains/apps/gateway/internal/types"
+	"megichains/apps/listener/internal/svc"
+	"megichains/apps/listener/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,8 +27,6 @@ func NewChainListensLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Chai
 }
 
 func (l *ChainListensLogic) ChainListens() (resp *types.Response, err error) {
-	// todo: add your logic here and delete this line
-
 	l.svcCtx.ListenService.ListenMany()
 
 	return

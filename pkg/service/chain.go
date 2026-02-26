@@ -51,10 +51,11 @@ type ChainService struct {
 	BscClinet    *ethclient.Client
 	EthClient    *ethclient.Client
 	SolanaClient *rpc.Client
+	UserService  *UserService
 }
 
-func NewChainService(cfg *global.BackendesConfig, db *gorm.DB) *ChainService {
-	return &ChainService{cfg: cfg, db: db}
+func NewChainService(cfg *global.BackendesConfig, db *gorm.DB, user *UserService) *ChainService {
+	return &ChainService{cfg: cfg, db: db, UserService: user}
 }
 
 func (s *ChainService) initChainClient(chain global.ChainName) (err error) {
@@ -424,7 +425,7 @@ func (s *ChainService) getContractAddress(currency global.CurrencyTypo, chain st
 	return
 }
 
-func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.AddressFundCollectReq) (resp *converter.AddressFundCollectResp, err error) {
+func (s *ChainService) Collect(ctx context.Context, un string, req *converter.AddressFundCollectReq) (resp *converter.AddressFundCollectResp, err error) {
 	// s.ScanAddressesFunds(global.ChainNameSolana)
 	// return
 	// s.ReEncryptPrivateKey()
@@ -530,7 +531,7 @@ func (s *ChainService) Collect(ctx context.Context, uid string, req *converter.A
 	}
 
 	collect := &entity.AddressFundCollect{
-		UserId:          uid,
+		Username:        un,
 		AddressGroupId:  req.AddressGroupId,
 		Chain:           req.Chain,
 		Currency:        req.Currency,

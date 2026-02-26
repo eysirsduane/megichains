@@ -30,6 +30,7 @@ var (
 	UserLoginGenerateTokenFailed    = NewSpecificError(3003, "生成token失败")
 	GenerateHashPasswordFailed      = NewSpecificError(3004, "生成密码失败")
 	UserCreateFailed                = NewSpecificError(3005, "创建用户失败")
+	UserGetFailed                   = NewSpecificError(3006, "获取用户信息失败")
 )
 
 var (

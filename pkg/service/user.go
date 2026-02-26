@@ -29,7 +29,7 @@ func (s *UserService) Create(username, password string) (success bool, err error
 		return
 	}
 
-	user := &entity.User{Id: strings.ReplaceAll(uuid.NewString(), "-", ""), Username: username, Password: hash}
+	user := &entity.User{Id: strings.ReplaceAll(uuid.NewString(), "-", ""), Username: username, Password: hash, Status: string(global.UserStatusProved)}
 	err = s.db.Model(&entity.User{}).Create(user).Error
 	if err != nil {
 		logx.Errorf("user service create user failed, username:%v, password:%v, err:%v", username, password, err)
@@ -44,10 +44,10 @@ func (s *UserService) Create(username, password string) (success bool, err error
 
 func (s *UserService) Get(username string) (userinfo *converter.UserInfo, err error) {
 	user := &entity.User{}
-	err = s.db.Model(&entity.User{}).Where("username = ?", username).First(user).Error
+	err = s.db.Model(&entity.User{}).Where("username = ? and status = ?", username, global.UserStatusNormal).First(user).Error
 	if err != nil {
 		logx.Errorf("user service get user info failed, username:%v,  err:%v", username, err)
-		err = biz.UserCreateFailed
+		err = biz.UserGetFailed
 		return
 	}
 

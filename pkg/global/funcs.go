@@ -30,14 +30,12 @@ func GetUsdt2TrxAmount(rate float64, amount float64, discount float64) (eamount,
 }
 
 type Claims struct {
-	UserID   string `json:"user_id"`
 	Username string `json:"username"`
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(uid string, username, secret string, expire int64, issuer string) (token string, err error) {
+func GenerateToken(username, secret string, expire int64, issuer string) (token string, err error) {
 	claims := Claims{
-		uid,
 		username,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(expire))),
@@ -54,9 +52,8 @@ func GenerateToken(uid string, username, secret string, expire int64, issuer str
 	return
 }
 
-func GenerateRefreshToken(uid string, username, secret string, expire int64, issuer string) (token string, err error) {
+func GenerateRefreshToken(username, secret string, expire int64, issuer string) (token string, err error) {
 	claims := Claims{
-		UserID:   uid,
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(expire))),

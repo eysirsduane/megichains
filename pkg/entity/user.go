@@ -10,6 +10,8 @@ type User struct {
 	Username string `gorm:"size:63;uniqueIndex"`
 	Password string `gorm:"size:255"`
 
+	Status string `gorm:"size:15"`
+
 	Contacts `gorm:"embedded"`
 	TimeAts  `gorm:"embedded"`
 }

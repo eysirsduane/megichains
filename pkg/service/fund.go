@@ -73,7 +73,7 @@ func (s *FundService) FindCollectList(ctx context.Context, req *converter.Addres
 	}
 
 	items := make([]*converter.AddressFundCollectItem, 0)
-	err = db.Session(&gorm.Session{}).Select("address_fund_collects.*, address_groups.name as address_group_name, users.username as username").Joins("left join address_groups on address_fund_collects.address_group_id = address_groups.id").Joins("left join users on address_fund_collects.user_id = users.id").Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Scan(&items).Error
+	err = db.Session(&gorm.Session{}).Select("address_fund_collects.*, address_groups.name as address_group_name").Joins("left join address_groups on address_fund_collects.address_group_id = address_groups.id").Offset(global.Offset(req.Current, req.Size)).Limit(req.Size).Scan(&items).Error
 	if err != nil {
 		logx.Errorf("address fund collect list paging failed, err:%v", err)
 		err = biz.AddressFundCollectFindFailed

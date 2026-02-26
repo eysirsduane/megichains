@@ -501,7 +501,8 @@ service backend {
 	// goctl 生成代码时会将当前 service 代码块下的接口
 	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
 	// 等信息配置的 golang 结构体名称
-	jwt: Auth
+	jwt:        Auth
+	middleware: CheckMiddleware
 	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
 	group: auth
 	// 定义路由前缀为 "/v1"
@@ -523,7 +524,8 @@ service backend {
 	// goctl 生成代码时会将当前 service 代码块下的接口
 	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
 	// 等信息配置的 golang 结构体名称
-	jwt: Auth
+	jwt:        Auth
+	middleware: CheckMiddleware
 	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
 	group: merchant
 	// 定义路由前缀为 "/v1"
@@ -547,7 +549,8 @@ service backend {
 	// 等信息配置的 golang 结构体名称
 	jwt: Auth
 	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
-	group: order
+	middleware: CheckMiddleware
+	group:      order
 	// 定义路由前缀为 "/v1"
 	prefix: /v1
 )
@@ -570,7 +573,8 @@ service backend {
 	// goctl 生成代码时会将当前 service 代码块下的接口
 	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
 	// 等信息配置的 golang 结构体名称
-	jwt: Auth
+	jwt:        Auth
+	middleware: CheckMiddleware
 	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
 	group: tron
 	// 定义路由前缀为 "/v1"
@@ -589,7 +593,8 @@ service backend {
 	// goctl 生成代码时会将当前 service 代码块下的接口
 	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
 	// 等信息配置的 golang 结构体名称
-	jwt: Auth
+	jwt:        Auth
+	middleware: CheckMiddleware
 	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
 	group: evm
 	// 定义路由前缀为 "/v1"
@@ -605,7 +610,8 @@ service backend {
 	// goctl 生成代码时会将当前 service 代码块下的接口
 	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
 	// 等信息配置的 golang 结构体名称
-	jwt: Auth
+	jwt:        Auth
+	middleware: CheckMiddleware
 	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
 	group: solana
 	// 定义路由前缀为 "/v1"
@@ -621,7 +627,8 @@ service backend {
 	// goctl 生成代码时会将当前 service 代码块下的接口
 	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
 	// 等信息配置的 golang 结构体名称
-	jwt: Auth
+	jwt:        Auth
+	middleware: CheckMiddleware
 	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
 	group: address
 	// 定义路由前缀为 "/v1"
@@ -658,7 +665,8 @@ service backend {
 	// goctl 生成代码时会将当前 service 代码块下的接口
 	// 信息添加上 jwt 相关代码，Auth 值为 jwt 密钥，过期
 	// 等信息配置的 golang 结构体名称
-	jwt: Auth
+	jwt:        Auth
+	middleware: CheckMiddleware
 	// 代表当前 service 代码块下的路由生成代码时都会被放到 user 目录下
 	group: fund
 	// 定义路由前缀为 "/v1"

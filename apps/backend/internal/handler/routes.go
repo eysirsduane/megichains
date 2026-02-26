@@ -22,141 +22,156 @@ import (
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/address/detail",
-				Handler: address.AddressDetailHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/address/generate",
-				Handler: address.AddressGenerateHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/address/group/all",
-				Handler: address.AddressGroupAllHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/address/group/detail",
-				Handler: address.AddressGroupDetailHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/address/group/list",
-				Handler: address.AddressGroupListHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/address/group/save",
-				Handler: address.AddressGroupSaveHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/address/list",
-				Handler: address.AddressListHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/address/save",
-				Handler: address.AddressSaveHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckMiddleware.Handle},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/address/detail",
+					Handler: address.AddressDetailHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/address/generate",
+					Handler: address.AddressGenerateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/address/group/all",
+					Handler: address.AddressGroupAllHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/address/group/detail",
+					Handler: address.AddressGroupDetailHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/address/group/list",
+					Handler: address.AddressGroupListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/address/group/save",
+					Handler: address.AddressGroupSaveHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/address/list",
+					Handler: address.AddressListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/address/save",
+					Handler: address.AddressSaveHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodPost,
-				Path:    "/auth/token/refresh",
-				Handler: auth.RefreshTokenHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/auth/user/create",
-				Handler: auth.UserCreateHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/auth/user/info",
-				Handler: auth.UserInfoGetHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckMiddleware.Handle},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/auth/token/refresh",
+					Handler: auth.RefreshTokenHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/auth/user/create",
+					Handler: auth.UserCreateHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/auth/user/info",
+					Handler: auth.UserInfoGetHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/evm/log/list",
-				Handler: evm.EvmLogListHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckMiddleware.Handle},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/evm/log/list",
+					Handler: evm.EvmLogListHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodPost,
-				Path:    "/fund/collect",
-				Handler: fund.AddressFundCollectHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/fund/collect/list",
-				Handler: fund.AddressFundCollectListHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/fund/collect/log/:id",
-				Handler: fund.AddressFundCollectLogDetailHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/fund/collect/log/list",
-				Handler: fund.AddressFundCollectLogListHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/fund/list",
-				Handler: fund.AddressFundListHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/fund/statistics",
-				Handler: fund.AddressFundStatisticsHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckMiddleware.Handle},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/fund/collect",
+					Handler: fund.AddressFundCollectHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/fund/collect/list",
+					Handler: fund.AddressFundCollectListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/fund/collect/log/:id",
+					Handler: fund.AddressFundCollectLogDetailHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/fund/collect/log/list",
+					Handler: fund.AddressFundCollectLogListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/fund/list",
+					Handler: fund.AddressFundListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/fund/statistics",
+					Handler: fund.AddressFundStatisticsHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/merchant/detail/:id",
-				Handler: merchant.MerchantDetailHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/merchant/list",
-				Handler: merchant.MerchantListHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/merchant/save",
-				Handler: merchant.MerchantSaveHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckMiddleware.Handle},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/merchant/detail/:id",
+					Handler: merchant.MerchantDetailHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/merchant/list",
+					Handler: merchant.MerchantListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/merchant/save",
+					Handler: merchant.MerchantSaveHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
@@ -178,57 +193,66 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/order/detail",
-				Handler: order.OrderDetailHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/order/interaction/:merchant_order_id",
-				Handler: order.OrderInteractionHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/order/list",
-				Handler: order.OrderListHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/order/test/place",
-				Handler: order.OrderTestPlaceHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckMiddleware.Handle},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/order/detail",
+					Handler: order.OrderDetailHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/order/interaction/:merchant_order_id",
+					Handler: order.OrderInteractionHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/order/list",
+					Handler: order.OrderListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/order/test/place",
+					Handler: order.OrderTestPlaceHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/solana/trans/list",
-				Handler: solana.SolanaTransListHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckMiddleware.Handle},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/solana/trans/list",
+					Handler: solana.SolanaTransListHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/tron/trans/detail",
-				Handler: tron.TronTransDetailHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/tron/trans/list",
-				Handler: tron.TronTransListHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckMiddleware.Handle},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/tron/trans/detail",
+					Handler: tron.TronTransDetailHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/tron/trans/list",
+					Handler: tron.TronTransListHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)

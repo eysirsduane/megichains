@@ -15,6 +15,7 @@ import (
 	"megichains/pkg/service"
 
 	"megichains/apps/backend/internal/handler"
+	"megichains/apps/backend/internal/middleware"
 	"megichains/apps/backend/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/conf"
@@ -54,6 +55,8 @@ func main() {
 	}))
 	defer server.Stop()
 
+	check := middleware.NewCheckMiddleware(db)
+
 	excfgservice := service.NewRangeConfigService(db)
 	authservice := service.NewAuthService(db, cfg.Auth.AccessSecret, cfg.Auth.AccessExpire, cfg.Auth.RefreshSecret, cfg.Auth.RefreshExpire, cfg.Auth.Issuer)
 	userservice := service.NewUserService(db)
@@ -66,7 +69,7 @@ func main() {
 	solanaservice := service.NewSolanaService(db)
 	listenservice := service.NewListenService(&cfg, db, merchservice, addrservice, orderservice, chainservice, evmservice, tronservice, solanaservice)
 	fundservice := service.NewFundService(db)
-	ctx := svc.NewServiceContext(cfg, excfgservice, authservice, userservice, merchservice, addrservice, orderservice, chainservice, listenservice, tronservice, evmservice, fundservice, solanaservice)
+	ctx := svc.NewServiceContext(cfg, check, excfgservice, authservice, userservice, merchservice, addrservice, orderservice, chainservice, listenservice, tronservice, evmservice, fundservice, solanaservice)
 	handler.RegisterHandlers(server, ctx)
 
 	httpx.SetOkHandler(biz.OkHandler)

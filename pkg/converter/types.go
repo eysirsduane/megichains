@@ -70,7 +70,6 @@ type ChainListenReq struct {
 	Mode            string           `json:"mode"`
 	Chain           global.ChainName `json:"chain"`
 	Currency        string           `json:"currency"`
-	Receiver        string           `json:"receiver"`
 	Seconds         int64            `json:"seconds"`
 	NotifyUrl       string           `json:"notify_url"`
 }

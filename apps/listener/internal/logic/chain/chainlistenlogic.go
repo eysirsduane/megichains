@@ -32,10 +32,10 @@ func NewChainListenLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Chain
 
 func (l *ChainListenLogic) ChainListen(req *types.ChainListenReq) (resp *types.ChainListenResp, err error) {
 	exist := false
-	rkey := global.GetOrderAddressKey(string(req.Chain), req.Receiver, req.Currency)
+	rkey := global.GetOrderAddressKey(string(req.Chain), "", req.Currency)
 	l.svcCtx.ListenService.Receivers.Range(func(key, val any) bool {
 		if key == rkey {
-			logx.Infof("已存在监听地址, chain:%v, receiver:%v, currency:%v", req.Chain, req.Receiver, req.Currency)
+			logx.Infof("已存在监听地址, chain:%v, currency:%v", req.Chain, req.Currency)
 			exist = true
 			return false
 		}

@@ -353,7 +353,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.manage_menu',
         meta: {
           title: 'manage_menu',
-          i18nKey: 'route.manage_menu'
+          i18nKey: 'route.manage_menu',
+          hideInMenu: true
         }
       },
       {
@@ -362,7 +363,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.manage_role',
         meta: {
           title: 'manage_role',
-          i18nKey: 'route.manage_role'
+          i18nKey: 'route.manage_role',
+          hideInMenu: true
         }
       },
       {
@@ -381,7 +383,8 @@ export const generatedRoutes: GeneratedRoute[] = [
         component: 'view.manage_user-detail',
         meta: {
           title: 'manage_user-detail',
-          i18nKey: 'route.manage_user-detail'
+          i18nKey: 'route.manage_user-detail',
+          hideInMenu: true
         }
       }
     ]
@@ -490,6 +493,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'order_evm',
           i18nKey: 'route.order_evm',
+          icon: 'gridicons:posts',
           order: 2,
           keepAlive: true
         }
@@ -513,6 +517,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'order_solana',
           i18nKey: 'route.order_solana',
+          icon: 'gridicons:posts',
           order: 4,
           keepAlive: true
         }
@@ -524,6 +529,7 @@ export const generatedRoutes: GeneratedRoute[] = [
         meta: {
           title: 'order_tron',
           i18nKey: 'route.order_tron',
+          icon: 'gridicons:posts',
           order: 3,
           keepAlive: true
         }

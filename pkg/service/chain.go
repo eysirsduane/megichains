@@ -95,11 +95,13 @@ func (s *ChainService) initChainClient(chain global.ChainName) (err error) {
 
 func (s *ChainService) EncryptPrivateKey() {
 	ctx := context.Background()
+
 	addrs, err := gorm.G[entity.Address](s.db).Where("chain = ? and id = 1102", global.ChainNameSolana).Order("id asc").Find(ctx)
 	if err != nil {
 		logx.Errorf("encrypt private key address find failed, err:%v", err)
 		return
 	}
+
 	for _, addr := range addrs {
 		encrypted, err := crypt.EncryptEthPrivateKey(addr.PrivateKey, crypt.PrivateKeySecretSalt)
 		if err != nil {

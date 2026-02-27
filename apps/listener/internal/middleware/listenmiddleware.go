@@ -113,12 +113,11 @@ func (m *ListenMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			Status:          string(global.OrderStatusCreated),
 			NotifyStatus:    string(global.NotifyStatusUnknown),
 			Currency:        string(req.Currency),
-			ToAddress:       req.Receiver,
 			Description:     "",
 		}
 		err = m.db.Create(order).Error
 		if err != nil {
-			logx.Errorf("listen middleware order create failed, mono:%v, receiver:%v, err:%v", req.MerchantOrderNo, req.Receiver, err)
+			logx.Errorf("listen middleware order create failed, mono:%v, err:%v", req.MerchantOrderNo, err)
 
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)

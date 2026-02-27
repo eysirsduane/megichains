@@ -95,7 +95,6 @@ type ChainListenReq {
 	Chain           string `json:"chain"`
 	Currency        string `json:"currency"`
 	Mode            string `json:"mode,optional"`
-	Receiver        string `json:"receiver"`
 	Seconds         int64  `json:"seconds"`
 }
 
@@ -110,6 +109,15 @@ type ChainAddressCreateReq {
 	Count int16  `json:"count"`
 }
 
+type AddrFreeoneReq {
+	Chain    string `form:"chain"`
+	Currency string `form:"currency"`
+}
+
+type AddrFreeoneResp {
+	Address string `json:"address"`
+}
+
 @server (
 	// 代表当前 service 代码块下的所有路由均需要 jwt 鉴权
 	// goctl 生成代码时会将当前 service 代码块下的接口
@@ -121,7 +129,7 @@ type ChainAddressCreateReq {
 	// 定义路由前缀为 "/v1"
 	prefix: /v1
 )
-service gateway {
+service listener {
 	@handler RegisterHandler
 	post /auth/register (RegisterReq) returns (RegisterResp)
 
@@ -143,7 +151,7 @@ service gateway {
 	// 定义路由前缀为 "/v1"
 	prefix: /v1
 )
-service gateway {
+service listener {
 	@handler RefreshTokenHandler
 	post /auth/token/refresh (RefreshTokenReq) returns (RefreshTokenResp)
 
@@ -166,8 +174,11 @@ service gateway {
 	prefix:     /v1
 	middleware: ListenMiddleware
 )
-service gateway {
+service listener {
 	@handler ChainListenHandler
 	post /chain/listen (ChainListenReq) returns (ChainListenResp)
+
+	@handler AddrFreeoneHandler
+	get /addr/freeone (AddrFreeoneReq) returns (AddrFreeoneResp)
 }
 

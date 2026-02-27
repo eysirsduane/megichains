@@ -47,11 +47,50 @@ func (s *AddressService) Get(ctx context.Context, id int64) (resp *converter.Add
 	return
 }
 
-func (s *AddressService) FirstFree(ctx context.Context) (resp *converter.AddressItem, err error) {
-	now := time.Now().Add(time.Minute * -31).UnixMilli()
-	addr, err := gorm.G[entity.Address](s.db).Where("last_used_timestamp <= ? or last_used_timestamp is null", now).First(ctx)
+func (s *AddressService) FirstFree(chain global.ChainName, currency global.CurrencyTypo) (resp *converter.AddressItem, err error) {
+	order := ""
+	cname := chain
+	switch chain {
+	case global.ChainNameBsc:
+		switch currency {
+		case global.CurrencyTypoUsdt:
+			order = "bal.bsc_usdt desc"
+		case global.CurrencyTypoUsdc:
+			order = "bal.bsc_usdc desc"
+		}
+
+		cname = global.ChainNameEvm
+	case global.ChainNameEth:
+		switch currency {
+		case global.CurrencyTypoUsdt:
+			order = "bal.eth_usdt desc"
+		case global.CurrencyTypoUsdc:
+			order = "bal.eth_usdc desc"
+		}
+		cname = global.ChainNameEvm
+	case global.ChainNameTron:
+		switch currency {
+		case global.CurrencyTypoUsdt:
+			order = "bal.tron_usdt desc"
+		case global.CurrencyTypoUsdc:
+			order = "bal.tron_usdc desc"
+		}
+	case global.ChainNameSolana:
+		switch currency {
+		case global.CurrencyTypoUsdt:
+			order = "bal.solana_usdt desc"
+		case global.CurrencyTypoUsdc:
+			order = "bal.solana_usdc desc"
+		}
+	default:
+		err = biz.AddressFindFailed
+		return
+	}
+
+	addr := &entity.Address{}
+	err = s.db.Model(&entity.Address{}).Joins("left join address_balances as bal on addresses.address = bal.address").Order(order).Where("status = ? and chain = ?", global.AddressStatusInFree, cname).First(addr).Error
 	if err != nil {
-		logx.Errorf("address detail get failed, err:%v", err)
+		logx.Errorf("address first free one get failed, err:%v", err)
 		return
 	}
 

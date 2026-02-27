@@ -73,28 +73,35 @@ func NewListenService(cfg *global.BackendesConfig, db *gorm.DB, merchservice *Me
 	}
 }
 
-func (s *ListenService) updateAddressLastUsed(addr string) {
-	err := s.addrservice.SetLastUsed(addr)
+func (s *ListenService) changeAddressStatus(addr string, status global.AddressStatus) {
+	err := s.addrservice.ChangeStatus(addr, status)
 	if err != nil {
-		logx.Errorf("chain listen free address failed, addr:%v", addr)
+		logx.Errorf("chain listen update address status failed, addr:%v, status:%v", addr, status)
 		return
 	}
+
+	logx.Infof("chain listen change address status success, addr:%v, status:%v", addr, status)
 }
 
 func (s *ListenService) Listen(req *converter.ChainListenReq) {
-	key := global.GetOrderAddressKey(string(req.Chain), req.Receiver, req.Currency)
-	s.Receivers.Store(key, true)
-	defer s.Receivers.Delete(key)
 	defer s.clearClients()
 
 	order, err := s.orderservice.GetByMerchant(req.MerchantAccount, req.MerchantOrderNo)
 	if err != nil {
 		err = biz.OrderSaveFailed
-		logx.Errorf("chain listen order save failed, mono:%v, receiver:%v, err:%v", req.MerchantOrderNo, req.Receiver, err)
+		logx.Errorf("chain listen order save failed, mono:%v, err:%v", req.MerchantOrderNo, err)
 		return
 	}
 
-	s.updateAddressLastUsed(req.Receiver)
+	freeo, err := s.addrservice.FirstFree(req.Chain, global.CurrencyTypo(req.Currency))
+	if err != nil {
+		logx.Errorf("chain listen first free address failed, chain:%v, currency:%v, err:%v", req.Chain, req.Currency, err)
+		return
+	}
+
+	receiver := freeo.Address
+	s.changeAddressStatus(receiver, global.AddressStatusInUse)
+	defer s.changeAddressStatus(receiver, global.AddressStatusInFree)
 
 	req.Seconds += 120
 	switch req.Chain {
@@ -109,7 +116,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		item.RunningQueryCount++
 		emu.Unlock()
 
-		s.listenEvm(order, req.Chain, global.CurrencyTypo(req.Currency), req.Receiver, req.Seconds, item)
+		s.listenEvm(order, req.Chain, global.CurrencyTypo(req.Currency), receiver, req.Seconds, item)
 	case global.ChainNameTron:
 		tmu.Lock()
 		c, err1 := s.getClientItem(req.Chain)
@@ -120,7 +127,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		item := c.(*clients.TronClientItem)
 		tmu.Unlock()
 
-		s.listenTron(order, req.Chain, global.CurrencyTypo(req.Currency), req.Receiver, req.Seconds, item)
+		s.listenTron(order, req.Chain, global.CurrencyTypo(req.Currency), receiver, req.Seconds, item)
 	case global.ChainNameSolana:
 		emu.Lock()
 		c, err1 := s.getClientItem(req.Chain)
@@ -132,7 +139,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		item.RunningQueryCount++
 		emu.Unlock()
 
-		s.listenSolana(order, req.Chain, global.CurrencyTypo(req.Currency), req.Receiver, req.Seconds, item)
+		s.listenSolana(order, req.Chain, global.CurrencyTypo(req.Currency), receiver, req.Seconds, item)
 	default:
 		logx.Errorf("=== 监听了未知的链 ===")
 		return
@@ -173,7 +180,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		err = biz.OrderSaveFailed
 	}
 
-	logx.Infof("监听事务结束, chain:%v, clen:%v, from:%v", req.Chain, s.clilen, req.Receiver)
+	logx.Infof("监听事务结束, chain:%v, clen:%v, from:%v", req.Chain, s.clilen, receiver)
 }
 
 func (s *ListenService) NotifyMerchant(ilog *entity.MerchantOrderInteractionLog, merch *entity.Merchant, url, ono, mono, status, txid, from, to, currency string, amount float64, sun int64) (err error) {
@@ -635,10 +642,8 @@ func (s *ListenService) ListenMany() {
 	cnames := []string{"BSC", "ETH"}
 	currencys := []string{"USDT", "USDC"}
 
-	ctx := context.Background()
-
 	for {
-		addr, err := s.addrservice.FirstFree(ctx)
+		addr, err := s.addrservice.FirstFree(global.ChainNameBsc, global.CurrencyTypoUsdt)
 		if err != nil {
 			break
 		}
@@ -660,7 +665,6 @@ func (s *ListenService) ListenMany() {
 				Chain:           global.ChainName(addr.Chain),
 				Currency:        currency,
 				Mode:            string(global.OrderModeTest),
-				Receiver:        addr.Address,
 				Seconds:         600,
 			})
 

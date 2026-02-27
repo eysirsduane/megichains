@@ -42,6 +42,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Middleware{serverCtx.ListenMiddleware.Handle},
 			[]rest.Route{
 				{
+					Method:  http.MethodGet,
+					Path:    "/addr/freeone",
+					Handler: chain.AddrFreeoneHandler(serverCtx),
+				},
+				{
 					Method:  http.MethodPost,
 					Path:    "/chain/listen",
 					Handler: chain.ChainListenHandler(serverCtx),

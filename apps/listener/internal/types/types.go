@@ -3,6 +3,15 @@
 
 package types
 
+type AddrFreeoneReq struct {
+	Chain    string `form:"chain"`
+	Currency string `form:"currency"`
+}
+
+type AddrFreeoneResp struct {
+	Address string `json:"address"`
+}
+
 type BscLogItem struct {
 }
 
@@ -26,7 +35,6 @@ type ChainListenReq struct {
 	Chain           string `json:"chain"`
 	Currency        string `json:"currency"`
 	Mode            string `json:"mode,optional"`
-	Receiver        string `json:"receiver"`
 	Seconds         int64  `json:"seconds"`
 }
 

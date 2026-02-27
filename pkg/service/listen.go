@@ -174,6 +174,7 @@ func (s *ListenService) Listen(req *converter.ChainListenReq) {
 		err = biz.OrderInteractionLogSaveFailed
 	}
 
+	order.ToAddress = receiver
 	err = s.orderservice.Save(order)
 	if err != nil {
 		logx.Errorf("chain listen order update failed, ono:%v, mono:%v, txid:%v, err:%v", order.OrderNo, req.MerchantOrderNo, order.TransactionId, err)

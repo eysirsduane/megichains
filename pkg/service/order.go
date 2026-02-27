@@ -46,7 +46,7 @@ func (s *MerchOrderService) GetByMerchant(acc, mono string) (order *entity.Merch
 }
 
 func (s *MerchOrderService) Find(ctx context.Context, req *converter.OrderListReq) (resp *converter.RespConverter[entity.MerchantOrder], err error) {
-	db := gorm.G[entity.MerchantOrder](s.db).Order("updated_at desc")
+	db := gorm.G[entity.MerchantOrder](s.db).Order("id desc")
 	if req.Id > 0 {
 		db = db.Where("id = ?", req.Id)
 	}
